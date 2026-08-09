@@ -1,0 +1,102 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\User;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
+
+class DatabaseSeeder extends Seeder
+{
+    /**
+     * Seed the application's database.
+     */
+    public function run(): void
+    {
+        // 1. Seed Roles
+        DB::table('roles')->insert([
+            ['name' => 'Superadmin'],
+            ['name' => 'Applicant'],
+        ]);
+
+        // 2. Seed Users
+        $superadmin = User::create([
+            'role_id' => 1,
+            'nik' => '0000000000000000',
+            'name' => 'Super Administrator',
+            'email' => 'admin@mail.com',
+            'password' => Hash::make('admin123'),
+        ]);
+
+        $applicant = User::create([
+            'role_id' => 2,
+            'nik' => '3374000011112222',
+            'name' => 'Ilham Taruprasetyo',
+            'email' => 'ilham@gmail.com',
+            'password' => Hash::make('ilham123'),
+        ]);
+
+        // 3. Seed Company & Department
+        $companyId = DB::table('companies')->insertGetId([
+            'name' => 'Tech Corp Indonesia',
+            'city' => 'Semarang',
+            'province' => 'Jawa Tengah'
+        ]);
+
+        $deptId = DB::table('departments')->insertGetId([
+            'company_id' => $companyId,
+            'name' => 'Engineering',
+            'description' => 'Software & Hardware Division'
+        ]);
+
+        // 4. Seed Jobs
+        DB::table('jobs')->insert([
+            [
+                'company_id' => $companyId,
+                'department_id' => $deptId,
+                'title' => 'Frontend Developer',
+                'description' => 'Menguasai React JS, TailwindCSS.',
+                'employment_type' => 'Full-time',
+                'location' => 'Semarang',
+                'salary_min' => 5000000,
+                'salary_max' => 8000000,
+                'quota' => 2,
+                'deadline' => Carbon::now()->addDays(30),
+                'status' => 'Open'
+            ],
+            [
+                'company_id' => $companyId,
+                'department_id' => $deptId,
+                'title' => 'IoT Engineer',
+                'description' => 'Pengalaman dengan ESP32 dan Arduino.',
+                'employment_type' => 'Contract',
+                'location' => 'Remote',
+                'salary_min' => 6000000,
+                'salary_max' => 10000000,
+                'quota' => 1,
+                'deadline' => Carbon::now()->addDays(15),
+                'status' => 'Open'
+            ]
+        ]);
+
+        // 5. Seed Degrees & Majors
+        DB::table('degrees')->insert([
+            ['name' => 'SMA/SMK', 'rank' => 1, 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'D3', 'rank' => 2, 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'D4/S1', 'rank' => 3, 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'S2', 'rank' => 4, 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'S3', 'rank' => 5, 'created_at' => now(), 'updated_at' => now()],
+        ]);
+
+        DB::table('majors')->insert([
+            ['name' => 'Teknik Informatika', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Sistem Informasi', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Teknik Komputer', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Teknik Elektro', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Manajemen', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Akuntansi', 'created_at' => now(), 'updated_at' => now()],
+        ]);
+    }
+}
