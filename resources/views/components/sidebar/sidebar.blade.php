@@ -65,6 +65,34 @@
                     </div>
                 </div>
 
+                <!-- Section 3: Perusahaan & Divisi -->
+                <div>
+                    <div
+                        class="px-3 mb-2 text-[11px] font-bold tracking-wider text-gray-400 dark:text-gray-500 uppercase">
+                        Data Master
+                    </div>
+                    <div class="space-y-1">
+                        <x-sidebar.nested-nav-link title="Perusahaan" :active="request()->routeIs('admin.company*') || request()->routeIs('admin.department*')">
+                            <x-slot:icon>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
+                                </svg>
+                            </x-slot:icon>
+
+                            <a href="{{ route('admin.company') }}"
+                                class="block px-3 py-2 text-xs font-medium {{ request()->routeIs('admin.company*') ? 'text-indigo-600 dark:text-indigo-400 font-semibold bg-indigo-50/50 dark:bg-indigo-950/30' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/60' }} rounded-lg transition-colors">
+                                Profil Perusahaan
+                            </a>
+                            <a href="{{ route('admin.department') }}"
+                                class="block px-3 py-2 text-xs font-medium {{ request()->routeIs('admin.department*') ? 'text-indigo-600 dark:text-indigo-400 font-semibold bg-indigo-50/50 dark:bg-indigo-950/30' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/60' }} rounded-lg transition-colors">
+                                Departemen / Divisi
+                            </a>
+                        </x-sidebar.nested-nav-link>
+                    </div>
+                </div>
+
                 <!-- Section 2: Manajemen rekrutmen -->
                 <div>
                     <div
@@ -72,7 +100,11 @@
                         Rekrutmen
                     </div>
                     <div class="space-y-1">
-                        <x-sidebar.nested-nav-link title="Data Rekrutmen" :active="request()->routeIs('admin.job*') || request()->routeIs('admin.application*')">
+                        <x-sidebar.nested-nav-link title="Data Rekrutmen" :active="request()->routeIs('admin.job*') ||
+                            request()->routeIs('admin.application*') ||
+                            request()->routeIs('admin.candidate*') ||
+                            request()->routeIs('admin.test*') ||
+                            request()->routeIs('admin.test_evaluation*')">
                             <x-slot:icon>
                                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -81,6 +113,10 @@
 
                             </x-slot:icon>
 
+                            <a href="{{ route('admin.candidate') }}"
+                                class="block px-3 py-2 text-xs font-medium {{ request()->routeIs('admin.candidate') ? 'text-indigo-600 dark:text-indigo-400 font-semibold bg-indigo-50/50 dark:bg-indigo-950/30' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/60' }} rounded-lg transition-colors">
+                                Kandidat Pelamar
+                            </a>
                             <a href="{{ route('admin.job') }}"
                                 class="block px-3 py-2 text-xs font-medium {{ request()->routeIs('admin.job') ? 'text-indigo-600 dark:text-indigo-400 font-semibold bg-indigo-50/50 dark:bg-indigo-950/30' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/60' }} rounded-lg transition-colors">
                                 Lowongan Kerja
@@ -89,73 +125,37 @@
                                 class="block px-3 py-2 text-xs font-medium {{ request()->routeIs('admin.application') ? 'text-indigo-600 dark:text-indigo-400 font-semibold bg-indigo-50/50 dark:bg-indigo-950/30' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/60' }} rounded-lg transition-colors">
                                 Lamaran Masuk
                             </a>
+                            <a href="{{ route('admin.test') }}"
+                                class="block px-3 py-2 text-xs font-medium {{ request()->routeIs('admin.test') ? 'text-indigo-600 dark:text-indigo-400 font-semibold bg-indigo-50/50 dark:bg-indigo-950/30' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/60' }} rounded-lg transition-colors">
+                                Paket Ujian Tes
+                            </a>
+                            <a href="{{ route('admin.test_evaluation') }}"
+                                class="block px-3 py-2 text-xs font-medium {{ request()->routeIs('admin.test_evaluation') ? 'text-indigo-600 dark:text-indigo-400 font-semibold bg-indigo-50/50 dark:bg-indigo-950/30' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/60' }} rounded-lg transition-colors">
+                                Evaluasi & Nilai Ujian
+                            </a>
                         </x-sidebar.nested-nav-link>
                     </div>
                 </div>
 
-                <!-- Section 3: Perusahaan & Divisi -->
-                <div>
-                    <div
-                        class="px-3 mb-2 text-[11px] font-bold tracking-wider text-gray-400 dark:text-gray-500 uppercase">
-                        Perusahaan
-                    </div>
-                    <div class="space-y-1">
-                        <!-- Job Vacancies -->
-                        <x-sidebar.single-nav-link :href="route('admin.company')" :active="request()->routeIs('admin.company*')">
-                            <x-slot:icon>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                    stroke-width="1.5" stroke="currentColor" class="size-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
-                                </svg>
-                            </x-slot:icon>
-                            Profil Perusahaan
-                        </x-sidebar.single-nav-link>
-
-                        <!-- Applicants List -->
-                        <x-sidebar.single-nav-link :href="route('admin.department')" :active="request()->routeIs('admin.department*')">
-                            <x-slot:icon>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                    stroke-width="1.5" stroke="currentColor" class="size-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
-                                </svg>
-
-
-                            </x-slot:icon>
-                            Departemen/Divisi
-                        </x-sidebar.single-nav-link>
-                        {{-- 
-                        <x-sidebar.single-nav-link 
-                            href="#" 
-                            :active="false"
-                            badge="#">
-                            <x-slot:icon>
-                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                </svg>
-                            </x-slot:icon>
-                            Manajemen Lamaran
-                        </x-sidebar.single-nav-link> --}}
-                    </div>
-                </div>
 
                 <!-- Section 4: Data Master -->
                 <div>
                     <div
                         class="px-3 mb-2 text-[11px] font-bold tracking-wider text-gray-400 dark:text-gray-500 uppercase">
-                        Data Master
+                        Data Soal
                     </div>
                     <div class="space-y-1">
                         <x-sidebar.nested-nav-link title="Kualifikasi & Tes" :active="request()->routeIs('admin.major') ||
                             request()->routeIs('admin.degree') ||
-                            request()->routeIs('admin.test_category')">
+                            request()->routeIs('admin.test_category') ||
+                            request()->routeIs('admin.question_bank')">
                             <x-slot:icon>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                    stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <svg class="size-6" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                     <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+                                        d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
                                 </svg>
+
 
                             </x-slot:icon>
                             <a href="{{ route('admin.degree') }}"
@@ -169,6 +169,10 @@
                             <a href="{{ route('admin.test_category') }}"
                                 class="block px-3 py-2 text-xs font-medium {{ request()->routeIs('admin.test_category') ? 'text-indigo-600 dark:text-indigo-400 font-semibold bg-indigo-50/50 dark:bg-indigo-950/30' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/60' }} rounded-lg transition-colors">
                                 Kategori Soal
+                            </a>
+                            <a href="{{ route('admin.question_bank') }}"
+                                class="block px-3 py-2 text-xs font-medium {{ request()->routeIs('admin.question_bank') ? 'text-indigo-600 dark:text-indigo-400 font-semibold bg-indigo-50/50 dark:bg-indigo-950/30' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/60' }} rounded-lg transition-colors">
+                                Bank Soal
                             </a>
                         </x-sidebar.nested-nav-link>
                     </div>
@@ -202,10 +206,6 @@
                         </x-sidebar.nested-nav-link>
                     </div>
                 </div> --}}
-
-
-
-
                 <!-- Settings  taruh dalam div kalo dipake-->
                 {{-- <x-sidebar.single-nav-link 
                             href="#" 

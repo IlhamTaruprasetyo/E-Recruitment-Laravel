@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\JobApplication;
+use App\Models\ApplicationStatusHistory;
 
 class JobApplicationController extends Controller
 {
@@ -27,7 +28,8 @@ class JobApplicationController extends Controller
             'applicantProfile.user',
             'applicantProfile.educations',
             'applicantProfile.workExperiences',
-            'applicantProfile.skills'
+            'applicantProfile.skills',
+            'statusHistories.changedBy'
         ])->findOrFail($id);
 
         return response()->json($application);
@@ -45,12 +47,24 @@ class JobApplicationController extends Controller
             'notes' => 'nullable|string',
         ]);
 
+        $newStatus = $request->input('status', $application->status);
+        $notes = $request->input('notes', $application->notes);
+
         $application->update([
-            'status' => $request->input('status', $application->status),
-            'notes' => $request->input('notes', $application->notes),
+            'status' => $newStatus,
+            'notes' => $notes,
+        ]);
+
+        // Catat perubahan status secara otomatis ke application_status_history
+        ApplicationStatusHistory::create([
+            'job_applications_id' => $application->id,
+            'status'              => $newStatus,
+            'notes'               => $notes,
+            'changed_by'          => auth()->id() ?? 1,
+            'changed_at'          => now(),
         ]);
 
         return redirect()->route('admin.application')
-            ->with('update', 'Status lamaran berhasil diperbarui');
+            ->with('update', 'Status lamaran berhasil diperbarui dan dicatat ke riwayat status.');
     }
 }

@@ -4,31 +4,22 @@ namespace App\Livewire\Admin;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\JobApplication;
+use App\Models\User;
 
-class ApplicantTable extends Component
+class CandidateTable extends Component
 {
     use WithPagination;
 
     public $search = '';
-    public $statusFilter = '';
 
     public function updatingSearch()
     {
         $this->resetPage();
     }
 
-    public function updatingStatusFilter()
-    {
-        $this->resetPage();
-    }
-
     public function render()
     {
-        $applications = JobApplication::with([
-            'job.company',
-            'job.department',
-            'applicantProfile.user',
+        $candidates = User::with([
             'applicantProfile.educations',
             'applicantProfile.workExperiences',
             'applicantProfile.organizations',
@@ -37,36 +28,28 @@ class ApplicantTable extends Component
             'applicantProfile.skills',
             'applicantProfile.socialMedias',
             'applicantProfile.languages',
-            'statusHistories.changedBy'
+            'applicantProfile.jobApplications.job.company'
         ])
+        ->whereHas('applicantProfile')
         ->when($this->search, function ($query) {
             $search = strtolower(trim($this->search));
             $query->where(function ($q) use ($search) {
-                $q->whereRaw('LOWER(status) LIKE ?', ['%' . $search . '%'])
+                $q->whereRaw('LOWER(name) LIKE ?', ['%' . $search . '%'])
+                  ->orWhereRaw('LOWER(email) LIKE ?', ['%' . $search . '%'])
                   ->orWhereHas('applicantProfile', function ($apq) use ($search) {
                       $apq->whereRaw('LOWER(full_name) LIKE ?', ['%' . $search . '%'])
                           ->orWhereRaw('LOWER(city) LIKE ?', ['%' . $search . '%'])
+                          ->orWhereRaw('LOWER(province) LIKE ?', ['%' . $search . '%'])
                           ->orWhereRaw('LOWER(nik) LIKE ?', ['%' . $search . '%'])
-                          ->orWhereHas('user', function ($uq) use ($search) {
-                              $uq->whereRaw('LOWER(email) LIKE ?', ['%' . $search . '%']);
-                          });
-                  })
-                  ->orWhereHas('job', function ($jq) use ($search) {
-                      $jq->whereRaw('LOWER(title) LIKE ?', ['%' . $search . '%'])
-                        ->orWhereHas('company', function ($cq) use ($search) {
-                            $cq->whereRaw('LOWER(name) LIKE ?', ['%' . $search . '%']);
-                        });
+                          ->orWhereRaw('LOWER(phone) LIKE ?', ['%' . $search . '%']);
                   });
             });
-        })
-        ->when($this->statusFilter, function ($query) {
-            $query->where('status', $this->statusFilter);
         })
         ->orderBy('id', 'desc')
         ->paginate(10);
 
-        return view('livewire.admin.applicants.table', [
-            'applications' => $applications,
+        return view('livewire.admin.candidates.table', [
+            'candidates' => $candidates
         ]);
     }
 }
