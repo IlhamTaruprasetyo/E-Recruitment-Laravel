@@ -13,8 +13,13 @@ class QuestionBank extends Model
         'category_id',
         'question',
         'question_type',
+        'metadata',
         'image_path',
         'points',
+    ];
+
+    protected $casts = [
+        'metadata' => 'array',
     ];
 
     public function category(): BelongsTo

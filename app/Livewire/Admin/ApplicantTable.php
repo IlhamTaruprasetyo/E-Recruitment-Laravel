@@ -5,6 +5,7 @@ namespace App\Livewire\Admin;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\JobApplication;
+use Illuminate\Support\Facades\DB;
 
 class ApplicantTable extends Component
 {
@@ -25,6 +26,9 @@ class ApplicantTable extends Component
 
     public function render()
     {
+        $user = auth()->user();
+        $isRecruiterOnly = $user && ($user->role_id == 2 || strtolower($user->role?->name ?? '') === 'recruiter');
+
         $applications = JobApplication::with([
             'job.company',
             'job.department',
@@ -39,6 +43,14 @@ class ApplicantTable extends Component
             'applicantProfile.languages',
             'statusHistories.changedBy'
         ])
+        ->when($isRecruiterOnly, function ($query) {
+            $query->whereHas('job', function ($jq) {
+                $jq->whereIn(DB::raw('LOWER(status)'), ['open', 'published', 'active', 'draft'])
+                  ->where(function($q) {
+                      $q->whereNull('deadline')->orWhere('deadline', '>=', now()->toDateString());
+                  });
+            });
+        })
         ->when($this->search, function ($query) {
             $search = strtolower(trim($this->search));
             $query->where(function ($q) use ($search) {

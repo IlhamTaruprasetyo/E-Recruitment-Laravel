@@ -78,10 +78,16 @@ class LoginForm extends Form
             return route('dashboard', absolute: false);
         }
 
-        return match (strtolower($user->role?->name ?? '')) {
-            'superadmin', 'admin' => route('admin.dashboard', absolute: false),
-            'applicant' => url('/'),
-            default => url('/'),
-        };
+        $roleName = strtolower($user->role?->name ?? '');
+
+        if ($user->role_id == 1 || in_array($roleName, ['superadmin', 'admin'])) {
+            return route('admin.dashboard', absolute: false);
+        }
+
+        if ($user->role_id == 2 || $roleName === 'recruiter') {
+            return route('recruiter.dashboard', absolute: false);
+        }
+
+        return url('/');
     }
 }

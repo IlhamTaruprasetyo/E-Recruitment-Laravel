@@ -44,7 +44,7 @@ class User extends Authenticatable
     protected static function booted(): void
     {
         static::created(function (User $user) {
-            if ($user->role_id == 2) {
+            if ($user->role_id == 3 || strtolower($user->role?->name ?? '') === 'applicant') {
                 ApplicantProfile::firstOrCreate(
                     ['user_id' => $user->id],
                     [

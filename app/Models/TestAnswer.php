@@ -13,6 +13,7 @@ class TestAnswer extends Model
         'attempt_id',
         'question_id',
         'option_id',
+        'answer_type',// e.g. most, least, default
         'essay_answer',
         'score',
         'reviewed_by',

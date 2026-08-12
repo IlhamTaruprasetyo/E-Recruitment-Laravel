@@ -35,4 +35,46 @@ class ApplicantProfile extends Model
     public function skills() { return $this->hasMany(Skill::class, 'profile_id'); }
     public function socialMedias() { return $this->hasMany(SocialMedia::class, 'profile_id'); }
     public function languages() { return $this->hasMany(Language::class, 'profile_id'); }
+
+    /**
+     * Get section completion status map
+     */
+    public function getSectionStatusesAttribute(): array
+    {
+        return [
+            'pribadi' => !empty($this->nik) && !empty($this->full_name) && !empty($this->phone) && !empty($this->address),
+            'pendidikan' => $this->educations()->exists(),
+            'pengalaman' => $this->workExperiences()->exists(),
+            'organisasi' => $this->organizations()->exists(),
+            'prestasi' => $this->achievements()->exists(),
+            'social_media' => $this->socialMedias()->exists(),
+            'data_tambahan' => $this->skills()->exists() || $this->certifications()->exists() || $this->trainings()->exists() || $this->languages()->exists(),
+        ];
+    }
+
+    /**
+     * Calculate profile completion percentage (0 - 100%)
+     */
+    public function getCompletionPercentageAttribute(): int
+    {
+        $statuses = $this->section_statuses;
+        $weights = [
+            'pribadi' => 20,
+            'pendidikan' => 20,
+            'pengalaman' => 15,
+            'organisasi' => 10,
+            'prestasi' => 10,
+            'social_media' => 10,
+            'data_tambahan' => 15,
+        ];
+
+        $totalPercentage = 0;
+        foreach ($weights as $key => $weight) {
+            if (!empty($statuses[$key])) {
+                $totalPercentage += $weight;
+            }
+        }
+
+        return min(100, $totalPercentage);
+    }
 }

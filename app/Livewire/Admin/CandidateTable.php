@@ -30,7 +30,13 @@ class CandidateTable extends Component
             'applicantProfile.languages',
             'applicantProfile.jobApplications.job.company'
         ])
-        ->whereHas('applicantProfile')
+        ->where(function ($q) {
+            $q->where('role_id', 3)
+              ->orWhereHas('role', function ($rq) {
+                  $rq->whereRaw('LOWER(name) = ?', ['applicant']);
+              })
+              ->orWhereHas('applicantProfile');
+        })
         ->when($this->search, function ($query) {
             $search = strtolower(trim($this->search));
             $query->where(function ($q) use ($search) {

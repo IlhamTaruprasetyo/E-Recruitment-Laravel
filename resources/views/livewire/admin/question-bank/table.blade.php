@@ -162,6 +162,7 @@
                     <option value="">Semua Jenis</option>
                     <option value="multiple_choice">Pilihan Ganda</option>
                     <option value="essay">Uraian / Essay</option>
+                    <option value="disc">Tes DISC</option>
                 </select>
 
                 @if ($search || $categoryId || $type)
@@ -188,7 +189,19 @@
     </div>
 
     <!-- Data Table Section -->
-    <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+    <div class="relative bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+        
+        <!-- Livewire Loading Overlay -->
+        <div wire:loading wire:target="search, categoryFilter, typeFilter, previousPage, nextPage, gotoPage" class="absolute inset-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-[1px] flex items-center justify-center z-10 transition">
+            <div class="flex items-center gap-2.5 px-4 py-2.5 bg-slate-900/90 dark:bg-slate-800/90 text-white rounded-xl shadow-xl text-xs font-semibold">
+                <svg class="animate-spin w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Memuat data...</span>
+            </div>
+        </div>
+
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse text-xs">
                 <thead>
@@ -209,8 +222,8 @@
                             </td>
                             <td class="px-6 py-4 max-w-md">
                                 <div class="space-y-1">
-                                    <p class="font-bold text-gray-900 dark:text-white line-clamp-2">
-                                        {{ $q->question }}
+                                    <p class="font-bold text-gray-900 dark:text-white line-clamp-2" title="{{ $q->question }}">
+                                        {{ Str::limit(trim($q->question), 120) }}
                                     </p>
                                     @if ($q->image_path)
                                         <div class="flex items-center gap-1.5 text-[11px] text-indigo-600 dark:text-indigo-400">
@@ -249,6 +262,13 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
                                         Pilihan Ganda
+                                    </span>
+                                @elseif ($q->question_type === 'disc')
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
+                                        Tes DISC
                                     </span>
                                 @else
                                     <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
@@ -340,6 +360,7 @@
                                 <select name="question_type" id="create_question_type" x-model="createType" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
                                     <option value="multiple_choice">Pilihan Ganda</option>
                                     <option value="essay">Uraian / Essay</option>
+                                    <option value="disc">Tes DISC</option>
                                 </select>
                                 @error('question_type')
                                     <p class="mt-1 text-[11px] text-rose-500">{{ $message }}</p>
@@ -475,6 +496,7 @@
                                 <select name="question_type" id="edit_question_type" x-model="editData.question_type" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
                                     <option value="multiple_choice">Pilihan Ganda</option>
                                     <option value="essay">Uraian / Essay</option>
+                                    <option value="disc">Tes DISC</option>
                                 </select>
                                 @error('question_type')
                                     <p class="mt-1 text-[11px] text-rose-500">{{ $message }}</p>
@@ -631,6 +653,23 @@
                                                 Kunci Jawaban
                                             </span>
                                         </template>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+
+                    <template x-if="detailData.question_type === 'disc'">
+                        <div>
+                            <h4 class="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2">Daftar Opsi Pernyataan DISC:</h4>
+                            <div class="space-y-2">
+                                <template x-for="(opt, idx) in detailData.options" :key="opt.id || idx">
+                                    <div class="flex items-center justify-between p-3 rounded-xl border bg-purple-50/50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-800/50 text-gray-800 dark:text-slate-200">
+                                        <div class="flex items-center gap-3">
+                                            <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold bg-purple-600 text-white" x-text="opt.attribute_tag || (idx + 1)"></span>
+                                            <span class="text-xs" x-text="opt.option_text"></span>
+                                        </div>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-700" x-text="'Dimensi ' + (opt.attribute_tag || '-')"></span>
                                     </div>
                                 </template>
                             </div>

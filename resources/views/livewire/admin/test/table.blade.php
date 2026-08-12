@@ -36,6 +36,12 @@
         questions: []
     },
 
+    categoriesMap: {{ json_encode($categories->pluck('name', 'id')) }},
+    isDiscCategory(catId) {
+        let name = this.categoriesMap[catId] || '';
+        return name.toLowerCase().includes('disc');
+    },
+
     openEditModal(test) {
         let qIds = [];
         if (test.questions) {
@@ -177,7 +183,19 @@
     </div>
 
     <!-- Data Table Section -->
-    <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+    <div class="relative bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+        
+        <!-- Livewire Loading Overlay -->
+        <div wire:loading wire:target="search, jobFilter, categoryFilter, previousPage, nextPage, gotoPage" class="absolute inset-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-[1px] flex items-center justify-center z-10 transition">
+            <div class="flex items-center gap-2.5 px-4 py-2.5 bg-slate-900/90 dark:bg-slate-800/90 text-white rounded-xl shadow-xl text-xs font-semibold">
+                <svg class="animate-spin w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Memuat data...</span>
+            </div>
+        </div>
+
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse text-xs">
                 <thead>
@@ -228,9 +246,15 @@
                                         </svg>
                                         {{ $t->duration_minutes }} Menit
                                     </div>
-                                    <div class="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
-                                        KKM: {{ number_format($t->passing_score, 0) }}%
-                                    </div>
+                                    @if (str_contains(strtolower($t->category->name ?? ''), 'disc'))
+                                        <div class="text-[11px] text-purple-600 dark:text-purple-400 font-semibold">
+                                            Tanpa KKM (Profil)
+                                        </div>
+                                    @else
+                                        <div class="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                                            KKM: {{ number_format($t->passing_score, 0) }}%
+                                        </div>
+                                    @endif
                                 </div>
                             </td>
                             <td class="px-6 py-4">
@@ -347,7 +371,18 @@
                                 <label for="create_category_id" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
                                     Kategori Soal <span class="text-rose-500">*</span>
                                 </label>
-                                <select name="category_id" id="create_category_id" x-model="createCategoryId" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                <select name="category_id" id="create_category_id" x-model="createCategoryId" 
+                                    @change="
+                                        if (isDiscCategory(createCategoryId)) {
+                                            $nextTick(() => {
+                                                let kkmInput = document.getElementById('create_passing_score');
+                                                let totalInput = document.getElementById('create_total_questions');
+                                                if (kkmInput) kkmInput.value = 0;
+                                                if (totalInput) totalInput.value = 24;
+                                            });
+                                        }
+                                    "
+                                    required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
                                     <option value="">-- Pilih Kategori Soal --</option>
                                     @foreach ($categories as $cat)
                                         <option value="{{ $cat->id }}">
@@ -388,7 +423,14 @@
                                 <label for="create_passing_score" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
                                     Nilai KKM (%) <span class="text-rose-500">*</span>
                                 </label>
-                                <input type="number" step="0.01" name="passing_score" id="create_passing_score" min="0" max="100" value="{{ old('passing_score', 75) }}" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                <input type="number" step="0.01" name="passing_score" id="create_passing_score" min="0" max="100" 
+                                    :value="isDiscCategory(createCategoryId) ? 0 : 75" 
+                                    :readonly="isDiscCategory(createCategoryId)"
+                                    :class="isDiscCategory(createCategoryId) ? 'opacity-60 bg-gray-200 cursor-not-allowed' : ''"
+                                    required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                <template x-if="isDiscCategory(createCategoryId)">
+                                    <p class="mt-1 text-[10px] text-purple-500 font-semibold">Tanpa KKM (Tes Profil)</p>
+                                </template>
                                 @error('passing_score')
                                     <p class="mt-1 text-[11px] text-rose-500">{{ $message }}</p>
                                 @enderror
@@ -398,7 +440,14 @@
                                 <label for="create_total_questions" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
                                     Jumlah Soal <span class="text-rose-500">*</span>
                                 </label>
-                                <input type="number" name="total_questions" id="create_total_questions" min="1" value="{{ old('total_questions', 10) }}" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                <input type="number" name="total_questions" id="create_total_questions" min="1" 
+                                    :value="isDiscCategory(createCategoryId) ? 24 : 10" 
+                                    :readonly="isDiscCategory(createCategoryId)"
+                                    :class="isDiscCategory(createCategoryId) ? 'opacity-60 bg-gray-200 cursor-not-allowed' : ''"
+                                    required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                <template x-if="isDiscCategory(createCategoryId)">
+                                    <p class="mt-1 text-[10px] text-purple-500 font-semibold">Standar 24 Soal DISC</p>
+                                </template>
                                 @error('total_questions')
                                     <p class="mt-1 text-[11px] text-rose-500">{{ $message }}</p>
                                 @enderror
@@ -424,7 +473,22 @@
                                     </label>
                                     <p class="text-[11px] text-gray-500 dark:text-slate-400">Centang soal-soal yang ingin disertakan ke dalam paket ujian ini.</p>
                                 </div>
-                                <span class="text-xs font-semibold text-indigo-600 dark:text-indigo-400" x-text="createSelectedQuestions.length + ' Soal Dipilih'"></span>
+                                <div class="flex items-center gap-3">
+                                    <button type="button" 
+                                        @click="
+                                            let availableIds = {{ json_encode($allQuestions->map(fn($q) => ['id' => (string)$q->id, 'category_id' => (string)$q->category_id])) }}.filter(q => !createCategoryId || q.category_id == createCategoryId).map(q => q.id);
+                                            let allSelected = availableIds.every(id => createSelectedQuestions.includes(id));
+                                            if (allSelected) {
+                                                createSelectedQuestions = createSelectedQuestions.filter(id => !availableIds.includes(id));
+                                            } else {
+                                                createSelectedQuestions = Array.from(new Set([...createSelectedQuestions, ...availableIds]));
+                                            }
+                                        " 
+                                        class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
+                                        Pilih Semua
+                                    </button>
+                                    <span class="text-xs font-semibold text-indigo-600 dark:text-indigo-400" x-text="createSelectedQuestions.length + ' Soal Dipilih'"></span>
+                                </div>
                             </div>
 
                             <div class="max-h-60 overflow-y-auto border border-gray-200 dark:border-slate-700 rounded-xl divide-y divide-gray-100 dark:divide-slate-800">
@@ -555,7 +619,14 @@
                                 <label for="edit_passing_score" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
                                     Nilai KKM (%) <span class="text-rose-500">*</span>
                                 </label>
-                                <input type="number" step="0.01" name="passing_score" id="edit_passing_score" min="0" max="100" x-model="editData.passing_score" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                <input type="number" step="0.01" name="passing_score" id="edit_passing_score" min="0" max="100" 
+                                    x-model="editData.passing_score" 
+                                    :readonly="isDiscCategory(editData.category_id)"
+                                    :class="isDiscCategory(editData.category_id) ? 'opacity-60 bg-gray-200 cursor-not-allowed' : ''"
+                                    required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                <template x-if="isDiscCategory(editData.category_id)">
+                                    <p class="mt-1 text-[10px] text-purple-500 font-semibold">Tanpa KKM (Tes Profil)</p>
+                                </template>
                                 @error('passing_score')
                                     <p class="mt-1 text-[11px] text-rose-500">{{ $message }}</p>
                                 @enderror
@@ -565,7 +636,14 @@
                                 <label for="edit_total_questions" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
                                     Jumlah Soal <span class="text-rose-500">*</span>
                                 </label>
-                                <input type="number" name="total_questions" id="edit_total_questions" min="1" x-model="editData.total_questions" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                <input type="number" name="total_questions" id="edit_total_questions" min="1" 
+                                    x-model="editData.total_questions" 
+                                    :readonly="isDiscCategory(editData.category_id)"
+                                    :class="isDiscCategory(editData.category_id) ? 'opacity-60 bg-gray-200 cursor-not-allowed' : ''"
+                                    required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                <template x-if="isDiscCategory(editData.category_id)">
+                                    <p class="mt-1 text-[10px] text-purple-500 font-semibold">Standar 24 Soal DISC</p>
+                                </template>
                                 @error('total_questions')
                                     <p class="mt-1 text-[11px] text-rose-500">{{ $message }}</p>
                                 @enderror
@@ -591,7 +669,22 @@
                                     </label>
                                     <p class="text-[11px] text-gray-500 dark:text-slate-400">Centang untuk menambahkan atau melepaskan soal dari paket ini.</p>
                                 </div>
-                                <span class="text-xs font-semibold text-indigo-600 dark:text-indigo-400" x-text="editData.selected_questions.length + ' Soal Terikat'"></span>
+                                <div class="flex items-center gap-3">
+                                    <button type="button" 
+                                        @click="
+                                            let availableIds = {{ json_encode($allQuestions->map(fn($q) => ['id' => (string)$q->id, 'category_id' => (string)$q->category_id])) }}.filter(q => !editData.category_id || q.category_id == editData.category_id).map(q => q.id);
+                                            let allSelected = availableIds.every(id => editData.selected_questions.includes(id));
+                                            if (allSelected) {
+                                                editData.selected_questions = editData.selected_questions.filter(id => !availableIds.includes(id));
+                                            } else {
+                                                editData.selected_questions = Array.from(new Set([...editData.selected_questions, ...availableIds]));
+                                            }
+                                        " 
+                                        class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
+                                        Pilih Semua
+                                    </button>
+                                    <span class="text-xs font-semibold text-indigo-600 dark:text-indigo-400" x-text="editData.selected_questions.length + ' Soal Terikat'"></span>
+                                </div>
                             </div>
 
                             <div class="max-h-60 overflow-y-auto border border-gray-200 dark:border-slate-700 rounded-xl divide-y divide-gray-100 dark:divide-slate-800">
@@ -669,7 +762,7 @@
                         </div>
                         <div class="p-3 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
                             <span class="block text-[10px] text-gray-400 font-semibold uppercase">Nilai KKM</span>
-                            <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400" x-text="detailData.passing_score + '%'"></span>
+                            <span class="text-xs font-bold" :class="isDiscCategory(detailData.category_id) ? 'text-purple-600 dark:text-purple-400' : 'text-emerald-600 dark:text-emerald-400'" x-text="isDiscCategory(detailData.category_id) ? 'Tanpa KKM' : detailData.passing_score + '%'"></span>
                         </div>
                         <div class="p-3 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
                             <span class="block text-[10px] text-gray-400 font-semibold uppercase">Opsi Acak</span>

@@ -16,26 +16,33 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. Seed Roles
-        DB::table('roles')->insert([
-            ['name' => 'Superadmin'],
-            ['name' => 'Applicant'],
-        ]);
+        DB::table('roles')->updateOrInsert(['id' => 1], ['name' => 'Admin']);
+        DB::table('roles')->updateOrInsert(['id' => 2], ['name' => 'Recruiter']);
+        DB::table('roles')->updateOrInsert(['id' => 3], ['name' => 'Applicant']);
 
         // 2. Seed Users
         $superadmin = User::create([
             'role_id' => 1,
             'nik' => '0000000000000000',
-            'name' => 'Super Administrator',
+            'name' => 'Administrator',
             'email' => 'admin@mail.com',
             'password' => Hash::make('admin123'),
         ]);
 
         $applicant = User::create([
-            'role_id' => 2,
+            'role_id' => 3,
             'nik' => '3374000011112222',
             'name' => 'Ilham Taruprasetyo',
             'email' => 'ilham@gmail.com',
             'password' => Hash::make('ilham123'),
+        ]);
+
+        $recruiter = User::create([
+            'role_id' => 2,
+            'nik' => '9999999999999999',
+            'name' => 'Recruiter Team',
+            'email' => 'recruiter@mail.com',
+            'password' => Hash::make('recruiter123'),
         ]);
 
         // 3. Seed Company & Department
@@ -98,5 +105,9 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Manajemen', 'created_at' => now(), 'updated_at' => now()],
             ['name' => 'Akuntansi', 'created_at' => now(), 'updated_at' => now()],
         ]);
+
+        // 6. Seed DISC Master Data & Questions
+        $this->call(DiscMasterSeeder::class);
+        // $this->call(DiscQuestionSeeder::class);
     }
 }

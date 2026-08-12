@@ -1,6 +1,7 @@
 <div class="space-y-6" x-data="{ 
     showDetailModal: false,
     showStatusModal: false,
+    isSubmittingStatus: false,
     detailData: {},
     statusData: {
         id: '',
@@ -81,7 +82,19 @@
     </div>
 
     <!-- Data Table Section -->
-    <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+    <div class="relative bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+        
+        <!-- Livewire Loading Overlay -->
+        <div wire:loading wire:target="search, statusFilter, previousPage, nextPage, gotoPage" class="absolute inset-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-[1px] flex items-center justify-center z-10 transition">
+            <div class="flex items-center gap-2.5 px-4 py-2.5 bg-slate-900/90 dark:bg-slate-800/90 text-white rounded-xl shadow-xl text-xs font-semibold">
+                <svg class="animate-spin w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Memuat data...</span>
+            </div>
+        </div>
+
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse text-xs">
                 <thead>
@@ -534,7 +547,11 @@
                         </button>
                     </div>
 
-                    <form :action="'/admin/applicants/' + statusData.id" method="POST" class="mt-4 space-y-4">
+                    @php
+                        $isRecruiter = auth()->check() && (auth()->user()->role_id == 2 || strtolower(auth()->user()->role?->name ?? '') === 'recruiter');
+                        $formActionPrefix = $isRecruiter ? '/recruiter/applicants/' : '/admin/applicants/';
+                    @endphp
+                    <form :action="'{{ $formActionPrefix }}' + statusData.id" method="POST" @submit="isSubmittingStatus = true" class="mt-4 space-y-4">
                         @csrf
                         @method('PUT')
 
@@ -572,8 +589,12 @@
                             <button type="button" @click="showStatusModal = false" class="px-4 py-2 text-xs font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition">
                                 Batal
                             </button>
-                            <button type="submit" class="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-md shadow-indigo-500/20 transition">
-                                Simpan Perubahan Status
+                            <button type="submit" :disabled="isSubmittingStatus" class="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-md shadow-indigo-500/20 transition flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+                                <svg x-show="isSubmittingStatus" class="animate-spin w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <span x-text="isSubmittingStatus ? 'Menyimpan...' : 'Simpan Perubahan Status'"></span>
                             </button>
                         </div>
                     </form>

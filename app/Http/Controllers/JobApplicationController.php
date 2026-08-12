@@ -40,7 +40,20 @@ class JobApplicationController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $application = JobApplication::findOrFail($id);
+        $application = JobApplication::with('job')->findOrFail($id);
+
+        $user = auth()->user();
+        $isRecruiter = $user && ($user->role_id == 2 || strtolower($user->role?->name ?? '') === 'recruiter');
+        $redirectRoute = $isRecruiter ? 'recruiter.application' : 'admin.application';
+
+        if ($isRecruiter) {
+            $job = $application->job;
+            $isActive = $job && $job->status === 'Open' && (! $job->deadline || $job->deadline >= now()->toDateString());
+            if (! $isActive) {
+                return redirect()->route($redirectRoute)
+                    ->with('error', 'Recruiter hanya diperbolehkan menyeleksi CV pada lowongan yang aktif.');
+            }
+        }
 
         $request->validate([
             'status' => 'required|string|max:255',
@@ -64,7 +77,7 @@ class JobApplicationController extends Controller
             'changed_at'          => now(),
         ]);
 
-        return redirect()->route('admin.application')
+        return redirect()->route($redirectRoute)
             ->with('update', 'Status lamaran berhasil diperbarui dan dicatat ke riwayat status.');
     }
 }

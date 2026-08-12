@@ -1,38 +1,59 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="flex justify-between items-center">
+    <div x-on:switch-tab.window="activeTab = $event.detail">
+        <x-slot name="header">
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                {{ __('Profile') }}
+                {{ __('Profil Saya') }}
             </h2>
-            {{-- @if(!in_array(strtolower(auth()->user()->role?->name ?? ''), ['admin', 'superadmin']))
-                <a href="{{ url('/') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm transition duration-150 ease-in-out">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                    </svg>
-                    <span>Kembali ke Beranda</span>
-                </a>
-            @endif --}}
-        </div>
-    </x-slot>
+        </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    <livewire:profile.update-profile-information-form />
+        <div class="py-4 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto space-y-3">
+                
+                <!-- Tab 1: Data Pribadi -->
+                <div x-show="activeTab === 'pribadi'" class="space-y-3">
+                    <livewire:applicant.pribadi />
                 </div>
-            </div>
 
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    <livewire:profile.update-password-form />
+                <!-- Tab 2: Pendidikan -->
+                <div x-show="activeTab === 'pendidikan'" class="space-y-3" x-cloak>
+                    <livewire:applicant.pendidikan />
                 </div>
-            </div>
 
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    <livewire:profile.delete-user-form />
+                <!-- Tab 3: Pengalaman Kerja -->
+                <div x-show="activeTab === 'pengalaman'" class="space-y-3" x-cloak>
+                    @include('livewire.applicant.pengalaman')
                 </div>
+
+                <!-- Tab 4: Organisasi -->
+                <div x-show="activeTab === 'organisasi'" class="space-y-3" x-cloak>
+                    @include('livewire.applicant.organisasi')
+                </div>
+
+                <!-- Tab 5: Prestasi -->
+                <div x-show="activeTab === 'prestasi'" class="space-y-3" x-cloak>
+                    @include('livewire.applicant.prestasi')
+                </div>
+
+                <!-- Tab 6: Social Media -->
+                <div x-show="activeTab === 'social_media'" class="space-y-3" x-cloak>
+                    @include('livewire.applicant.social_media')
+                </div>
+
+                <!-- Tab 7: Data Tambahan -->
+                <div x-show="activeTab === 'data_tambahan'" class="space-y-3" x-cloak>
+                    @include('livewire.applicant.data_tambahan')
+                </div>
+
+                <!-- Tab 8: Riwayat Lamaran -->
+                <div x-show="activeTab === 'riwayat'" class="space-y-3" x-cloak>
+                    @include('livewire.applicant.riwayat')
+                </div>
+
+                <!-- Tab 9: Pengaturan Akun -->
+                <div x-show="activeTab === 'pengaturan'" class="space-y-3" x-cloak>
+                    @include('livewire.applicant.pengaturan')
+                </div>
+
             </div>
         </div>
     </div>

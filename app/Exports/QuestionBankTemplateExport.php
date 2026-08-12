@@ -59,6 +59,17 @@ class QuestionBankTemplateExport implements FromCollection, WithHeadings, WithTi
                 'opsi_d' => '',
                 'kunci_jawaban' => '',
             ],
+            [
+                'kategori' => 'Tes Kepribadian (DISC)',
+                'soal' => 'Pilihlah satu yang Paling Menggambarkan (Most) dan Satu yang Paling Tidak Menggambarkan (Least) diri Anda. (Soal Nomor 1)',
+                'tipe_soal' => 'disc',
+                'poin' => 1,
+                'opsi_a' => 'Petualang, Mengambil resiko (Tag: D)',
+                'opsi_b' => 'Percaya, Mudah percaya pada orang (Tag: I)',
+                'opsi_c' => 'Gampang gaul, Mudah setuju (Tag: S)',
+                'opsi_d' => 'Toleran, Menghormati (Tag: C)',
+                'kunci_jawaban' => '',
+            ],
         ]);
     }
 

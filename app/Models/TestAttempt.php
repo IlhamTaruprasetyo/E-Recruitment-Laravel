@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
 class TestAttempt extends Model
 {
     public $timestamps = false;
@@ -35,5 +37,10 @@ class TestAttempt extends Model
     public function answers(): HasMany
     {
         return $this->hasMany(TestAnswer::class, 'attempt_id');
+    }
+
+    public function discTestResult(): HasOne
+    {
+        return $this->hasOne(DiscTestResult::class, 'test_attempt_id');
     }
 }

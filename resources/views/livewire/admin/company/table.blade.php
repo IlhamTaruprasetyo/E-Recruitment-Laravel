@@ -2,7 +2,9 @@
     showCreateModal: {{ $errors->any() && !old('is_edit') ? 'true' : 'false' }},
     showEditModal: {{ $errors->any() && old('is_edit') ? 'true' : 'false' }},
     showDeleteModal: false,
+    isSubmittingCreate: false,
     isSubmitting: false,
+    isSubmittingDelete: false,
     editData: {
         id: '{{ old('id', '') }}',
         role_id: '{{ old('role_id', '') }}',
@@ -141,7 +143,19 @@
 
     <!-- Data Table Section -->
     <div
-        class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+        class="relative bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+        
+        <!-- Livewire Loading Overlay -->
+        <div wire:loading wire:target="search, previousPage, nextPage, gotoPage" class="absolute inset-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-[1px] flex items-center justify-center z-10 transition">
+            <div class="flex items-center gap-2.5 px-4 py-2.5 bg-slate-900/90 dark:bg-slate-800/90 text-white rounded-xl shadow-xl text-xs font-semibold">
+                <svg class="animate-spin w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Memuat data...</span>
+            </div>
+        </div>
+
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse text-xs">
                 <thead>
@@ -159,7 +173,7 @@
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
                                     @if ($company->logo)
-                                        <img src="{{ asset('storage/' . $company->logo) }}" alt="{{ $company->name }}"
+                                        <img src="{{ \Illuminate\Support\Str::startsWith($company->logo, 'http') ? $company->logo : asset('storage/' . $company->logo) }}" alt="{{ $company->name }}"
                                             class="w-10 h-10 rounded-xl object-cover border border-gray-200 dark:border-slate-700 shadow-sm shrink-0">
                                     @else
                                         <div
@@ -216,7 +230,7 @@
                                         'city' => $company->city,
                                         'province' => $company->province,
                                         'address' => $company->address,
-                                        'logo' => $company->logo ? asset('storage/' . $company->logo) : null
+                                        'logo' => $company->logo ? (\Illuminate\Support\Str::startsWith($company->logo, 'http') ? $company->logo : asset('storage/' . $company->logo)) : null
                                     ]) }})"
                                         class="p-1.5 rounded-lg text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
                                         title="Edit">
@@ -289,9 +303,8 @@
                         </button>
                     </div>
 
-                    <form action="{{ route('admin.company.store') }}" method="POST" enctype="multipart/form-data" class="mt-4 space-y-4">
+                    <form action="{{ route('admin.company.store') }}" method="POST" enctype="multipart/form-data" @submit="isSubmittingCreate = true" class="mt-4 space-y-4">
                         @csrf
-
                         <!-- Role Selection -->
                         <div>
                             <label for="role_id" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
@@ -381,8 +394,12 @@
                             <button type="button" @click="showCreateModal = false" class="px-4 py-2 text-xs font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition">
                                 Batal
                             </button>
-                            <button type="submit" class="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-md shadow-indigo-500/20 transition">
-                                Simpan Perusahaan
+                            <button type="submit" :disabled="isSubmittingCreate" class="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-md shadow-indigo-500/20 transition flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+                                <svg x-show="isSubmittingCreate" class="animate-spin w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <span x-text="isSubmittingCreate ? 'Menyimpan...' : 'Simpan Perusahaan'"></span>
                             </button>
                         </div>
                     </form>
@@ -539,15 +556,19 @@
                         </p>
                     </div>
 
-                    <form :action="'/admin/companies/' + deleteData.id" method="POST" class="mt-6 flex items-center justify-end gap-3">
+                    <form :action="'/admin/companies/' + deleteData.id" method="POST" @submit="isSubmittingDelete = true" class="mt-6 flex items-center justify-end gap-3">
                         @csrf
                         @method('DELETE')
 
                         <button type="button" @click="showDeleteModal = false" class="px-4 py-2 text-xs font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition">
                             Batal
                         </button>
-                        <button type="submit" class="px-4 py-2 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-500 rounded-xl shadow-md shadow-rose-500/20 transition">
-                            Hapus Perusahaan
+                        <button type="submit" :disabled="isSubmittingDelete" class="px-4 py-2 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-500 rounded-xl shadow-md shadow-rose-500/20 transition flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+                            <svg x-show="isSubmittingDelete" class="animate-spin w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span x-text="isSubmittingDelete ? 'Menghapus...' : 'Hapus Perusahaan'"></span>
                         </button>
                     </form>
                 </div>

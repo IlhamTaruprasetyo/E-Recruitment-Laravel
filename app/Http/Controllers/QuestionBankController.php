@@ -18,7 +18,7 @@ class QuestionBankController extends Controller
         $rules = [
             'category_id' => 'required|exists:test_categories,id',
             'question' => 'required|string',
-            'question_type' => 'required|in:multiple_choice,essay',
+            'question_type' => 'required|in:multiple_choice,essay,disc',
             'points' => 'required|integer|min:1',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ];

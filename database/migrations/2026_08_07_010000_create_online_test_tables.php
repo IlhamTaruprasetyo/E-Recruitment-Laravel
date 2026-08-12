@@ -19,7 +19,8 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('category_id')->constrained('test_categories')->cascadeOnDelete();
             $table->text('question');
-            $table->string('question_type')->default('multiple_choice'); // e.g. multiple_choice, essay
+            $table->string('question_type')->default('multiple_choice'); // e.g. multiple_choice, essay, disc
+            $table->json('metadata')->nullable();
             $table->string('image_path')->nullable();
             $table->integer('points')->default(1);
             $table->timestamps();
@@ -30,6 +31,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('question_id')->constrained('question_banks')->cascadeOnDelete();
             $table->text('option_text');
+            $table->string('attribute_tag')->nullable(); // e.g. D, I, S, C
             $table->boolean('is_correct')->default(false);
         });
 
@@ -74,6 +76,7 @@ return new class extends Migration {
             $table->foreignId('attempt_id')->constrained('test_attempts')->cascadeOnDelete();
             $table->foreignId('question_id')->constrained('question_banks')->cascadeOnDelete();
             $table->foreignId('option_id')->nullable()->constrained('question_options')->nullOnDelete();
+            $table->string('answer_type')->nullable(); // e.g. most (P), least (K), default
             $table->text('essay_answer')->nullable();
             $table->decimal('score', 5, 2)->nullable();
             $table->foreignId('reviewed_by')->nullable()->constrained('users')->nullOnDelete();
