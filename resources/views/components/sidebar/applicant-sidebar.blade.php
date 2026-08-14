@@ -2,301 +2,349 @@
     'activeTab' => 'pribadi',
 ])
 
-<!-- Off-canvas / Mobile backdrop -->
-<div x-show="sidebarOpen" x-transition:enter="transition-opacity ease-linear duration-300"
-    x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-    x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100"
-    x-transition:leave-end="opacity-0" @click="sidebarOpen = false"
-    class="fixed inset-0 z-40 bg-gray-900/50 dark:bg-gray-950/80 backdrop-blur-sm lg:hidden" x-cloak></div>
+<div>
+    <!-- Off-canvas / Mobile backdrop -->
+    <div x-show="sidebarOpen" x-transition:enter="transition-opacity ease-linear duration-300"
+        x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+        x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0" @click="sidebarOpen = false"
+        class="fixed inset-0 z-40 bg-gray-900/50 dark:bg-gray-950/80 backdrop-blur-sm lg:hidden" x-cloak></div>
 
-<!-- Main Sidebar Container -->
-<aside x-cloak :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
-    class="fixed top-0 left-0 z-50 h-screen w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 transition-transform duration-300 ease-in-out flex flex-col justify-between shadow-xl">
+    <!-- Main Sidebar Container -->
+    <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
+        class="fixed top-0 left-0 z-50 h-screen w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 transition-transform duration-300 ease-in-out flex flex-col justify-between shadow-xl">
 
-    <!-- Top Section: Brand Header & Navigation -->
-    <div class="flex-1 overflow-y-auto px-4 py-5 custom-scrollbar">
+        <!-- Top Section: Brand Header & Navigation -->
+        <div class="flex-1 overflow-y-auto px-4 py-5 custom-scrollbar">
 
-        <!-- Brand Logo Header -->
-        <div class="flex items-center justify-between pb-6 mb-4 border-b border-gray-200 dark:border-gray-700/80 px-2">
-            <a href="{{ url('/') }}" class="flex items-center gap-3 group">
-                <div
-                    class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform duration-200">
-                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V11m0 0H9m4 0h2M9 11V7m0 0h6m-6 0v4" />
-                    </svg>
-                </div>
-                <div>
-                    <span
-                        class="block font-bold text-lg tracking-tight text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">E-Rekrutmen</span>
-                    <span
-                        class="block text-[10px] font-semibold tracking-widest text-indigo-600 dark:text-indigo-400 uppercase">
-                        Panel Pelamar
-                    </span>
-                </div>
-            </a>
-
-            <!-- Mobile Close Button -->
-            <button @click="sidebarOpen = false"
-                class="lg:hidden p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-        </div>
-
-        @php
-            $applicantProfile = auth()->user()?->applicantProfile;
-            $completionPercentage = $applicantProfile ? $applicantProfile->completion_percentage : 0;
-            $sectionStatuses = $applicantProfile ? $applicantProfile->section_statuses : [];
-        @endphp
-
-        <!-- Navigation Sections -->
-        <nav class="space-y-6">
-
-            <!-- Section 1: Data Profil -->
-            <div>
-                <div
-                    class="px-3 mb-2 text-[11px] font-bold tracking-wider text-gray-400 dark:text-gray-500 uppercase flex items-center justify-between">
-                    <span>Data Profil</span>
-                    <span
-                        class="text-xs text-indigo-600 dark:text-indigo-400 font-extrabold">{{ $completionPercentage }}%</span>
-                </div>
-
-                <!-- Profile Completeness Progress Bar Card -->
-                <div class="px-1 mb-3">
+            <!-- Brand Logo Header -->
+            <div
+                class="flex items-center justify-between pb-6 mb-4 border-b border-gray-200 dark:border-gray-700/80 px-2">
+                <a href="{{ url('/') }}" class="flex items-center gap-3 group">
                     <div
-                        class="p-3 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/40 dark:to-purple-950/30 border border-indigo-100 dark:border-indigo-900/50 rounded-xl shadow-2xs">
-                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden mb-1.5">
-                            <div class="bg-gradient-to-r from-indigo-500 to-purple-600 h-2 rounded-full transition-all duration-500"
-                                style="width: {{ $completionPercentage }}%"></div>
+                        class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform duration-200">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V11m0 0H9m4 0h2M9 11V7m0 0h6m-6 0v4" />
+                        </svg>
+                    </div>
+                    <div>
+                        <span
+                            class="block font-bold text-lg tracking-tight text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">E-Rekrutmen</span>
+                        <span
+                            class="block text-[10px] font-semibold tracking-widest text-indigo-600 dark:text-indigo-400 uppercase">
+                            Panel Pelamar
+                        </span>
+                    </div>
+                </a>
+
+                <!-- Mobile Close Button -->
+                <button @click="sidebarOpen = false"
+                    class="lg:hidden p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            @php
+                $applicantProfile = auth()->user()?->applicantProfile;
+                $completionPercentage = $applicantProfile ? $applicantProfile->completion_percentage : 0;
+                $mandatoryPercentage = $applicantProfile ? $applicantProfile->mandatory_completion_percentage : 0;
+                $isMandatoryComplete = $applicantProfile ? $applicantProfile->is_mandatory_complete : false;
+                $missingMandatorySections = $applicantProfile ? $applicantProfile->missing_mandatory_sections : [];
+                $sectionStatuses = $applicantProfile ? $applicantProfile->section_statuses : [];
+            @endphp
+
+            <!-- Navigation Sections -->
+            <nav class="space-y-6">
+
+                <!-- Section 1: Data Profil -->
+                <div>
+                    <div
+                        class="px-3 mb-2 text-[11px] font-bold tracking-wider text-gray-400 dark:text-gray-500 uppercase flex items-center justify-between">
+                        <span>Data Profil</span>
+                        {{-- <span
+                            class="text-xs text-indigo-600 dark:text-indigo-400 font-extrabold">{{ $completionPercentage }}%</span> --}}
+                    </div>
+
+                    <!-- Profile Completeness Progress Bar Card -->
+                    <div class="px-1 mb-3">
+                        <div
+                            class="p-3 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/40 dark:to-purple-950/30 border border-indigo-100 dark:border-indigo-900/50 rounded-xl shadow-2xs">
+                            <div class="flex items-center justify-between text-[11px] font-bold text-gray-700 dark:text-gray-300 mb-1">
+                                <span>Kelengkapan Profil</span>
+                                <span class="text-indigo-600 dark:text-indigo-400">{{ $completionPercentage }}%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden mb-2">
+                                <div class="bg-gradient-to-r from-indigo-500 to-purple-600 h-2 rounded-full transition-all duration-500"
+                                    style="width: {{ $completionPercentage }}%"></div>
+                            </div>
+                            <div class="text-[10px] font-medium leading-snug">
+                                @if ($completionPercentage == 100)
+                                    <div class="p-2 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 rounded-lg text-emerald-700 dark:text-emerald-300 font-bold flex items-start gap-1.5">
+                                        <span>Profilmu sudah 100% lengkap! Yuk, kirim lamaran sekarang dan buat rekruter melirik.</span>
+                                    </div>
+                                @elseif ($isMandatoryComplete)
+                                    <div class="p-2 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 rounded-lg text-emerald-700 dark:text-emerald-300 font-bold flex items-start gap-1.5">
+                                        <span>Profil kamu sudah cukup. Silakan kirimkan lamaran Anda sekarang juga!</span>
+                                    </div>
+                                @else
+                                    <div class="p-2 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/60 rounded-lg text-amber-800 dark:text-amber-300">
+                                        <div class="font-bold flex items-center gap-1 text-amber-700 dark:text-amber-400 mb-0.5">
+                                            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                            </svg>
+                                            Data Wajib {{ $mandatoryPercentage }}%
+                                        </div>
+                                        <p class="text-[9.5px] opacity-90">
+                                            Lengkapi: <span class="font-bold text-rose-600 dark:text-rose-400">{{ implode(', ', $missingMandatorySections) }}</span> agar bisa melamar.
+                                        </p>
+                                    </div>
+                                @endif
+                            </div>
                         </div>
-                        <p class="text-[10px] text-gray-500 dark:text-gray-400 font-medium">
-                            @if ($completionPercentage >= 100)
-                                <span class="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
-                                    <svg class="w-3 h-3 inline" fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    </div>
+
+                    <div class="space-y-1">
+                        <!-- 1. Data Pribadi -->
+                        <x-sidebar.single-nav-link :href="route('profile', ['tab' => 'pribadi'])" tab="pribadi"
+                            x-on:click.prevent="activeTab = 'pribadi'; $dispatch('switch-tab', 'pribadi')">
+                            <x-slot:icon>
+                                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Zm6-10.125a1.875 1.875 0 1 1-3.75 0 1.875 1.875 0 0 1 3.75 0Zm1.294 6.336a6.721 6.721 0 0 1-3.17.789 6.721 6.721 0 0 1-3.168-.789 3.376 3.376 0 0 1 6.338 0Z" />
+                                </svg>
+                            </x-slot:icon>
+                            Data Pribadi
+                            @if (!empty($sectionStatuses['pribadi']))
+                                <x-slot:append>
+                                    <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                             d="M5 13l4 4L19 7" />
                                     </svg>
-                                    Profil Sangat Lengkap
-                                </span>
-                            @elseif($completionPercentage >= 50)
-                                <span class="text-indigo-600 dark:text-indigo-400">Lengkapi data untuk hasil
-                                    terbaik</span>
-                            @else
-                                <span class="text-amber-600 dark:text-amber-400">Harap lengkapi kolom data
-                                    pribadi</span>
+                                </x-slot:append>
                             @endif
-                        </p>
+                        </x-sidebar.single-nav-link>
+
+                        <!-- Data Keluarga -->
+                        <x-sidebar.single-nav-link :href="route('profile', ['tab' => 'keluarga'])" tab="keluarga"
+                            x-on:click.prevent="activeTab = 'keluarga'; $dispatch('switch-tab', 'keluarga')">
+                            <x-slot:icon>
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                            </x-slot:icon>
+                            Data Keluarga
+                            @if (!empty($sectionStatuses['keluarga']))
+                                <x-slot:append>
+                                    <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                            d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </x-slot:append>
+                            @endif
+                        </x-sidebar.single-nav-link>
+
+                        <!-- 2. Pendidikan -->
+                        <x-sidebar.single-nav-link :href="route('profile', ['tab' => 'pendidikan'])" tab="pendidikan"
+                            x-on:click.prevent="activeTab = 'pendidikan'; $dispatch('switch-tab', 'pendidikan')">
+                            <x-slot:icon>
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 14l9-5-9-5-9 5 9 5z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                                </svg>
+                            </x-slot:icon>
+                            Pendidikan
+                            @if (!empty($sectionStatuses['pendidikan']))
+                                <x-slot:append>
+                                    <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                            d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </x-slot:append>
+                            @endif
+                        </x-sidebar.single-nav-link>
+
+                        <!-- 3. Pengalaman Kerja & Minat Kerja -->
+                        <x-sidebar.single-nav-link :href="route('profile', ['tab' => 'pengalaman'])" tab="pengalaman"
+                            x-on:click.prevent="activeTab = 'pengalaman'; $dispatch('switch-tab', 'pengalaman')">
+                            <x-slot:icon>
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                            </x-slot:icon>
+                            Pengalaman Kerja
+                            @if (!empty($sectionStatuses['pengalaman']))
+                                <x-slot:append>
+                                    <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                            d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </x-slot:append>
+                            @endif
+                        </x-sidebar.single-nav-link>
+
+                        <!-- 4. Organisasi & Prestasi -->
+                        <x-sidebar.single-nav-link :href="route('profile', ['tab' => 'prestasi'])" tab="prestasi"
+                            x-on:click.prevent="activeTab = 'prestasi'; $dispatch('switch-tab', 'prestasi')">
+                            <x-slot:icon>
+                                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
+                                </svg>
+
+                            </x-slot:icon>
+                            Organisasi & Prestasi
+                            @if (!empty($sectionStatuses['prestasi']) || !empty($sectionStatuses['organisasi']))
+                                <x-slot:append>
+                                    <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                            d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </x-slot:append>
+                            @endif
+                        </x-sidebar.single-nav-link>
+
+                        <!-- 6. Social Media -->
+                        <x-sidebar.single-nav-link :href="route('profile', ['tab' => 'social_media'])" tab="social_media"
+                            x-on:click.prevent="activeTab = 'social_media'; $dispatch('switch-tab', 'social_media')">
+                            <x-slot:icon>
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                </svg>
+                            </x-slot:icon>
+                            Social Media
+                            @if (!empty($sectionStatuses['social_media']))
+                                <x-slot:append>
+                                    <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                            d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </x-slot:append>
+                            @endif
+                        </x-sidebar.single-nav-link>
+
+                        <!-- 7. Data Tambahan -->
+                        <x-sidebar.single-nav-link :href="route('profile', ['tab' => 'data_tambahan'])" tab="data_tambahan"
+                            x-on:click.prevent="activeTab = 'data_tambahan'; $dispatch('switch-tab', 'data_tambahan')">
+                            <x-slot:icon>
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </x-slot:icon>
+                            Data Tambahan
+                            @if (!empty($sectionStatuses['data_tambahan']))
+                                <x-slot:append>
+                                    <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                            d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </x-slot:append>
+                            @endif
+                        </x-sidebar.single-nav-link>
+
+                        <!-- Status Pencari Kerja Badge Card -->
+                        <div class="px-1 mb-3">
+                            <button type="button" wire:click="openJobSearchStatusModal"
+                                class="w-full p-3 text-left bg-gradient-to-r from-slate-50 to-indigo-50/50 dark:from-gray-800/80 dark:to-indigo-950/30 border border-gray-200/80 dark:border-gray-700/80 hover:border-indigo-300 dark:hover:border-indigo-700 rounded-xl transition duration-200 group relative">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Status Pencari Kerja</span>
+                                    <svg class="w-3.5 h-3.5 text-indigo-500 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </div>
+                                <div class="mt-1 flex items-center gap-1.5">
+                                    @if ($job_search_status === 'Aktif')
+                                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                        <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400">Aktif</span>
+                                    @elseif ($job_search_status === 'Pasif')
+                                        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                                        <span class="text-xs font-bold text-amber-600 dark:text-amber-400">Pasif</span>
+                                    @else
+                                        <span class="w-2 h-2 rounded-full bg-gray-400"></span>
+                                        <span class="text-xs font-bold text-gray-500 dark:text-gray-400">Tidak Aktif</span>
+                                    @endif
+                                </div>
+                            </button>
+                        </div>
+
+                        <!-- Generate CV Action Button -->
+                        <div class="pt-1 px-1">
+                            <a href="{{ route('profile.cv.preview') }}" target="_blank"
+                                class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/35 transition-all duration-200 group">
+                                <svg class="w-4 h-4 text-white group-hover:scale-110 transition-transform"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <span>Generate / Cetak CV</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
-                <div class="space-y-1">
-                    <!-- 1. Data Pribadi -->
-                    <x-sidebar.single-nav-link :href="route('profile', ['tab' => 'pribadi'])" tab="pribadi"
-                        x-on:click.prevent="activeTab = 'pribadi'; $dispatch('switch-tab', 'pribadi')">
-                        <x-slot:icon>
-                            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke-width="1.5" stroke="currentColor" class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Zm6-10.125a1.875 1.875 0 1 1-3.75 0 1.875 1.875 0 0 1 3.75 0Zm1.294 6.336a6.721 6.721 0 0 1-3.17.789 6.721 6.721 0 0 1-3.168-.789 3.376 3.376 0 0 1 6.338 0Z" />
-                            </svg>
-
-                        </x-slot:icon>
-                        Data Pribadi
-                        @if (!empty($sectionStatuses['pribadi']))
-                            <x-slot:append>
-                                <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                        d="M5 13l4 4L19 7" />
+                <!-- Section 2: Aktivitas & Pengaturan -->
+                <div>
+                    <div
+                        class="px-3 mb-2 text-[11px] font-bold tracking-wider text-gray-400 dark:text-gray-500 uppercase">
+                        Aktivitas & Pengaturan
+                    </div>
+                    <div class="space-y-1">
+                        <x-sidebar.single-nav-link :href="route('profile', ['tab' => 'riwayat'])" tab="riwayat"
+                            x-on:click.prevent="activeTab = 'riwayat'; $dispatch('switch-tab', 'riwayat')">
+                            <x-slot:icon>
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                            </x-slot:append>
-                        @endif
-                    </x-sidebar.single-nav-link>
+                            </x-slot:icon>
+                            Riwayat Lamaran
+                            @if (!empty($applicationCount) && $applicationCount > 0)
+                                <x-slot:append>
+                                    <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
+                                        {{ $applicationCount }}
+                                    </span>
+                                </x-slot:append>
+                            @endif
+                        </x-sidebar.single-nav-link>
 
-                    <!-- 2. Pendidikan -->
-                    <x-sidebar.single-nav-link :href="route('profile', ['tab' => 'pendidikan'])" tab="pendidikan"
-                        x-on:click.prevent="activeTab = 'pendidikan'; $dispatch('switch-tab', 'pendidikan')">
-                        <x-slot:icon>
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 14l9-5-9-5-9 5 9 5z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-                            </svg>
-                        </x-slot:icon>
-                        Pendidikan
-                        @if (!empty($sectionStatuses['pendidikan']))
-                            <x-slot:append>
-                                <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                        d="M5 13l4 4L19 7" />
+                        <x-sidebar.single-nav-link :href="route('profile', ['tab' => 'pengaturan'])" tab="pengaturan"
+                            x-on:click.prevent="activeTab = 'pengaturan'; $dispatch('switch-tab', 'pengaturan')">
+                            <x-slot:icon>
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
-                            </x-slot:append>
-                        @endif
-                    </x-sidebar.single-nav-link>
-
-                    <!-- 3. Pengalaman Kerja -->
-                    <x-sidebar.single-nav-link :href="route('profile', ['tab' => 'pengalaman'])" tab="pengalaman"
-                        x-on:click.prevent="activeTab = 'pengalaman'; $dispatch('switch-tab', 'pengalaman')">
-                        <x-slot:icon>
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                            </svg>
-                        </x-slot:icon>
-                        Pengalaman Kerja
-                        @if (!empty($sectionStatuses['pengalaman']))
-                            <x-slot:append>
-                                <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                        d="M5 13l4 4L19 7" />
-                                </svg>
-                            </x-slot:append>
-                        @endif
-                    </x-sidebar.single-nav-link>
-
-                    <!-- 4. Organisasi -->
-                    <x-sidebar.single-nav-link :href="route('profile', ['tab' => 'organisasi'])" tab="organisasi"
-                        x-on:click.prevent="activeTab = 'organisasi'; $dispatch('switch-tab', 'organisasi')">
-                        <x-slot:icon>
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                        </x-slot:icon>
-                        Organisasi
-                        @if (!empty($sectionStatuses['organisasi']))
-                            <x-slot:append>
-                                <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                        d="M5 13l4 4L19 7" />
-                                </svg>
-                            </x-slot:append>
-                        @endif
-                    </x-sidebar.single-nav-link>
-
-                    <!-- 5. Prestasi -->
-                    <x-sidebar.single-nav-link :href="route('profile', ['tab' => 'prestasi'])" tab="prestasi"
-                        x-on:click.prevent="activeTab = 'prestasi'; $dispatch('switch-tab', 'prestasi')">
-                        <x-slot:icon>
-                            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" />
-                            </svg>
-                        </x-slot:icon>
-                        Prestasi
-                        @if (!empty($sectionStatuses['prestasi']))
-                            <x-slot:append>
-                                <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                        d="M5 13l4 4L19 7" />
-                                </svg>
-                            </x-slot:append>
-                        @endif
-                    </x-sidebar.single-nav-link>
-
-                    <!-- 6. Social Media -->
-                    <x-sidebar.single-nav-link :href="route('profile', ['tab' => 'social_media'])" tab="social_media"
-                        x-on:click.prevent="activeTab = 'social_media'; $dispatch('switch-tab', 'social_media')">
-                        <x-slot:icon>
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                            </svg>
-                        </x-slot:icon>
-                        Social Media
-                        @if (!empty($sectionStatuses['social_media']))
-                            <x-slot:append>
-                                <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                        d="M5 13l4 4L19 7" />
-                                </svg>
-                            </x-slot:append>
-                        @endif
-                    </x-sidebar.single-nav-link>
-
-                    <!-- 7. Data Tambahan -->
-                    <x-sidebar.single-nav-link :href="route('profile', ['tab' => 'data_tambahan'])" tab="data_tambahan"
-                        x-on:click.prevent="activeTab = 'data_tambahan'; $dispatch('switch-tab', 'data_tambahan')">
-                        <x-slot:icon>
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                        </x-slot:icon>
-                        Data Tambahan
-                        @if (!empty($sectionStatuses['data_tambahan']))
-                            <x-slot:append>
-                                <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                        d="M5 13l4 4L19 7" />
-                                </svg>
-                            </x-slot:append>
-                        @endif
-                    </x-sidebar.single-nav-link>
-
-                    <!-- Generate CV Action Button -->
-                    <div class="pt-2 px-1">
-                        <a href="{{ route('profile.cv.preview') }}" target="_blank"
-                            class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/35 transition-all duration-200 group">
-                            <svg class="w-4 h-4 text-white group-hover:scale-110 transition-transform" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            <span>Generate / Cetak CV</span>
-                        </a>
+                            </x-slot:icon>
+                            Pengaturan
+                        </x-sidebar.single-nav-link>
                     </div>
                 </div>
-            </div>
 
-            <!-- Section 2: Aktivitas & Pengaturan -->
-            <div>
-                <div class="px-3 mb-2 text-[11px] font-bold tracking-wider text-gray-400 dark:text-gray-500 uppercase">
-                    Aktivitas & Pengaturan
-                </div>
-                <div class="space-y-1">
-                    <x-sidebar.single-nav-link :href="route('profile', ['tab' => 'riwayat'])" tab="riwayat"
-                        x-on:click.prevent="activeTab = 'riwayat'; $dispatch('switch-tab', 'riwayat')">
-                        <x-slot:icon>
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </x-slot:icon>
-                        Riwayat Lamaran
-                    </x-sidebar.single-nav-link>
+            </nav>
+        </div>
 
-                    <x-sidebar.single-nav-link :href="route('profile', ['tab' => 'pengaturan'])" tab="pengaturan"
-                        x-on:click.prevent="activeTab = 'pengaturan'; $dispatch('switch-tab', 'pengaturan')">
-                        <x-slot:icon>
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                        </x-slot:icon>
-                        Pengaturan
-                    </x-sidebar.single-nav-link>
-                </div>
-            </div>
-
-        </nav>
-    </div>
-
-    <!-- Bottom Section: Logout (Commented out) -->
-    {{-- <div class="p-4 border-t border-gray-200 dark:border-gray-700/80">
+        <!-- Bottom Section: Logout (Commented out) -->
+        {{-- <div class="p-4 border-t border-gray-200 dark:border-gray-700/80">
         <form method="POST" action="{{ route('logout') }}" class="w-full">
             @csrf
             <button type="submit"
@@ -309,4 +357,177 @@
             </button>
         </form>
     </div> --}}
-</aside>
+    </aside>
+
+    <!-- Modal Status Pencari Kerja -->
+    @if ($showJobSearchStatusModal)
+        <div class="fixed inset-0 z-50 overflow-y-auto" x-cloak>
+            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                <!-- Backdrop -->
+                <div class="fixed inset-0 transition-opacity bg-gray-900/75 backdrop-blur-sm" wire:click="closeJobSearchStatusModal"></div>
+
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+                <!-- Modal Dialog -->
+                <div class="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white dark:bg-gray-800 rounded-2xl shadow-2xl sm:my-8 sm:align-middle sm:max-w-xl sm:w-full border border-gray-100 dark:border-gray-700">
+                    
+                    <!-- Header -->
+                    <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Status Pencari Kerja</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Tentukan status pencarian kerjamu</p>
+                        </div>
+                        <button type="button" wire:click="closeJobSearchStatusModal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Sub Tab Navigation -->
+                    <div class="flex border-b border-gray-200 dark:border-gray-700 px-6 pt-2">
+                        <button type="button" wire:click="$set('activeSubTab', 'status')"
+                            class="py-3 px-4 text-xs font-bold transition border-b-2 flex items-center gap-1.5 {{ $activeSubTab === 'status' ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700' }}">
+                            <span>Status Pencari Kerja</span>
+                            <span class="text-red-500">*</span>
+                        </button>
+
+                        <button type="button" 
+                            @if ($job_search_status === 'Tidak Aktif') 
+                                disabled title="Notifikasi tidak tersedia saat status Tidak Aktif" 
+                            @else 
+                                wire:click="$set('activeSubTab', 'notification')" 
+                            @endif
+                            class="py-3 px-4 text-xs font-bold transition border-b-2 flex items-center gap-1.5 {{ $job_search_status === 'Tidak Aktif' ? 'opacity-40 cursor-not-allowed text-gray-400 border-transparent' : ($activeSubTab === 'notification' ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700') }}">
+                            <span>Periode Pengiriman Notifikasi</span>
+                            <span class="text-red-500">*</span>
+                        </button>
+                    </div>
+
+                    <!-- Form Body -->
+                    <form wire:submit.prevent="saveJobSearchStatus" class="p-6">
+                        
+                        <!-- TAB 1: Status Pencari Kerja -->
+                        @if ($activeSubTab === 'status')
+                            <div class="space-y-4">
+                                <!-- Option 1: Aktif -->
+                                <label class="block p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-700 bg-gray-50/40 dark:bg-gray-900/30 cursor-pointer transition">
+                                    <div class="flex items-start gap-3">
+                                        <input type="radio" wire:model.live="job_search_status" value="Aktif"
+                                            class="mt-1 w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500 dark:bg-gray-900 dark:border-gray-700">
+                                        <div>
+                                            <span class="block text-sm font-bold text-gray-900 dark:text-white">Aktif</span>
+                                            <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+                                                Saya sedang mencari pekerjaan dan terbuka untuk menerima undangan pekerjaan serta email terkait lowongan yang sesuai dengan profil saya
+                                            </span>
+                                        </div>
+                                    </div>
+                                </label>
+
+                                <!-- Option 2: Pasif -->
+                                <label class="block p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-700 bg-gray-50/40 dark:bg-gray-900/30 cursor-pointer transition">
+                                    <div class="flex items-start gap-3">
+                                        <input type="radio" wire:model.live="job_search_status" value="Pasif"
+                                            class="mt-1 w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500 dark:bg-gray-900 dark:border-gray-700">
+                                        <div>
+                                            <span class="block text-sm font-bold text-gray-900 dark:text-white">Pasif</span>
+                                            <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+                                                Saya tidak mencari pekerjaan tetapi saya terbuka untuk menerima email terkait lowongan yang sesuai dengan profil saya
+                                            </span>
+                                        </div>
+                                    </div>
+                                </label>
+
+                                <!-- Option 3: Tidak Aktif -->
+                                <label class="block p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-700 bg-gray-50/40 dark:bg-gray-900/30 cursor-pointer transition">
+                                    <div class="flex items-start gap-3">
+                                        <input type="radio" wire:model.live="job_search_status" value="Tidak Aktif"
+                                            class="mt-1 w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500 dark:bg-gray-900 dark:border-gray-700">
+                                        <div>
+                                            <span class="block text-sm font-bold text-gray-900 dark:text-white">Tidak Aktif</span>
+                                            <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+                                                Saya tidak mencari pekerjaan dan tidak ingin menerima email apapun
+                                            </span>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        @endif
+
+                        <!-- TAB 2: Periode Pengiriman Notifikasi -->
+                        @if ($activeSubTab === 'notification')
+                            <div class="space-y-4">
+                                @if ($job_search_status === 'Tidak Aktif')
+                                    <div class="p-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 rounded-xl text-amber-800 dark:text-amber-300 text-xs">
+                                        Status Anda saat ini adalah <strong>Tidak Aktif</strong>. Periode pengiriman notifikasi tidak dapat diatur.
+                                    </div>
+                                @else
+                                    <!-- Harian -->
+                                    <label class="block p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-700 bg-gray-50/40 dark:bg-gray-900/30 cursor-pointer transition">
+                                        <div class="flex items-start gap-3">
+                                            <input type="radio" wire:model="notification_period" value="Harian"
+                                                class="mt-1 w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500 dark:bg-gray-900 dark:border-gray-700">
+                                            <div>
+                                                <span class="block text-sm font-bold text-gray-900 dark:text-white">Harian</span>
+                                                <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+                                                    Kamu akan mendapatkan email terkait lowongan yang sesuai dengan profilmu sebanyak maksimal satu kali sehari
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </label>
+
+                                    <!-- Mingguan -->
+                                    <label class="block p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-700 bg-gray-50/40 dark:bg-gray-900/30 cursor-pointer transition">
+                                        <div class="flex items-start gap-3">
+                                            <input type="radio" wire:model="notification_period" value="Mingguan"
+                                                class="mt-1 w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500 dark:bg-gray-900 dark:border-gray-700">
+                                            <div>
+                                                <span class="block text-sm font-bold text-gray-900 dark:text-white">Mingguan</span>
+                                                <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+                                                    Kamu akan mendapatkan email terkait lowongan yang sesuai dengan profilmu sebanyak maksimal satu kali seminggu
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </label>
+
+                                    <!-- Bulanan -->
+                                    <label class="block p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-700 bg-gray-50/40 dark:bg-gray-900/30 cursor-pointer transition">
+                                        <div class="flex items-start gap-3">
+                                            <input type="radio" wire:model="notification_period" value="Bulanan"
+                                                class="mt-1 w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500 dark:bg-gray-900 dark:border-gray-700">
+                                            <div>
+                                                <span class="block text-sm font-bold text-gray-900 dark:text-white">Bulanan</span>
+                                                <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+                                                    Kamu akan mendapatkan email terkait lowongan yang sesuai dengan profilmu sebanyak maksimal satu kali sebulan
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </label>
+                                @endif
+                            </div>
+                        @endif
+
+                        <!-- Footer Actions -->
+                        <div class="flex items-center justify-end gap-3 pt-6 mt-6 border-t border-gray-100 dark:border-gray-700">
+                            <button type="button" wire:click="closeJobSearchStatusModal"
+                                class="px-5 py-2.5 text-xs font-semibold text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-xl transition">
+                                Batal
+                            </button>
+                            <button type="submit" wire:loading.attr="disabled"
+                                class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl shadow-md shadow-indigo-500/20 transition flex items-center gap-2">
+                                <span wire:loading.remove wire:target="saveJobSearchStatus">Simpan Status</span>
+                                <span wire:loading wire:target="saveJobSearchStatus" class="flex items-center gap-2">
+                                    <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Menyimpan...
+                                </span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endif
+</div>

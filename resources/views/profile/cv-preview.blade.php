@@ -142,7 +142,7 @@
                         <div>
                             <div class="flex flex-col sm:flex-row sm:items-baseline justify-between mb-1">
                                 <h3 class="text-sm font-bold text-gray-900 dark:text-white">
-                                    {{ $exp->position }} <span class="font-normal text-gray-600 dark:text-gray-400">at {{ $exp->company_name }}</span>
+                                    {{ $exp->position }} <span class="font-normal text-gray-600 dark:text-gray-400">di {{ $exp->company_name }}</span>
                                 </h3>
                                 <span class="text-xs text-gray-500 font-medium">
                                     {{ \Carbon\Carbon::parse($exp->start_date)->isoFormat('MMM YYYY') }} - 

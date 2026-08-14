@@ -6,14 +6,23 @@ use App\Models\ApplicantProfile;
 use App\Models\Degree;
 use App\Models\Education;
 use App\Models\Major;
+use App\Models\Skill;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class Pendidikan extends Component
 {
+    use WithFileUploads;
+
+    // --- FORM MODAL EDUCATION STATE ---
     public $showModal = false;
     public $isEdit = false;
     public $education_id;
+
+    public $showDeleteModal = false;
+    public $deleteId = null;
 
     public $degree_id;
     public $degree;
@@ -26,6 +35,17 @@ class Pendidikan extends Component
     public $is_ongoing = false;
     public $gpa;
     public $description;
+
+    // --- FORM MODAL SKILL STATE ---
+    public $showSkillModal = false;
+    public $isSkillEdit = false;
+    public $skill_id = null;
+    public $skill_name = '';
+    public $skill_certificate = null;
+    public $existing_skill_certificate = null;
+
+    public $showDeleteSkillModal = false;
+    public $deleteSkillId = null;
 
     public function updatedIsOngoing($value)
     {
@@ -181,19 +201,152 @@ class Pendidikan extends Component
         }
 
         $this->closeModal();
-        return redirect(route('profile', ['tab' => 'pendidikan']));
+        $this->dispatch('profile-updated');
     }
 
-    public function delete($id)
+    public function confirmDelete($id)
+    {
+        $this->deleteId = $id;
+        $this->showDeleteModal = true;
+    }
+
+    public function cancelDelete()
+    {
+        $this->showDeleteModal = false;
+        $this->deleteId = null;
+    }
+
+    public function delete()
+    {
+        if ($this->deleteId) {
+            $user = Auth::user();
+            $profile = ApplicantProfile::where('user_id', $user->id)->first();
+            if ($profile) {
+                Education::where('profile_id', $profile->id)->where('id', $this->deleteId)->delete();
+                session()->flash('message', 'Riwayat pendidikan berhasil dihapus.');
+            }
+        }
+
+        $this->showDeleteModal = false;
+        $this->deleteId = null;
+        $this->dispatch('profile-updated');
+    }
+
+    // --- SKILL CRUD METHODS ---
+    public function openSkillModal()
+    {
+        $this->resetSkillForm();
+        $this->isSkillEdit = false;
+        $this->showSkillModal = true;
+    }
+
+    public function closeSkillModal()
+    {
+        $this->showSkillModal = false;
+        $this->resetSkillForm();
+    }
+
+    public function resetSkillForm()
+    {
+        $this->reset([
+            'skill_id',
+            'skill_name',
+            'skill_certificate',
+            'existing_skill_certificate',
+        ]);
+        $this->resetErrorBag();
+    }
+
+    public function editSkill($id)
     {
         $user = Auth::user();
         $profile = ApplicantProfile::where('user_id', $user->id)->first();
-        if ($profile) {
-            Education::where('profile_id', $profile->id)->where('id', $id)->delete();
-            session()->flash('message', 'Riwayat pendidikan berhasil dihapus.');
+        if (!$profile) return;
+
+        $skill = Skill::where('profile_id', $profile->id)->where('id', $id)->firstOrFail();
+
+        $this->skill_id = $skill->id;
+        $this->skill_name = $skill->name;
+        $this->existing_skill_certificate = $skill->certificate_path;
+
+        $this->isSkillEdit = true;
+        $this->showSkillModal = true;
+    }
+
+    public function saveSkill()
+    {
+        $this->validate([
+            'skill_name' => 'required|string|max:255',
+            'skill_certificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+        ], [
+            'skill_name.required' => 'Nama keahlian / skill wajib diisi.',
+            'skill_certificate.mimes' => 'Format file sertifikat/bukti harus PDF, JPG, JPEG, atau PNG.',
+            'skill_certificate.max' => 'Ukuran file tidak boleh melebihi 2MB.',
+        ]);
+
+        $user = Auth::user();
+        $profile = ApplicantProfile::firstOrCreate(['user_id' => $user->id]);
+
+        $certPath = $this->existing_skill_certificate;
+        if ($this->skill_certificate) {
+            if ($certPath && Storage::disk('public')->exists($certPath)) {
+                Storage::disk('public')->delete($certPath);
+            }
+            $certPath = $this->skill_certificate->store('certificates/skills', 'public');
         }
 
-        return redirect(route('profile', ['tab' => 'pendidikan']));
+        if ($this->isSkillEdit && $this->skill_id) {
+            $skill = Skill::where('profile_id', $profile->id)->where('id', $this->skill_id)->firstOrFail();
+            $skill->update([
+                'name' => $this->skill_name,
+                'certificate_path' => $certPath,
+            ]);
+            session()->flash('message', 'Skill / Keahlian berhasil diperbarui.');
+        } else {
+            Skill::create([
+                'profile_id' => $profile->id,
+                'name' => $this->skill_name,
+                'certificate_path' => $certPath,
+            ]);
+            session()->flash('message', 'Skill / Keahlian berhasil ditambahkan.');
+        }
+
+        $this->closeSkillModal();
+        $this->dispatch('profile-updated');
+    }
+
+    public function confirmDeleteSkill($id)
+    {
+        $this->deleteSkillId = $id;
+        $this->showDeleteSkillModal = true;
+    }
+
+    public function cancelDeleteSkill()
+    {
+        $this->showDeleteSkillModal = false;
+        $this->deleteSkillId = null;
+    }
+
+    public function deleteSkill()
+    {
+        if ($this->deleteSkillId) {
+            $user = Auth::user();
+            $profile = ApplicantProfile::where('user_id', $user->id)->first();
+            if ($profile) {
+                $skill = Skill::where('profile_id', $profile->id)->where('id', $this->deleteSkillId)->first();
+                if ($skill) {
+                    if ($skill->certificate_path && Storage::disk('public')->exists($skill->certificate_path)) {
+                        Storage::disk('public')->delete($skill->certificate_path);
+                    }
+                    $skill->delete();
+                    session()->flash('message', 'Skill / Keahlian berhasil dihapus.');
+                }
+            }
+        }
+
+        $this->showDeleteSkillModal = false;
+        $this->deleteSkillId = null;
+        $this->dispatch('profile-updated');
     }
 
     public function render()
@@ -201,12 +354,14 @@ class Pendidikan extends Component
         $user = Auth::user();
         $profile = ApplicantProfile::where('user_id', $user->id)->first();
         $educations = $profile ? Education::where('profile_id', $profile->id)->orderBy('start_year', 'desc')->get() : collect();
+        $skills = $profile ? Skill::where('profile_id', $profile->id)->get() : collect();
 
         $degrees = Degree::orderBy('rank', 'asc')->get();
         $majors = Major::orderBy('name', 'asc')->get();
 
         return view('livewire.applicant.pendidikan', [
             'educations' => $educations,
+            'skills' => $skills,
             'degrees' => $degrees,
             'majors' => $majors,
         ]);

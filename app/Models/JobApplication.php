@@ -29,4 +29,9 @@ class JobApplication extends Model
     {
         return $this->hasMany(InterviewSchedule::class, 'job_applications_id');
     }
+
+    public function testAttempts()
+    {
+        return $this->hasMany(TestAttempt::class, 'job_application_id');
+    }
 }

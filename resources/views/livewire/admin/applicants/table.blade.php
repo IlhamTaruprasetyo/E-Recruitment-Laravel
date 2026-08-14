@@ -23,28 +23,45 @@
             notes: application.notes || ''
         };
         this.showStatusModal = true;
+    },
+    formatDate(dateStr) {
+        if (!dateStr) return '-';
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return dateStr;
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        return months[d.getMonth()] + ' ' + d.getFullYear();
     }
 }">
     <!-- Session Notifications -->
     @if (session('update'))
-        <div class="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 flex items-center justify-between shadow-sm">
+        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)" x-transition class="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 flex items-center justify-between shadow-sm">
             <div class="flex items-center gap-3">
                 <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <span class="text-xs font-semibold">{{ session('update') }}</span>
             </div>
+            <button @click="show = false" class="text-emerald-500 hover:text-emerald-700 dark:hover:text-emerald-200">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
         </div>
     @endif
 
     @if (session('error'))
-        <div class="p-4 rounded-2xl bg-rose-50 dark:bg-rose-900/30 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 flex items-center justify-between shadow-sm">
+        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)" x-transition class="p-4 rounded-2xl bg-rose-50 dark:bg-rose-900/30 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 flex items-center justify-between shadow-sm">
             <div class="flex items-center gap-3">
                 <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <span class="text-xs font-semibold">{{ session('error') }}</span>
             </div>
+            <button @click="show = false" class="text-rose-500 hover:text-rose-700 dark:hover:text-rose-200">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
         </div>
     @endif
 
@@ -112,7 +129,7 @@
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
                                     @if ($app->applicantProfile && $app->applicantProfile->photo)
-                                        <img src="{{ asset('storage/' . $app->applicantProfile->photo) }}" alt="{{ $app->applicantProfile->full_name }}" class="w-9 h-9 rounded-full object-cover border border-gray-200 dark:border-slate-700 shadow-sm shrink-0">
+                                        <img src="{{ \Illuminate\Support\Str::startsWith($app->applicantProfile->photo, ['http://', 'https://']) ? $app->applicantProfile->photo : asset('storage/' . $app->applicantProfile->photo) }}" alt="{{ $app->applicantProfile->full_name }}" class="w-9 h-9 rounded-full object-cover border border-gray-200 dark:border-slate-700 shadow-sm shrink-0">
                                     @else
                                         <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-sm shrink-0">
                                             {{ strtoupper(substr($app->applicantProfile->full_name ?? 'P', 0, 2)) }}
@@ -313,7 +330,7 @@
                                                     <span class="font-bold text-gray-900 dark:text-white text-xs block" x-text="work.position"></span>
                                                     <span class="text-indigo-600 dark:text-indigo-400 font-semibold text-[11px]" x-text="work.company_name + ' • (' + work.employment_type + ')'"></span>
                                                 </div>
-                                                <span class="text-gray-400 text-[11px] bg-gray-100 dark:bg-slate-800 px-2 py-0.5 rounded-lg" x-text="work.start_date + ' s/d ' + (work.currently_working ? 'Sekarang' : (work.end_date || '-'))"></span>
+                                                <span class="text-gray-400 text-[11px] bg-gray-100 dark:bg-slate-800 px-2 py-0.5 rounded-lg" x-text="formatDate(work.start_date) + ' s/d ' + (work.currently_working ? 'Sekarang' : formatDate(work.end_date))"></span>
                                             </div>
                                             <p x-show="work.description" class="text-gray-600 dark:text-slate-300 text-[11px] pt-1" x-text="work.description"></p>
                                         </div>
@@ -459,11 +476,21 @@
 
                             <!-- 9. Media Sosial (social_medias) -->
                             <div>
-                                <h4 class="font-bold text-gray-900 dark:text-white mb-2">Media Sosial</h4>
+                                <h4 class="font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-1.5 text-xs">
+                                    <svg class="w-3.5 h-3.5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                    </svg>
+                                    <span>Media Sosial & Portofolio</span>
+                                </h4>
                                 <template x-if="detailData.applicant_profile && detailData.applicant_profile.social_medias && detailData.applicant_profile.social_medias.length > 0">
-                                    <div class="space-y-1">
+                                    <div class="flex flex-wrap gap-2">
                                         <template x-for="sm in detailData.applicant_profile.social_medias" :key="sm.id">
-                                            <a :href="sm.url" target="_blank" class="block text-indigo-600 dark:text-indigo-400 hover:underline font-semibold text-[11px]" x-text="sm.platform_name + ': ' + sm.url"></a>
+                                            <a :href="sm.url" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50/80 hover:bg-indigo-100 dark:bg-indigo-950/50 dark:hover:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 font-semibold text-[11px] border border-indigo-200/60 dark:border-indigo-800/60 transition group shadow-2xs">
+                                                <span x-text="sm.platform_name"></span>
+                                                <svg class="w-3 h-3 text-indigo-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                </svg>
+                                            </a>
                                         </template>
                                     </div>
                                 </template>

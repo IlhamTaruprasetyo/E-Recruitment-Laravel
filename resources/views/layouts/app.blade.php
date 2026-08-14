@@ -32,7 +32,7 @@
         @if ($isAdminOrRecruiter)
             <x-sidebar.sidebar />
         @elseif($isApplicantProfile)
-            <x-sidebar.applicant-sidebar :active-tab="request('tab', 'pribadi')" />
+            <livewire:applicant.applicant-sidebar :active-tab="request('tab', 'pribadi')" />
         @endif
 
         <!-- Main Content Container -->

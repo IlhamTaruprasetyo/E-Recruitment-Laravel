@@ -10,8 +10,13 @@
             <div class="max-w-7xl mx-auto space-y-3">
                 
                 <!-- Tab 1: Data Pribadi -->
-                <div x-show="activeTab === 'pribadi'" class="space-y-3">
+                <div x-show="activeTab === 'pribadi'" class="space-y-3" x-cloak>
                     <livewire:applicant.pribadi />
+                </div>
+
+                <!-- Tab 1.5: Data Keluarga -->
+                <div x-show="activeTab === 'keluarga'" class="space-y-3" x-cloak>
+                    <livewire:applicant.keluarga />
                 </div>
 
                 <!-- Tab 2: Pendidikan -->
@@ -21,32 +26,27 @@
 
                 <!-- Tab 3: Pengalaman Kerja -->
                 <div x-show="activeTab === 'pengalaman'" class="space-y-3" x-cloak>
-                    @include('livewire.applicant.pengalaman')
+                    <livewire:applicant.pengalaman />
                 </div>
 
-                <!-- Tab 4: Organisasi -->
-                <div x-show="activeTab === 'organisasi'" class="space-y-3" x-cloak>
-                    @include('livewire.applicant.organisasi')
-                </div>
-
-                <!-- Tab 5: Prestasi -->
-                <div x-show="activeTab === 'prestasi'" class="space-y-3" x-cloak>
-                    @include('livewire.applicant.prestasi')
+                <!-- Tab 4 & 5: Organisasi & Prestasi -->
+                <div x-show="activeTab === 'prestasi' || activeTab === 'organisasi' || activeTab === 'organisasi_prestasi'" class="space-y-3" x-cloak>
+                    <livewire:applicant.prestasi />
                 </div>
 
                 <!-- Tab 6: Social Media -->
                 <div x-show="activeTab === 'social_media'" class="space-y-3" x-cloak>
-                    @include('livewire.applicant.social_media')
+                    <livewire:applicant.social-media />
                 </div>
 
-                <!-- Tab 7: Data Tambahan -->
+                <!-- Tab 7: Data Tambahan (Keahlian / Skill) -->
                 <div x-show="activeTab === 'data_tambahan'" class="space-y-3" x-cloak>
-                    @include('livewire.applicant.data_tambahan')
+                    <livewire:applicant.data-tambahan />
                 </div>
 
                 <!-- Tab 8: Riwayat Lamaran -->
                 <div x-show="activeTab === 'riwayat'" class="space-y-3" x-cloak>
-                    @include('livewire.applicant.riwayat')
+                    <livewire:applicant.riwayat />
                 </div>
 
                 <!-- Tab 9: Pengaturan Akun -->

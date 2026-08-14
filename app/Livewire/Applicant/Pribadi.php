@@ -116,6 +116,7 @@ class Pribadi extends Component
         }
 
         session()->flash('message', 'Data pribadi berhasil diperbarui.');
+        $this->dispatch('profile-updated', name: $this->full_name);
     }
 
     public function render()

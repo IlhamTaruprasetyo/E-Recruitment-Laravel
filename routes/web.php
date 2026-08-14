@@ -32,6 +32,7 @@ Route::middleware(['auth', 'verified', RoleMiddleware::class . ':recruiter'])
         Route::view('applicants', 'livewire.admin.applicants.index')->name('application');
         Route::put('applicants/{id}', [JobApplicationController::class, 'update'])->name('application.update');
         Route::view('candidates', 'livewire.admin.candidates.index')->name('candidate');
+        Route::view('profile', 'profile')->name('profile');
     });
 
 // Admin Group Routes (/admin/*)
@@ -40,6 +41,7 @@ Route::middleware(['auth', 'verified', RoleMiddleware::class . ':admin'])
     ->name('admin.')
     ->group(function () {
         Route::view('dashboard', 'livewire.admin.dashboard.index')->name('dashboard');
+        Route::view('profile', 'profile')->name('profile');
         
         // Recruitment Management - Selection CV & Candidate View
         Route::view('applicants', 'livewire.admin.applicants.index')->name('application');

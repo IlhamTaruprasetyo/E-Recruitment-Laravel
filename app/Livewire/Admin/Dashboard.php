@@ -24,7 +24,12 @@ class Dashboard extends Component
                   $rq->whereRaw('LOWER(name) = ?', ['applicant']);
               })
               ->orWhereHas('applicantProfile');
-        })->count();
+        })
+        ->whereNotIn('role_id', [1, 2])
+        ->whereDoesntHave('role', function ($rq) {
+            $rq->whereIn(DB::raw('LOWER(name)'), ['admin', 'superadmin', 'recruiter']);
+        })
+        ->count();
 
         if ($isRecruiter) {
             $totalJobs = Job::whereIn(DB::raw('LOWER(status)'), ['open', 'published', 'active', 'draft'])

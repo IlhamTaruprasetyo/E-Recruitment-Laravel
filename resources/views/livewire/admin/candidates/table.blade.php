@@ -4,6 +4,13 @@
     openDetailModal(candidate) {
         this.detailData = candidate;
         this.showDetailModal = true;
+    },
+    formatDate(dateStr) {
+        if (!dateStr) return '-';
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return dateStr;
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        return months[d.getMonth()] + ' ' + d.getFullYear();
     }
 }">
     <!-- Header & Filter Section -->
@@ -264,7 +271,7 @@
                                         </div>
                                         <span
                                             class="text-gray-400 text-[11px] bg-gray-100 dark:bg-slate-800 px-2 py-0.5 rounded-lg"
-                                            x-text="work.start_date + ' s/d ' + (work.currently_working ? 'Sekarang' : (work.end_date || '-'))"></span>
+                                            x-text="formatDate(work.start_date) + ' s/d ' + (work.currently_working ? 'Sekarang' : formatDate(work.end_date))"></span>
                                     </div>
                                     <p x-show="work.description"
                                         class="text-gray-600 dark:text-slate-300 text-[11px] pt-1"
@@ -463,15 +470,23 @@
 
                     <!-- 9. Media Sosial (social_medias) -->
                     <div>
-                        <h4 class="font-bold text-gray-900 dark:text-white mb-2">Media Sosial</h4>
+                        <h4 class="font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-1.5 text-xs">
+                            <svg class="w-3.5 h-3.5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                            </svg>
+                            <span>Media Sosial & Portofolio</span>
+                        </h4>
                         <template
                             x-if="detailData.applicant_profile && detailData.applicant_profile.social_medias && detailData.applicant_profile.social_medias.length > 0">
-                            <div class="space-y-1">
-                                <template x-for="sm in detailData.applicant_profile.social_medias"
-                                    :key="sm.id">
+                            <div class="flex flex-wrap gap-2">
+                                <template x-for="sm in detailData.applicant_profile.social_medias" :key="sm.id">
                                     <a :href="sm.url" target="_blank"
-                                        class="block text-indigo-600 dark:text-indigo-400 hover:underline font-semibold text-[11px]"
-                                        x-text="sm.platform_name + ': ' + sm.url"></a>
+                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50/80 hover:bg-indigo-100 dark:bg-indigo-950/50 dark:hover:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 font-semibold text-[11px] border border-indigo-200/60 dark:border-indigo-800/60 transition group shadow-2xs">
+                                        <span x-text="sm.platform_name"></span>
+                                        <svg class="w-3 h-3 text-indigo-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                        </svg>
+                                    </a>
                                 </template>
                             </div>
                         </template>

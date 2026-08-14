@@ -37,6 +37,10 @@ class CandidateTable extends Component
               })
               ->orWhereHas('applicantProfile');
         })
+        ->whereNotIn('role_id', [1, 2])
+        ->whereDoesntHave('role', function ($rq) {
+            $rq->whereIn(\Illuminate\Support\Facades\DB::raw('LOWER(name)'), ['admin', 'superadmin', 'recruiter']);
+        })
         ->when($this->search, function ($query) {
             $search = strtolower(trim($this->search));
             $query->where(function ($q) use ($search) {
