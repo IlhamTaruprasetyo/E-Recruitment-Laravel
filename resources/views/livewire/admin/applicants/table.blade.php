@@ -66,26 +66,16 @@
     @endif
 
     <!-- Header & Filter Section -->
-    <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 overflow-hidden shadow-sm rounded-2xl p-6">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="relative z-20 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 shadow-sm rounded-2xl p-6">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div>
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white">Daftar Lamaran Kerja</h3>
                 <p class="text-xs text-gray-500 dark:text-slate-400">Pantau dan kelola tahapan seleksi berkas pelamar pekerjaan.</p>
             </div>
-            <div class="flex flex-col sm:flex-row items-center gap-3">
-                <!-- Status Filter -->
-                <select wire:model.live="statusFilter" class="w-full sm:w-auto px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                    <option value="">Semua Status</option>
-                    <option value="Submitted">Submitted (Diajukan)</option>
-                    <option value="Reviewed">Reviewed (Ditinjau)</option>
-                    <option value="Shortlisted">Shortlisted (Lolos Berkas)</option>
-                    <option value="Interview">Interview (Wawancara)</option>
-                    <option value="Accepted">Accepted (Diterima)</option>
-                    <option value="Rejected">Rejected (Ditolak)</option>
-                </select>
-
+            
+            <div class="flex flex-wrap items-center gap-3">
                 <!-- Search Input -->
-                <div class="relative w-full sm:w-64">
+                <div class="relative w-full sm:w-60">
                     <input type="text" 
                            wire:model.live.debounce.300ms="search"
                            placeholder="Cari pelamar, posisi..." 
@@ -94,6 +84,130 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
+
+                <!-- Multi-Checklist Status Filter Dropdown -->
+                <div x-data="{ open: false }" class="relative">
+                    <button @click="open = !open" 
+                            type="button" 
+                            class="inline-flex items-center gap-2 px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700/80 transition focus:outline-none">
+                        <svg class="w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                        </svg>
+                        <span>Checklist Status</span>
+                        @if(count($selectedStatuses) > 0)
+                            <span class="px-1.5 py-0.5 text-[10px] font-bold bg-indigo-600 text-white rounded-full">
+                                {{ count($selectedStatuses) }}
+                            </span>
+                        @endif
+                        <svg class="w-3.5 h-3.5 text-gray-400 ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+
+                    <div x-show="open" 
+                         @click.outside="open = false" 
+                         x-transition:enter="transition ease-out duration-100"
+                         x-transition:enter-start="transform opacity-0 scale-95"
+                         x-transition:enter-end="transform opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="transform opacity-100 scale-100"
+                         x-transition:leave-end="transform opacity-0 scale-95"
+                         x-cloak
+                         class="absolute right-0 mt-2 w-56 rounded-2xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 shadow-xl z-50 p-3 space-y-2">
+                        
+                        <div class="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-slate-800">
+                            <span class="text-xs font-bold text-gray-900 dark:text-white">Filter Multi-Status</span>
+                            @if(count($selectedStatuses) > 0)
+                                <button wire:click="$set('selectedStatuses', [])" class="text-[10px] text-indigo-600 dark:text-indigo-400 hover:underline">
+                                    Reset Filter
+                                </button>
+                            @endif
+                        </div>
+
+                        <div class="space-y-1.5 max-h-48 overflow-y-auto custom-scrollbar">
+                            @foreach([
+                                'Submitted' => 'Submitted (Diajukan)',
+                                'Reviewed' => 'Reviewed (Ditinjau)',
+                                'Shortlisted' => 'Shortlisted (Lolos Berkas)',
+                                'Interview' => 'Interview (Wawancara)',
+                                'Accepted' => 'Accepted (Diterima)',
+                                'Rejected' => 'Rejected (Ditolak)'
+                            ] as $val => $label)
+                                <label class="flex items-center gap-2.5 px-2 py-1.5 hover:bg-gray-50 dark:hover:bg-slate-800/60 rounded-xl cursor-pointer transition text-xs text-gray-700 dark:text-slate-300">
+                                    <input type="checkbox" 
+                                           value="{{ $val }}" 
+                                           wire:model.live="selectedStatuses"
+                                           class="w-3.5 h-3.5 rounded border-gray-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500">
+                                    <span>{{ $label }}</span>
+                                </label>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Columns Toggle Dropdown -->
+                <div x-data="{ open: false }" class="relative">
+                    <button @click="open = !open" 
+                            type="button" 
+                            class="inline-flex items-center gap-2 px-3 py-2 text-xs rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/60 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition focus:outline-none font-semibold">
+                        <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+                        </svg>
+                        <span>Atur Kolom</span>
+                        <span class="px-1.5 py-0.5 text-[10px] font-bold bg-indigo-600 text-white rounded-full">
+                            {{ count($selectedColumns) }}
+                        </span>
+                        <svg class="w-3.5 h-3.5 text-indigo-400 ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+
+                    <div x-show="open" 
+                         @click.outside="open = false" 
+                         x-transition:enter="transition ease-out duration-100"
+                         x-transition:enter-start="transform opacity-0 scale-95"
+                         x-transition:enter-end="transform opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="transform opacity-100 scale-100"
+                         x-transition:leave-end="transform opacity-0 scale-95"
+                         x-cloak
+                         class="absolute right-0 mt-2 w-60 rounded-2xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 shadow-xl z-50 p-3 space-y-2">
+                        
+                        <div class="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-slate-800">
+                            <span class="text-xs font-bold text-gray-900 dark:text-white">Tampilkan Kolom</span>
+                            <div class="flex gap-2 text-[10px]">
+                                <button wire:click="selectAllColumns" class="text-indigo-600 dark:text-indigo-400 hover:underline">Semua</button>
+                                <span class="text-gray-300 dark:text-slate-700">•</span>
+                                <button wire:click="resetColumnSelection" class="text-gray-500 hover:underline">Reset</button>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1.5 max-h-56 overflow-y-auto custom-scrollbar">
+                            @foreach([
+                                'applicant' => 'Pelamar (Nama & Email)',
+                                'contact' => 'Kontak & NIK',
+                                'job' => 'Posisi & Perusahaan',
+                                'applied_at' => 'Tanggal Melamar',
+                                'status' => 'Status & Catatan',
+                                'actions' => 'Aksi'
+                            ] as $colKey => $colLabel)
+                                <label class="flex items-center gap-2.5 px-2 py-1.5 hover:bg-gray-50 dark:hover:bg-slate-800/60 rounded-xl cursor-pointer transition text-xs text-gray-700 dark:text-slate-300">
+                                    <input type="checkbox" 
+                                           value="{{ $colKey }}" 
+                                           wire:model.live="selectedColumns"
+                                           class="w-3.5 h-3.5 rounded border-gray-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500">
+                                    <span>{{ $colLabel }}</span>
+                                </label>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+
+                @if(!empty($selectedStatuses) || $search)
+                    <button wire:click="resetAllFilters" class="px-3 py-2 text-xs rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 transition">
+                        Reset Semua Filter
+                    </button>
+                @endif
             </div>
         </div>
     </div>
@@ -102,7 +216,7 @@
     <div class="relative bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
         
         <!-- Livewire Loading Overlay -->
-        <div wire:loading wire:target="search, statusFilter, previousPage, nextPage, gotoPage" class="absolute inset-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-[1px] flex items-center justify-center z-10 transition">
+        <div wire:loading wire:target="search, statusFilter, selectedStatuses, selectedColumns, previousPage, nextPage, gotoPage" class="absolute inset-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-[1px] flex items-center justify-center z-10 transition">
             <div class="flex items-center gap-2.5 px-4 py-2.5 bg-slate-900/90 dark:bg-slate-800/90 text-white rounded-xl shadow-xl text-xs font-semibold">
                 <svg class="animate-spin w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -116,110 +230,146 @@
             <table class="w-full text-left border-collapse text-xs">
                 <thead>
                     <tr class="border-b border-gray-200 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/50 text-gray-500 dark:text-slate-400 uppercase tracking-wider font-semibold">
-                        <th class="px-6 py-4">Pelamar</th>
-                        <th class="px-6 py-4">Posisi & Perusahaan</th>
-                        <th class="px-6 py-4">Tanggal Melamar</th>
-                        <th class="px-6 py-4">Status & Catatan</th>
-                        <th class="px-6 py-4 text-right">Aksi</th>
+                        @if(in_array('applicant', $selectedColumns))
+                            <th class="px-6 py-4">Pelamar</th>
+                        @endif
+                        @if(in_array('contact', $selectedColumns))
+                            <th class="px-6 py-4">Kontak & NIK</th>
+                        @endif
+                        @if(in_array('job', $selectedColumns))
+                            <th class="px-6 py-4">Posisi & Perusahaan</th>
+                        @endif
+                        @if(in_array('applied_at', $selectedColumns))
+                            <th class="px-6 py-4">Tanggal Melamar</th>
+                        @endif
+                        @if(in_array('status', $selectedColumns))
+                            <th class="px-6 py-4">Status & Catatan</th>
+                        @endif
+                        @if(in_array('actions', $selectedColumns))
+                            <th class="px-6 py-4 text-right">Aksi</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-slate-800/60 text-gray-700 dark:text-slate-300">
                     @forelse ($applications as $app)
                         <tr class="hover:bg-gray-50/80 dark:hover:bg-slate-800/40 transition-colors">
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-3">
-                                    @if ($app->applicantProfile && $app->applicantProfile->photo)
-                                        <img src="{{ \Illuminate\Support\Str::startsWith($app->applicantProfile->photo, ['http://', 'https://']) ? $app->applicantProfile->photo : asset('storage/' . $app->applicantProfile->photo) }}" alt="{{ $app->applicantProfile->full_name }}" class="w-9 h-9 rounded-full object-cover border border-gray-200 dark:border-slate-700 shadow-sm shrink-0">
-                                    @else
-                                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-sm shrink-0">
-                                            {{ strtoupper(substr($app->applicantProfile->full_name ?? 'P', 0, 2)) }}
+                            @if(in_array('applicant', $selectedColumns))
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        @if ($app->applicantProfile && $app->applicantProfile->photo)
+                                            <img src="{{ \Illuminate\Support\Str::startsWith($app->applicantProfile->photo, ['http://', 'https://']) ? $app->applicantProfile->photo : asset('storage/' . $app->applicantProfile->photo) }}" alt="{{ $app->applicantProfile->full_name }}" class="w-9 h-9 rounded-full object-cover border border-gray-200 dark:border-slate-700 shadow-sm shrink-0">
+                                        @else
+                                            <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-sm shrink-0">
+                                                {{ strtoupper(substr($app->applicantProfile->full_name ?? 'P', 0, 2)) }}
+                                            </div>
+                                        @endif
+                                        <div>
+                                            <span class="font-bold text-gray-900 dark:text-white block text-sm">{{ $app->applicantProfile->full_name ?? 'Pelamar' }}</span>
+                                            <span class="text-[11px] text-gray-400 dark:text-slate-400 block">{{ $app->applicantProfile->user->email ?? '-' }}</span>
                                         </div>
-                                    @endif
+                                    </div>
+                                </td>
+                            @endif
+
+                            @if(in_array('contact', $selectedColumns))
+                                <td class="px-6 py-4">
                                     <div>
-                                        <span class="font-bold text-gray-900 dark:text-white block text-sm">{{ $app->applicantProfile->full_name ?? 'Pelamar' }}</span>
-                                        <span class="text-[11px] text-gray-400 dark:text-slate-400 block">{{ $app->applicantProfile->user->email ?? '-' }}</span>
+                                        <span class="font-medium text-gray-800 dark:text-slate-200 block">{{ $app->applicantProfile->phone ?? '-' }}</span>
+                                        <span class="text-[11px] text-gray-400 block">NIK: {{ $app->applicantProfile->nik ?? '-' }}</span>
                                     </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div>
-                                    <span class="font-semibold text-gray-800 dark:text-slate-200 block">{{ $app->job->title ?? 'Lowongan' }}</span>
-                                    <div class="flex items-center gap-2 mt-0.5">
-                                        @if ($app->job && $app->job->company)
-                                            <span class="text-[11px] font-medium text-indigo-600 dark:text-indigo-400">
-                                                {{ $app->job->company->name }}
+                                </td>
+                            @endif
+
+                            @if(in_array('job', $selectedColumns))
+                                <td class="px-6 py-4">
+                                    <div>
+                                        <span class="font-semibold text-gray-800 dark:text-slate-200 block">{{ $app->job->title ?? 'Lowongan' }}</span>
+                                        <div class="flex items-center gap-2 mt-0.5">
+                                            @if ($app->job && $app->job->company)
+                                                <span class="text-[11px] font-medium text-indigo-600 dark:text-indigo-400">
+                                                    {{ $app->job->company->name }}
+                                                </span>
+                                            @endif
+                                            @if ($app->job && $app->job->department)
+                                                <span class="text-[11px] text-gray-400">
+                                                    • {{ $app->job->department->name }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </td>
+                            @endif
+
+                            @if(in_array('applied_at', $selectedColumns))
+                                <td class="px-6 py-4">
+                                    <span class="text-gray-600 dark:text-slate-300 font-medium">
+                                        {{ \Carbon\Carbon::parse($app->applied_at)->format('d M Y, H:i') }}
+                                    </span>
+                                </td>
+                            @endif
+
+                            @if(in_array('status', $selectedColumns))
+                                <td class="px-6 py-4">
+                                    <div class="space-y-1">
+                                        @if ($app->status === 'Accepted')
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+                                                Accepted (Diterima)
+                                            </span>
+                                        @elseif ($app->status === 'Rejected')
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800">
+                                                Rejected (Ditolak)
+                                            </span>
+                                        @elseif ($app->status === 'Interview')
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
+                                                Interview (Wawancara)
+                                            </span>
+                                        @elseif ($app->status === 'Shortlisted')
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800">
+                                                Shortlisted (Lolos Berkas)
+                                            </span>
+                                        @elseif ($app->status === 'Reviewed')
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+                                                Reviewed (Ditinjau)
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
+                                                Submitted (Diajukan)
                                             </span>
                                         @endif
-                                        @if ($app->job && $app->job->department)
-                                            <span class="text-[11px] text-gray-400">
-                                                • {{ $app->job->department->name }}
-                                            </span>
+
+                                        @if ($app->notes)
+                                            <p class="text-[11px] text-gray-400 dark:text-slate-500 italic truncate max-w-xs" title="{{ $app->notes }}">
+                                                "{{ $app->notes }}"
+                                            </p>
                                         @endif
                                     </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <span class="text-gray-600 dark:text-slate-300 font-medium">
-                                    {{ \Carbon\Carbon::parse($app->applied_at)->format('d M Y, H:i') }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="space-y-1">
-                                    @if ($app->status === 'Accepted')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-                                            Accepted (Diterima)
-                                        </span>
-                                    @elseif ($app->status === 'Rejected')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800">
-                                            Rejected (Ditolak)
-                                        </span>
-                                    @elseif ($app->status === 'Interview')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
-                                            Interview (Wawancara)
-                                        </span>
-                                    @elseif ($app->status === 'Shortlisted')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800">
-                                            Shortlisted (Lolos Berkas)
-                                        </span>
-                                    @elseif ($app->status === 'Reviewed')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
-                                            Reviewed (Ditinjau)
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
-                                            Submitted (Diajukan)
-                                        </span>
-                                    @endif
+                                </td>
+                            @endif
 
-                                    @if ($app->notes)
-                                        <p class="text-[11px] text-gray-400 dark:text-slate-500 italic truncate max-w-xs" title="{{ $app->notes }}">
-                                            "{{ $app->notes }}"
-                                        </p>
-                                    @endif
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-right">
-                                <div class="flex items-center justify-end gap-2">
-                                    <!-- View Detail Button -->
-                                    <button @click="openDetailModal({{ json_encode($app) }})" class="p-1.5 rounded-lg text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors" title="Lihat Detail Profil">
-                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-                                    </button>
+                            @if(in_array('actions', $selectedColumns))
+                                <td class="px-6 py-4 text-right">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <!-- View Detail Button -->
+                                        <button @click="openDetailModal({{ json_encode($app) }})" class="p-1.5 rounded-lg text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors" title="Lihat Detail Profil">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                        </button>
 
-                                    <!-- Edit Status Button -->
-                                    <button @click="openStatusModal({{ json_encode($app) }})" class="p-1.5 rounded-lg text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors" title="Update Status Lamaran">
-                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </td>
+                                        <!-- Edit Status Button -->
+                                        <button @click="openStatusModal({{ json_encode($app) }})" class="p-1.5 rounded-lg text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors" title="Update Status Lamaran">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            @endif
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-12 text-center text-gray-400 dark:text-slate-500">
+                            <td colspan="{{ max(count($selectedColumns), 1) }}" class="px-6 py-12 text-center text-gray-400 dark:text-slate-500">
                                 <div class="flex flex-col items-center justify-center gap-2">
                                     <svg class="w-10 h-10 text-gray-300 dark:text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />

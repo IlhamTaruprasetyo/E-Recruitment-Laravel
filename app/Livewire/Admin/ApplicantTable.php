@@ -13,6 +13,8 @@ class ApplicantTable extends Component
 
     public $search = '';
     public $statusFilter = '';
+    public array $selectedStatuses = [];
+    public array $selectedColumns = ['applicant', 'job', 'applied_at', 'status', 'actions'];
 
     public function updatingSearch()
     {
@@ -21,6 +23,29 @@ class ApplicantTable extends Component
 
     public function updatingStatusFilter()
     {
+        $this->resetPage();
+    }
+
+    public function updatingSelectedStatuses()
+    {
+        $this->resetPage();
+    }
+
+    public function resetColumnSelection()
+    {
+        $this->selectedColumns = ['applicant', 'job', 'applied_at', 'status', 'actions'];
+    }
+
+    public function selectAllColumns()
+    {
+        $this->selectedColumns = ['applicant', 'contact', 'job', 'applied_at', 'status', 'actions'];
+    }
+
+    public function resetAllFilters()
+    {
+        $this->search = '';
+        $this->statusFilter = '';
+        $this->selectedStatuses = [];
         $this->resetPage();
     }
 
@@ -70,6 +95,9 @@ class ApplicantTable extends Component
                         });
                   });
             });
+        })
+        ->when(!empty($this->selectedStatuses), function ($query) {
+            $query->whereIn('status', $this->selectedStatuses);
         })
         ->when($this->statusFilter, function ($query) {
             $query->where('status', $this->statusFilter);
