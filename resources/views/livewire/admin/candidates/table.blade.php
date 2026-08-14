@@ -535,14 +535,24 @@
                     </template>
                 </div>
 
-                <!-- CV Document Link -->
-                <template x-if="detailData.applicant_profile && detailData.applicant_profile.generated_cv_url">
-                    <div class="pt-2 border-t border-gray-100 dark:border-slate-800 flex items-center justify-between">
-                        <span class="font-bold text-gray-900 dark:text-white text-xs">Dokumen CV / Resume</span>
-                        <a :href="detailData.applicant_profile.generated_cv_url" target="_blank"
-                            class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl shadow-sm transition">
-                            Unduh / Lihat CV
-                        </a>
+                <!-- Dokumen CV / Resume -->
+                <template x-if="detailData.applicant_profile">
+                    <div class="pt-3 border-t border-gray-100 dark:border-slate-800 space-y-2">
+                        <span class="font-bold text-gray-900 dark:text-white text-xs block">Dokumen CV / Resume Kandidat</span>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <template x-if="detailData.applicant_profile.cv_file_url || detailData.applicant_profile.cv_file_path">
+                                <a :href="detailData.applicant_profile.cv_file_url ? detailData.applicant_profile.cv_file_url : ('/storage/' + detailData.applicant_profile.cv_file_path)" target="_blank"
+                                    class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-xl shadow-sm transition flex items-center gap-1.5">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    <span>Unduh / Buka File CV</span>
+                                </a>
+                            </template>
+                            <template x-if="!detailData.applicant_profile.cv_file_url && !detailData.applicant_profile.cv_file_path">
+                                <span class="text-xs text-gray-400 dark:text-slate-400 italic">Kandidat belum mengunggah file CV.</span>
+                            </template>
+                        </div>
                     </div>
                 </template>
             </div>

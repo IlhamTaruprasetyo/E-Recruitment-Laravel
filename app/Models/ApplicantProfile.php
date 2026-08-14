@@ -13,8 +13,26 @@ class ApplicantProfile extends Model
         'user_id', 'nik', 'full_name', 'gender', 'birth_place',
         'birth_date', 'phone', 'address', 'city', 'province',
         'photo', 'npwp', 'child_sequence', 'total_siblings', 'marital_status',
-        'about_me', 'generated_cv_url',
+        'about_me', 'generated_cv_url', 'cv_file_path',
     ];
+
+    protected $appends = ['cv_url', 'cv_file_url'];
+
+    public function getCvFileUrlAttribute(): ?string
+    {
+        return $this->cv_file_path ? asset('storage/' . $this->cv_file_path) : null;
+    }
+
+    public function getCvUrlAttribute(): ?string
+    {
+        if ($this->cv_file_path) {
+            return asset('storage/' . $this->cv_file_path);
+        }
+        if ($this->generated_cv_url) {
+            return $this->generated_cv_url;
+        }
+        return route('profile.cv.preview');
+    }
 
     public function user()
     {
@@ -87,7 +105,7 @@ class ApplicantProfile extends Model
     public function getSectionStatusesAttribute(): array
     {
         return [
-            'pribadi' => ! empty($this->nik) && ! empty($this->full_name) && ! empty($this->phone) && ! empty($this->address),
+            'pribadi' => ! empty($this->nik) && ! empty($this->full_name) && ! empty($this->phone) && ! empty($this->address) && (! empty($this->cv_file_path) || ! empty($this->generated_cv_url)),
             'keluarga' => $this->family()->exists() || (! empty($this->child_sequence) && ! empty($this->marital_status)),
             'pendidikan' => $this->educations()->exists(),
             'skill' => $this->skills()->exists(),
@@ -137,7 +155,7 @@ class ApplicantProfile extends Model
     {
         $statuses = $this->section_statuses;
         $labels = [
-            'pribadi' => 'Data Pribadi',
+            'pribadi' => 'Data Pribadi & Dokumen CV',
             'keluarga' => 'Data Keluarga',
             'pendidikan' => 'Pendidikan',
             'skill' => 'Skill / Keahlian',

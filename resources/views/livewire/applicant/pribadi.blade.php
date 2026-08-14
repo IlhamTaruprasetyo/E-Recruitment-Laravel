@@ -118,7 +118,7 @@
                 </div>
 
                 <div class="flex-1 text-center sm:text-left space-y-2">
-                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">Foto Profil / Pas Foto</label>
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">Foto Profil / Pas Foto <span class="text-red-500">*</span></label>
                     
                     <div class="flex flex-wrap items-center gap-3 justify-center sm:justify-start">
                         <label class="px-4 py-2 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-xs font-semibold rounded-xl cursor-pointer transition border border-indigo-200 dark:border-indigo-800 flex items-center gap-2">
@@ -140,7 +140,7 @@
 
                 <!-- NIK -->
                 <div>
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">NIK (Nomor Induk Kependudukan)</label>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">NIK (Nomor Induk Kependudukan) <span class="text-red-500">*</span></label>
                     <input type="text" wire:model="nik" placeholder="Masukkan 16 digit NIK"
                         class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition">
                     @error('nik') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
@@ -156,7 +156,7 @@
 
                 <!-- Jenis Kelamin -->
                 <div>
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Jenis Kelamin</label>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Jenis Kelamin <span class="text-red-500">*</span></label>
                     <select wire:model="gender"
                         class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition">
                         <option value="">-- Pilih Jenis Kelamin --</option>
@@ -168,7 +168,7 @@
 
                 <!-- Nomor Telepon / WA -->
                 <div>
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">No. Telepon / WhatsApp</label>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">No. Telepon / WhatsApp <span class="text-red-500">*</span></label>
                     <input type="text" wire:model="phone" placeholder="Contoh: 081234567890"
                         class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition">
                     @error('phone') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
@@ -176,7 +176,7 @@
 
                 <!-- Tempat Lahir -->
                 <div>
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Tempat Lahir</label>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Tempat Lahir <span class="text-red-500">*</span></label>
                     <input type="text" wire:model="birth_place" placeholder="Kota tempat lahir"
                         class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition">
                     @error('birth_place') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
@@ -184,7 +184,7 @@
 
                 <!-- Tanggal Lahir -->
                 <div>
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Tanggal Lahir</label>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Tanggal Lahir <span class="text-red-500">*</span></label>
                     <input type="date" wire:model="birth_date"
                         class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition">
                     @error('birth_date') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
@@ -304,7 +304,7 @@
                     <!-- Kota / Kabupaten Dropdown -->
                     <div class="relative">
                         <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">
-                            Kota / Kabupaten Domisili
+                            Kota / Kabupaten Domisili <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
                             <input type="text" 
@@ -339,7 +339,7 @@
                     <!-- Provinsi Dropdown -->
                     <div class="relative">
                         <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">
-                            Provinsi Domisili
+                            Provinsi Domisili <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
                             <input type="text" 
@@ -375,7 +375,7 @@
 
                 <!-- Alamat Lengkap -->
                 <div class="md:col-span-2">
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Alamat Lengkap</label>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Alamat Lengkap <span class="text-red-500">*</span></label>
                     <textarea wire:model="address" rows="3" placeholder="Alamat lengkap tempat tinggal saat ini"
                         class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"></textarea>
                     @error('address') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
@@ -387,6 +387,61 @@
                     <textarea wire:model="about_me" rows="4" placeholder="Tuliskan gambaran singkat mengenai latar belakang, motivasi, dan keahlian Anda..."
                         class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"></textarea>
                     @error('about_me') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                </div>
+
+                <!-- Upload Dokumen CV / Resume -->
+                <div class="md:col-span-2 p-5 bg-gray-50/70 dark:bg-gray-900/40 border border-gray-200/80 dark:border-gray-700/80 rounded-2xl space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">Dokumen CV / Resume (PDF / DOCX) <span class="text-red-500">*</span></label>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Unggah file CV terbaru Anda (Maksimal 5MB, Format PDF, DOC, atau DOCX)</p>
+                        </div>
+                        <a href="{{ route('profile.cv.preview') }}" target="_blank" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            <span>Preview CV ATS System</span>
+                        </a>
+                    </div>
+
+                    <!-- File Upload Input / Status -->
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                        <label class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl cursor-pointer shadow-sm transition flex items-center gap-2 shrink-0">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
+                            <span>{{ $current_cv_path ? 'Ganti File CV' : 'Pilih & Unggah CV' }}</span>
+                            <input type="file" wire:model.live="cv_file" accept=".pdf,.doc,.docx" class="hidden">
+                        </label>
+
+                        @if ($current_cv_url)
+                            <div class="flex items-center gap-3 bg-white dark:bg-gray-800 px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-xs w-full sm:w-auto justify-between">
+                                <a href="{{ $current_cv_url }}" target="_blank" class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-semibold hover:underline truncate">
+                                    <svg class="w-4 h-4 shrink-0 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                    </svg>
+                                    <span class="truncate">File CV Tersimpan</span>
+                                </a>
+                                <button type="button" wire:click="deleteCv" wire:confirm="Apakah Anda yakin ingin menghapus file CV ini?" class="text-red-500 hover:text-red-700 font-medium text-xs ml-2">
+                                    Hapus
+                                </button>
+                            </div>
+                        @else
+                            <span class="text-xs text-gray-400 dark:text-gray-500 italic">Belum ada file CV yang diunggah.</span>
+                        @endif
+                    </div>
+
+                    <!-- Progress indicator -->
+                    <div wire:loading wire:target="cv_file" class="text-xs text-indigo-600 dark:text-indigo-400 font-medium flex items-center gap-2">
+                        <svg class="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Munggah file...
+                    </div>
+
+                    @error('cv_file') <span class="text-xs text-red-500 block">{{ $message }}</span> @enderror
                 </div>
             </div>
 

@@ -13,20 +13,38 @@ class Pribadi extends Component
     use WithFileUploads;
 
     public $nik;
+
     public $full_name;
+
     public $gender;
+
     public $birth_place;
+
     public $birth_date;
+
     public $phone;
+
     public $address;
+
     public $city;
+
     public $province;
+
     public $npwp;
+
     public $about_me;
 
     public $photo;
+
     public $cropped_photo_base64;
+
     public $current_photo_url;
+
+    public $cv_file;
+
+    public $current_cv_path;
+
+    public $current_cv_url;
 
     public function mount()
     {
@@ -50,7 +68,9 @@ class Pribadi extends Component
         $this->province = $profile->province;
         $this->npwp = $profile->npwp;
         $this->about_me = $profile->about_me;
-        $this->current_photo_url = $profile->photo ? (asset('storage/' . $profile->photo) . '?v=' . time()) : null;
+        $this->current_photo_url = $profile->photo ? (asset('storage/'.$profile->photo).'?v='.time()) : null;
+        $this->current_cv_path = $profile->cv_file_path;
+        $this->current_cv_url = $profile->cv_file_path ? asset('storage/'.$profile->cv_file_path) : null;
     }
 
     protected function rules()
@@ -68,7 +88,43 @@ class Pribadi extends Component
             'npwp' => 'nullable|string|max:30',
             'about_me' => 'nullable|string|max:1000',
             'photo' => 'nullable|image|max:5120',
+            'cv_file' => 'nullable|file|max:10240',
         ];
+    }
+
+    public function updatedCvFile()
+    {
+        $this->validate([
+            'cv_file' => 'required|file|max:10240',
+        ], [
+            'cv_file.required' => 'Silakan pilih file CV.',
+            'cv_file.file' => 'File CV tidak valid.',
+            'cv_file.max' => 'Ukuran file CV maksimal 10MB.',
+        ]);
+
+        $extension = strtolower($this->cv_file->getClientOriginalExtension());
+        if (! in_array($extension, ['pdf', 'doc', 'docx'])) {
+            $this->addError('cv_file', 'Format file CV harus berupa PDF, DOC, atau DOCX.');
+            $this->cv_file = null;
+            return;
+        }
+
+        $user = Auth::user();
+        $profile = ApplicantProfile::firstOrCreate(['user_id' => $user->id]);
+
+        if ($profile->cv_file_path && Storage::disk('public')->exists($profile->cv_file_path)) {
+            Storage::disk('public')->delete($profile->cv_file_path);
+        }
+
+        $cvPath = $this->cv_file->store('applicant-cvs', 'public');
+        $profile->update(['cv_file_path' => $cvPath]);
+
+        $this->current_cv_path = $cvPath;
+        $this->current_cv_url = asset('storage/' . $cvPath) . '?v=' . time();
+        $this->cv_file = null;
+
+        session()->flash('message', 'File CV berhasil diunggah.');
+        $this->dispatch('profile-updated', name: $this->full_name);
     }
 
     public function save()
@@ -84,17 +140,19 @@ class Pribadi extends Component
             }
 
             // Decode base64 image from Cropper.js
-            $imageParts = explode(";base64,", $this->cropped_photo_base64);
-            $imageTypeAux = explode("image/", $imageParts[0]);
+            $imageParts = explode(';base64,', $this->cropped_photo_base64);
+            $imageTypeAux = explode('image/', $imageParts[0]);
             $imageType = isset($imageTypeAux[1]) ? strtolower($imageTypeAux[1]) : 'jpeg';
-            if ($imageType === 'jpeg') { $imageType = 'jpg'; }
+            if ($imageType === 'jpeg') {
+                $imageType = 'jpg';
+            }
             $imageBase64 = base64_decode($imageParts[1]);
 
-            $fileName = 'applicant-photos/' . uniqid() . '.' . $imageType;
+            $fileName = 'applicant-photos/'.uniqid().'.'.$imageType;
             Storage::disk('public')->put($fileName, $imageBase64);
 
             $validatedData['photo'] = $fileName;
-            $this->current_photo_url = asset('storage/' . $fileName) . '?v=' . time();
+            $this->current_photo_url = asset('storage/'.$fileName).'?v='.time();
             $this->photo = null;
             $this->cropped_photo_base64 = null;
         } elseif ($this->photo) {
@@ -103,11 +161,26 @@ class Pribadi extends Component
             }
             $photoPath = $this->photo->store('applicant-photos', 'public');
             $validatedData['photo'] = $photoPath;
-            $this->current_photo_url = asset('storage/' . $photoPath) . '?v=' . time();
+            $this->current_photo_url = asset('storage/'.$photoPath).'?v='.time();
             $this->photo = null;
         } else {
             unset($validatedData['photo']);
         }
+
+        if ($this->cv_file) {
+            $extension = strtolower($this->cv_file->getClientOriginalExtension());
+            if (in_array($extension, ['pdf', 'doc', 'docx'])) {
+                if ($profile->cv_file_path && Storage::disk('public')->exists($profile->cv_file_path)) {
+                    Storage::disk('public')->delete($profile->cv_file_path);
+                }
+                $cvPath = $this->cv_file->store('applicant-cvs', 'public');
+                $validatedData['cv_file_path'] = $cvPath;
+                $this->current_cv_path = $cvPath;
+                $this->current_cv_url = asset('storage/' . $cvPath) . '?v=' . time();
+                $this->cv_file = null;
+            }
+        }
+        unset($validatedData['cv_file']);
 
         $profile->update($validatedData);
 
@@ -117,6 +190,21 @@ class Pribadi extends Component
 
         session()->flash('message', 'Data pribadi berhasil diperbarui.');
         $this->dispatch('profile-updated', name: $this->full_name);
+    }
+
+    public function deleteCv()
+    {
+        $user = Auth::user();
+        $profile = ApplicantProfile::where('user_id', $user->id)->first();
+        if ($profile && $profile->cv_file_path) {
+            if (Storage::disk('public')->exists($profile->cv_file_path)) {
+                Storage::disk('public')->delete($profile->cv_file_path);
+            }
+            $profile->update(['cv_file_path' => null]);
+            $this->current_cv_path = null;
+            $this->current_cv_url = null;
+            session()->flash('message', 'File CV berhasil dihapus.');
+        }
     }
 
     public function render()
