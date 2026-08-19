@@ -105,7 +105,8 @@ class ApplicantProfile extends Model
     public function getSectionStatusesAttribute(): array
     {
         return [
-            'pribadi' => ! empty($this->nik) && ! empty($this->full_name) && ! empty($this->phone) && ! empty($this->address) && (! empty($this->cv_file_path) || ! empty($this->generated_cv_url)),
+            'pribadi' => ! empty($this->nik) && ! empty($this->full_name) && ! empty($this->phone) && ! empty($this->address),
+            'cv' => ! empty($this->cv_file_path) || ! empty($this->generated_cv_url),
             'keluarga' => $this->family()->exists() || (! empty($this->child_sequence) && ! empty($this->marital_status)),
             'pendidikan' => $this->educations()->exists(),
             'skill' => $this->skills()->exists(),
@@ -124,6 +125,7 @@ class ApplicantProfile extends Model
     {
         $statuses = $this->section_statuses;
         return ! empty($statuses['pribadi'])
+            && ! empty($statuses['cv'])
             && ! empty($statuses['keluarga'])
             && ! empty($statuses['pendidikan'])
             && ! empty($statuses['skill'])
@@ -136,7 +138,7 @@ class ApplicantProfile extends Model
     public function getMandatoryCompletionPercentageAttribute(): int
     {
         $statuses = $this->section_statuses;
-        $mandatoryKeys = ['pribadi', 'keluarga', 'pendidikan', 'skill', 'pengalaman'];
+        $mandatoryKeys = ['pribadi', 'cv', 'keluarga', 'pendidikan', 'skill', 'pengalaman'];
         
         $completedCount = 0;
         foreach ($mandatoryKeys as $key) {
@@ -155,7 +157,8 @@ class ApplicantProfile extends Model
     {
         $statuses = $this->section_statuses;
         $labels = [
-            'pribadi' => 'Data Pribadi & Dokumen CV',
+            'pribadi' => 'Data Pribadi',
+            'cv' => 'Unggah Dokumen CV',
             'keluarga' => 'Data Keluarga',
             'pendidikan' => 'Pendidikan',
             'skill' => 'Skill / Keahlian',
@@ -180,11 +183,12 @@ class ApplicantProfile extends Model
         $statuses = $this->section_statuses;
         $weights = [
             // Data Wajib (80% total)
-            'pribadi' => 16,
-            'keluarga' => 16,
-            'pendidikan' => 16,
-            'skill' => 16,
-            'pengalaman' => 16,
+            'pribadi' => 15,
+            'cv' => 15,
+            'keluarga' => 13,
+            'pendidikan' => 13,
+            'skill' => 12,
+            'pengalaman' => 12,
             // Data Pelengkap (20% total)
             'organisasi' => 5,
             'prestasi' => 5,

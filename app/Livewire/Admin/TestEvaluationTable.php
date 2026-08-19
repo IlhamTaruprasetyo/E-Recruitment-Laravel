@@ -58,6 +58,7 @@ class TestEvaluationTable extends Component
             'answers.question.options',
             'answers.option',
             'answers.reviewer',
+            'discTestResult.discProfile',
         ])
         ->when($this->search, function ($query) {
             $search = strtolower(trim($this->search));

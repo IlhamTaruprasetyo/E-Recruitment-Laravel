@@ -25,4 +25,20 @@ class Company extends Model
     {
         return $this->hasMany(Job::class);
     }
+
+    /**
+     * Get formatted logo URL (Cloudinary, external URL, or local storage)
+     */
+    public function getLogoUrlAttribute()
+    {
+        if (empty($this->logo)) {
+            return null;
+        }
+
+        if (\Illuminate\Support\Str::startsWith($this->logo, ['http://', 'https://', '//'])) {
+            return $this->logo;
+        }
+
+        return asset('storage/' . ltrim($this->logo, '/'));
+    }
 }

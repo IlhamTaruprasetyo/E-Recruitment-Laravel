@@ -20,7 +20,7 @@ class QuestionBankController extends Controller
             'question' => 'required|string',
             'question_type' => 'required|in:multiple_choice,essay,disc',
             'points' => 'required|integer|min:1',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'image' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,pdf,doc,docx,xls,xlsx,csv|max:10240',
         ];
 
         if ($request->question_type === 'multiple_choice') {
@@ -29,14 +29,17 @@ class QuestionBankController extends Controller
             $rules['correct_option'] = 'required|integer|in:0,1,2,3';
         }
 
-        $request->validate($rules);
+        $request->validate($rules, [
+            'image.mimes' => 'Format file pendukung harus berupa gambar (JPG, PNG, WEBP), PDF, Word (.doc/.docx), atau Excel (.xls/.xlsx/.csv).',
+            'image.max' => 'Ukuran file pendukung maksimal 10 MB.',
+        ]);
 
         try {
             DB::beginTransaction();
 
             $imagePath = null;
             if ($request->hasFile('image')) {
-                $imagePath = $request->file('image')->store('question_images', 'public');
+                $imagePath = $request->file('image')->store('question_attachments', 'public');
             }
 
             $question = QuestionBank::create([
@@ -77,7 +80,7 @@ class QuestionBankController extends Controller
             'question' => 'required|string',
             'question_type' => 'required|in:multiple_choice,essay',
             'points' => 'required|integer|min:1',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'image' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,pdf,doc,docx,xls,xlsx,csv|max:10240',
         ];
 
         if ($request->question_type === 'multiple_choice') {
@@ -86,7 +89,10 @@ class QuestionBankController extends Controller
             $rules['correct_option'] = 'required|integer|in:0,1,2,3';
         }
 
-        $request->validate($rules);
+        $request->validate($rules, [
+            'image.mimes' => 'Format file pendukung harus berupa gambar (JPG, PNG, WEBP), PDF, Word (.doc/.docx), atau Excel (.xls/.xlsx/.csv).',
+            'image.max' => 'Ukuran file pendukung maksimal 10 MB.',
+        ]);
 
         try {
             DB::beginTransaction();
@@ -96,7 +102,7 @@ class QuestionBankController extends Controller
                 if ($imagePath && Storage::disk('public')->exists($imagePath)) {
                     Storage::disk('public')->delete($imagePath);
                 }
-                $imagePath = $request->file('image')->store('question_images', 'public');
+                $imagePath = $request->file('image')->store('question_attachments', 'public');
             } elseif ($request->boolean('remove_image')) {
                 if ($imagePath && Storage::disk('public')->exists($imagePath)) {
                     Storage::disk('public')->delete($imagePath);

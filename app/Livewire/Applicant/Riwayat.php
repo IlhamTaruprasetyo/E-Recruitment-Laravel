@@ -70,8 +70,14 @@ class Riwayat extends Component
             $stats['accepted'] = (clone $baseQuery)->whereIn('status', ['Accepted', 'accepted'])->count();
             $stats['rejected'] = (clone $baseQuery)->whereIn('status', ['Rejected', 'rejected'])->count();
 
-            $query = JobApplication::with(['job.company', 'job.department', 'statusHistories', 'interviewSchedules'])
-                ->where('profile_id', $applicantProfile->id);
+            $query = JobApplication::with([
+                'job.company', 
+                'job.department', 
+                'job.tests',
+                'testAttempts.test',
+                'statusHistories', 
+                'interviewSchedules'
+            ])->where('profile_id', $applicantProfile->id);
 
             if (!empty($this->search)) {
                 $search = '%' . $this->search . '%';

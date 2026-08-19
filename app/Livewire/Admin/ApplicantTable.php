@@ -5,6 +5,8 @@ namespace App\Livewire\Admin;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\JobApplication;
+use App\Models\Company;
+use App\Models\Job;
 use Illuminate\Support\Facades\DB;
 
 class ApplicantTable extends Component
@@ -15,6 +17,9 @@ class ApplicantTable extends Component
     public $statusFilter = '';
     public array $selectedStatuses = [];
     public array $selectedColumns = ['applicant', 'job', 'applied_at', 'status', 'actions'];
+
+    public $sortField = 'id';
+    public $sortDirection = 'desc';
 
     public function updatingSearch()
     {
@@ -28,6 +33,17 @@ class ApplicantTable extends Component
 
     public function updatingSelectedStatuses()
     {
+        $this->resetPage();
+    }
+
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
         $this->resetPage();
     }
 
@@ -46,6 +62,8 @@ class ApplicantTable extends Component
         $this->search = '';
         $this->statusFilter = '';
         $this->selectedStatuses = [];
+        $this->sortField = 'id';
+        $this->sortDirection = 'desc';
         $this->resetPage();
     }
 
@@ -61,6 +79,7 @@ class ApplicantTable extends Component
             'applicantProfile.educations',
             'applicantProfile.workExperiences',
             'applicantProfile.organizations',
+            'applicantProfile.achievements',
             'applicantProfile.certifications',
             'applicantProfile.trainings',
             'applicantProfile.skills',
@@ -102,7 +121,31 @@ class ApplicantTable extends Component
         ->when($this->statusFilter, function ($query) {
             $query->where('status', $this->statusFilter);
         })
-        ->orderBy('id', 'desc')
+        ->when($this->sortField === 'position', function ($query) {
+            $query->join('jobs', 'job_applications.job_id', '=', 'jobs.id')
+                  ->orderBy('jobs.title', $this->sortDirection)
+                  ->select('job_applications.*');
+        })
+        ->when($this->sortField === 'company', function ($query) {
+            $query->join('jobs', 'job_applications.job_id', '=', 'jobs.id')
+                  ->join('companies', 'jobs.company_id', '=', 'companies.id')
+                  ->orderBy('companies.name', $this->sortDirection)
+                  ->select('job_applications.*');
+        })
+        ->when($this->sortField === 'applicant', function ($query) {
+            $query->join('applicant_profile', 'job_applications.profile_id', '=', 'applicant_profile.id')
+                  ->orderBy('applicant_profile.full_name', $this->sortDirection)
+                  ->select('job_applications.*');
+        })
+        ->when($this->sortField === 'applied_at', function ($query) {
+            $query->orderBy('job_applications.created_at', $this->sortDirection);
+        })
+        ->when($this->sortField === 'status', function ($query) {
+            $query->orderBy('job_applications.status', $this->sortDirection);
+        })
+        ->when($this->sortField === 'id' || !in_array($this->sortField, ['position', 'company', 'applicant', 'applied_at', 'status']), function ($query) {
+            $query->orderBy('job_applications.id', $this->sortDirection);
+        })
         ->paginate(10);
 
         return view('livewire.admin.applicants.table', [

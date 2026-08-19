@@ -360,6 +360,45 @@
                     </template>
                 </div>
 
+                <!-- 4.1 Prestasi & Penghargaan (achievements) -->
+                <div>
+                    <h4 class="font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2 text-sm">
+                        <svg class="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                        </svg>
+                        Prestasi & Penghargaan
+                    </h4>
+                    <template x-if="detailData.applicant_profile && detailData.applicant_profile.achievements && detailData.applicant_profile.achievements.length > 0">
+                        <div class="space-y-2">
+                            <template x-for="ach in detailData.applicant_profile.achievements" :key="ach.id">
+                                <div class="p-3 bg-gray-50 dark:bg-slate-800/40 rounded-xl border border-gray-100 dark:border-slate-800 flex items-center justify-between gap-3">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-semibold text-gray-900 dark:text-white truncate" x-text="ach.name"></span>
+                                            <span class="px-2 py-0.5 text-[10px] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 rounded-md border border-amber-200 dark:border-amber-800 shrink-0" x-text="ach.scale"></span>
+                                        </div>
+                                        <span class="text-gray-500 dark:text-slate-400 text-[11px]" x-text="(ach.month || '') + ' ' + (ach.year || '')"></span>
+                                    </div>
+                                    <template x-if="ach.certificate_path">
+                                        <a :href="ach.certificate_path.startsWith('http') ? ach.certificate_path : ('{{ asset('storage') }}/' + ach.certificate_path.replace(/^\/+/, ''))" 
+                                           target="_blank" 
+                                           class="px-2.5 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/80 rounded-lg border border-indigo-200/80 dark:border-indigo-800/80 transition shrink-0 flex items-center gap-1">
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                            <span>Lihat Berkas</span>
+                                        </a>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                    <template x-if="!detailData.applicant_profile || !detailData.applicant_profile.achievements || detailData.applicant_profile.achievements.length === 0">
+                        <div class="p-3 bg-gray-50 dark:bg-slate-800/40 rounded-xl text-gray-400 italic text-[11px]">Belum ada prestasi dicantumkan.</div>
+                    </template>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- 5. Sertifikasi (certifications) -->
                     <div>
@@ -377,12 +416,20 @@
                                 <template x-for="cert in detailData.applicant_profile.certifications"
                                     :key="cert.id">
                                     <div
-                                        class="p-3 bg-gray-50 dark:bg-slate-800/40 rounded-xl border border-gray-100 dark:border-slate-800 flex items-center justify-between">
-                                        <span class="font-semibold text-gray-900 dark:text-white"
+                                        class="p-3 bg-gray-50 dark:bg-slate-800/40 rounded-xl border border-gray-100 dark:border-slate-800 flex items-center justify-between gap-3">
+                                        <span class="font-semibold text-gray-900 dark:text-white truncate"
                                             x-text="cert.name"></span>
-                                        <a x-show="cert.certificate_path" :href="cert.certificate_path"
-                                            target="_blank"
-                                            class="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline text-[11px]">Lihat</a>
+                                        <template x-if="cert.certificate_path">
+                                            <a :href="cert.certificate_path.startsWith('http') ? cert.certificate_path : ('{{ asset('storage') }}/' + cert.certificate_path.replace(/^\/+/, ''))"
+                                                target="_blank"
+                                                class="px-2.5 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/80 rounded-lg border border-indigo-200/80 dark:border-indigo-800/80 transition shrink-0 flex items-center gap-1">
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                </svg>
+                                                <span>Lihat Berkas</span>
+                                            </a>
+                                        </template>
                                     </div>
                                 </template>
                             </div>
@@ -410,11 +457,20 @@
                             <div class="space-y-2">
                                 <template x-for="tr in detailData.applicant_profile.trainings" :key="tr.id">
                                     <div
-                                        class="p-3 bg-gray-50 dark:bg-slate-800/40 rounded-xl border border-gray-100 dark:border-slate-800 flex items-center justify-between">
-                                        <span class="font-semibold text-gray-900 dark:text-white"
+                                        class="p-3 bg-gray-50 dark:bg-slate-800/40 rounded-xl border border-gray-100 dark:border-slate-800 flex items-center justify-between gap-3">
+                                        <span class="font-semibold text-gray-900 dark:text-white truncate"
                                             x-text="tr.name"></span>
-                                        <a x-show="tr.certificate_path" :href="tr.certificate_path" target="_blank"
-                                            class="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline text-[11px]">Lihat</a>
+                                        <template x-if="tr.certificate_path">
+                                            <a :href="tr.certificate_path.startsWith('http') ? tr.certificate_path : ('{{ asset('storage') }}/' + tr.certificate_path.replace(/^\/+/, ''))" 
+                                                target="_blank"
+                                                class="px-2.5 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/80 rounded-lg border border-indigo-200/80 dark:border-indigo-800/80 transition shrink-0 flex items-center gap-1">
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                </svg>
+                                                <span>Lihat Berkas</span>
+                                            </a>
+                                        </template>
                                     </div>
                                 </template>
                             </div>

@@ -15,6 +15,9 @@ class TestAnswer extends Model
         'option_id',
         'answer_type',// e.g. most, least, default
         'essay_answer',
+        'attachment_url',
+        'attachment_name',
+        'attachment_size',
         'score',
         'reviewed_by',
     ];

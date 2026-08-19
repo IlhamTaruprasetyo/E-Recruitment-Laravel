@@ -95,7 +95,7 @@ new class extends Component
                         </x-dropdown-link>
                     @endif
 
-                    <x-dropdown-link :href="$profileRoute" wire:navigate>
+                    <x-dropdown-link :href="$profileRoute">
                         {{ __('Profil Saya') }}
                     </x-dropdown-link>
 
@@ -162,7 +162,7 @@ new class extends Component
                     </x-responsive-nav-link>
                 @endif
 
-                <x-responsive-nav-link :href="$profileRoute" wire:navigate>
+                <x-responsive-nav-link :href="$profileRoute">
                     {{ __('Profil Saya') }}
                 </x-responsive-nav-link>
 

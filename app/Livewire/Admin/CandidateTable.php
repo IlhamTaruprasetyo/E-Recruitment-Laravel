@@ -23,6 +23,7 @@ class CandidateTable extends Component
             'applicantProfile.educations',
             'applicantProfile.workExperiences',
             'applicantProfile.organizations',
+            'applicantProfile.achievements',
             'applicantProfile.certifications',
             'applicantProfile.trainings',
             'applicantProfile.skills',

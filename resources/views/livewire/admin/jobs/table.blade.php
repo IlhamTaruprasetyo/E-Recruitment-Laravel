@@ -2,6 +2,8 @@
     showCreateModal: {{ $errors->any() && !old('is_edit') ? 'true' : 'false' }},
     showEditModal: {{ $errors->any() && old('is_edit') ? 'true' : 'false' }},
     showDeleteModal: false,
+    createQuill: null,
+    editQuill: null,
     editData: {
         id: '{{ old('id', '') }}',
         company_id: '{{ old('company_id', '') }}',
@@ -20,6 +22,76 @@
         id: '',
         title: ''
     },
+    initQuillCreate() {
+        if (this.createQuill) return;
+        this.$nextTick(() => {
+            let container = document.getElementById('create_quill_editor');
+            if (!container) return;
+            this.createQuill = new Quill(container, {
+                theme: 'snow',
+                placeholder: 'Tuliskan deskripsi pekerjaan, tanggung jawab, dan rincian persyaratan kualifikasi di sini...',
+                modules: {
+                    toolbar: [
+                        [{ 'header': [2, 3, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        ['clean']
+                    ]
+                }
+            });
+
+            this.createQuill.on('text-change', () => {
+                let html = this.createQuill.root.innerHTML;
+                let isEmpty = this.createQuill.getText().trim().length === 0;
+                document.getElementById('create_final_description').value = isEmpty ? '' : html;
+            });
+        });
+    },
+    initQuillEdit(content) {
+        this.$nextTick(() => {
+            let container = document.getElementById('edit_quill_editor');
+            if (!container) return;
+            if (!this.editQuill) {
+                this.editQuill = new Quill(container, {
+                    theme: 'snow',
+                    placeholder: 'Tuliskan deskripsi pekerjaan dan persyaratan di sini...',
+                    modules: {
+                        toolbar: [
+                            [{ 'header': [2, 3, false] }],
+                            ['bold', 'italic', 'underline', 'strike'],
+                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                            ['clean']
+                        ]
+                    }
+                });
+
+                this.editQuill.on('text-change', () => {
+                    let html = this.editQuill.root.innerHTML;
+                    let isEmpty = this.editQuill.getText().trim().length === 0;
+                    this.editData.description = isEmpty ? '' : html;
+                });
+            }
+            
+            // Set existing content (support both HTML & legacy markdown/plain text)
+            if (content) {
+                if (content.includes('<p>') || content.includes('<ul>') || content.includes('<ol>') || content.includes('<h3>')) {
+                    this.editQuill.root.innerHTML = content;
+                } else {
+                    let formatted = content
+                        .replace(/### Persyaratan:\s*/g, '<h3>Persyaratan</h3>')
+                        .replace(/### Deskripsi Pekerjaan:\s*/g, '<h3>Deskripsi Pekerjaan</h3>')
+                        .replace(/\n/g, '<br>');
+                    this.editQuill.root.innerHTML = formatted;
+                }
+            } else {
+                this.editQuill.root.innerHTML = '';
+            }
+        });
+    },
+    openCreateModal() {
+        this.showCreateModal = true;
+        this.initQuillCreate();
+    },
     openEditModal(job) {
         this.editData = {
             id: job.id,
@@ -36,6 +108,7 @@
             status: job.status || 'Open'
         };
         this.showEditModal = true;
+        this.initQuillEdit(job.description || '');
     },
     openDeleteModal(job) {
         this.deleteData = {
@@ -45,6 +118,65 @@
         this.showDeleteModal = true;
     }
 }">
+
+    <!-- Quill.js Stylesheet & Script (Loaded securely via CDN) -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+    <style>
+        .ql-toolbar.ql-snow {
+            border-top-left-radius: 0.75rem;
+            border-top-right-radius: 0.75rem;
+            border-color: #e2e8f0;
+            background-color: #f8fafc;
+        }
+        .dark .ql-toolbar.ql-snow {
+            border-color: #334155;
+            background-color: #1e293b;
+        }
+        .dark .ql-snow .ql-stroke {
+            stroke: #cbd5e1;
+        }
+        .dark .ql-snow .ql-fill {
+            fill: #cbd5e1;
+        }
+        .dark .ql-snow .ql-picker {
+            color: #cbd5e1;
+        }
+        .ql-container.ql-snow {
+            border-bottom-left-radius: 0.75rem;
+            border-bottom-right-radius: 0.75rem;
+            border-color: #e2e8f0;
+            font-family: inherit;
+            font-size: 0.85rem;
+            min-height: 180px;
+            background-color: #ffffff;
+        }
+        .dark .ql-container.ql-snow {
+            border-color: #334155;
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+        .ql-editor {
+            min-height: 180px;
+            max-height: 280px;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+        .ql-editor ul {
+            list-style-type: disc;
+            padding-left: 1.25rem;
+        }
+        .ql-editor ol {
+            list-style-type: decimal;
+            padding-left: 1.25rem;
+        }
+        .ql-editor h2, .ql-editor h3 {
+            font-weight: bold;
+            margin-top: 0.75rem;
+            margin-bottom: 0.25rem;
+        }
+    </style>
     <!-- Session Notifications -->
     @if (session('create'))
         <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)" x-transition class="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 flex items-center justify-between shadow-sm">
@@ -129,7 +261,7 @@
                     </svg>
                 </div>
 
-                <button @click="showCreateModal = true" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-md shadow-indigo-500/20 transition-all flex items-center justify-center gap-2 w-full sm:w-auto shrink-0">
+                <button @click="openCreateModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-md shadow-indigo-500/20 transition-all flex items-center justify-center gap-2 w-full sm:w-auto shrink-0">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
@@ -407,12 +539,22 @@
                             </div>
                         </div>
 
-                        <!-- Description -->
-                        <div>
-                            <label for="description" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                Deskripsi & Persyaratan Pekerjaan
-                            </label>
-                            <textarea name="description" id="description" rows="3" placeholder="Persyaratan, kualifikasi, deskripsi tugas..." class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">{{ old('description') }}</textarea>
+                        <!-- Quill Rich Text Visual Editor for Description & Requirements -->
+                        <input type="hidden" name="description" id="create_final_description" :value="editData.description">
+
+                        <div class="space-y-1.5 pt-1">
+                            <div class="flex items-center justify-between">
+                                <label class="block text-xs font-bold text-gray-800 dark:text-slate-200">
+                                    Deskripsi & Persyaratan Pekerjaan
+                                </label>
+                                <span class="text-[11px] text-gray-400 dark:text-slate-400">
+                                    Gunakan toolbar untuk format Heading, Bullet List (•), Numbering, atau Bold
+                                </span>
+                            </div>
+                            
+                            <div class="rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700">
+                                <div id="create_quill_editor"></div>
+                            </div>
                         </div>
 
                         <!-- Modal Actions -->
@@ -570,12 +712,22 @@
                             </div>
                         </div>
 
-                        <!-- Description -->
-                        <div>
-                            <label for="edit_description" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                Deskripsi & Persyaratan Pekerjaan
-                            </label>
-                            <textarea name="description" id="edit_description" rows="3" x-model="editData.description" placeholder="Deskripsi..." class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"></textarea>
+                        <!-- Quill Rich Text Visual Editor for Description & Requirements -->
+                        <input type="hidden" name="description" x-model="editData.description">
+
+                        <div class="space-y-1.5 pt-1">
+                            <div class="flex items-center justify-between">
+                                <label class="block text-xs font-bold text-gray-800 dark:text-slate-200">
+                                    Deskripsi & Persyaratan Pekerjaan
+                                </label>
+                                <span class="text-[11px] text-gray-400 dark:text-slate-400">
+                                    Gunakan toolbar untuk format Heading, Bullet List (•), Numbering, atau Bold
+                                </span>
+                            </div>
+                            
+                            <div class="rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700">
+                                <div id="edit_quill_editor"></div>
+                            </div>
                         </div>
 
                         <!-- Modal Actions -->

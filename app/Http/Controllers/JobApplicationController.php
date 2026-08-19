@@ -18,6 +18,78 @@ class JobApplicationController extends Controller
     }
 
     /**
+     * Handle applicant job application submission (Create/Store)
+     */
+    public function store(Request $request, string $id)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return redirect()->route('login');
+        }
+
+        $applicantProfile = \App\Models\ApplicantProfile::where('user_id', $user->id)->first();
+        if (!$applicantProfile) {
+            return redirect()->route('profile')
+                ->with('error', 'Profil pelamar tidak ditemukan. Silakan lengkapi profil Anda terlebih dahulu.');
+        }
+
+        // Cek kelengkapan data wajib
+        if (!$applicantProfile->is_mandatory_complete) {
+            return redirect()->route('jobs.show', $id)
+                ->with('error', 'Mohon lengkapi seluruh data wajib profil Anda sebelum mengajukan lamaran.');
+        }
+
+        $job = \App\Models\Job::findOrFail($id);
+
+        // Cek apakah lowongan aktif
+        $isActive = $job->status === 'Open' && (!$job->deadline || $job->deadline >= now()->toDateString());
+        if (!$isActive) {
+            return redirect()->route('jobs.show', $id)
+                ->with('error', 'Lowongan pekerjaan ini sudah ditutup atau tidak menerima lamaran baru.');
+        }
+
+        // Cek apakah sudah pernah melamar lowongan ini
+        $alreadyApplied = JobApplication::where('job_id', $job->id)
+            ->where('profile_id', $applicantProfile->id)
+            ->exists();
+
+        if ($alreadyApplied) {
+            return redirect()->route('jobs.show', $id)
+                ->with('error', 'Anda sudah pernah mengajukan lamaran untuk lowongan pekerjaan ini.');
+        }
+
+        try {
+            \Illuminate\Support\Facades\DB::beginTransaction();
+
+            $application = JobApplication::create([
+                'job_id'     => $job->id,
+                'profile_id' => $applicantProfile->id,
+                'status'     => 'Submitted',
+                'applied_at' => now(),
+                'notes'      => null,
+            ]);
+
+            // Catat history status awal
+            ApplicationStatusHistory::create([
+                'job_applications_id' => $application->id,
+                'status'              => 'Submitted',
+                'notes'               => 'Lamaran pekerjaan berhasil diajukan oleh pelamar.',
+                'changed_by'          => $user->id,
+                'changed_at'          => now(),
+            ]);
+
+            \Illuminate\Support\Facades\DB::commit();
+
+            return redirect()->route('profile', ['tab' => 'riwayat'])
+                ->with('create', 'Lamaran Anda berhasil dikirim! Silakan pantau perkembangan seleksi dan ikuti tes online jika tersedia.');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\DB::rollBack();
+            return redirect()->route('jobs.show', $id)
+                ->with('error', 'Gagal mengirimkan lamaran: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Display the specified job application details (Read)
      */
     public function show(string $id)

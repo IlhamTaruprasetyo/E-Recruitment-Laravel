@@ -11,11 +11,13 @@ class TestEvaluationController extends Controller
 {
     public function updateGrade(Request $request, string $id)
     {
-        $attempt = TestAttempt::with(['answers.question', 'test'])->findOrFail($id);
+        $attempt = TestAttempt::with(['answers.question', 'test', 'jobApplication'])->findOrFail($id);
 
         $request->validate([
             'essay_scores' => 'nullable|array',
             'essay_scores.*' => 'nullable|numeric|min:0',
+            'application_status' => 'nullable|string|in:Submitted,Reviewed,Shortlisted,Interview,Accepted,Rejected',
+            'application_notes' => 'nullable|string|max:1000',
         ]);
 
         try {
@@ -67,6 +69,46 @@ class TestEvaluationController extends Controller
                 'total_score' => $totalScore,
                 'status' => $status,
             ]);
+
+            // Update status lamaran: prioritaskan pilihan manual HR jika dipilih, jika tidak dan lulus KKM otomatis Shortlisted
+            if ($attempt->jobApplication) {
+                $app = $attempt->jobApplication;
+                $newStatus = $request->input('application_status');
+                $customNotes = $request->input('application_notes');
+
+                if (!empty($newStatus)) {
+                    $notes = !empty($customNotes) 
+                        ? $customNotes 
+                        : 'Status lamaran diperbarui oleh HR melalui evaluasi ujian (Total Nilai: ' . number_format($totalScore, 1) . ').';
+
+                    $app->update([
+                        'status' => $newStatus,
+                        'notes'  => $notes,
+                    ]);
+
+                    \App\Models\ApplicationStatusHistory::create([
+                        'job_applications_id' => $app->id,
+                        'status'              => $newStatus,
+                        'notes'               => $notes,
+                        'changed_by'          => $reviewerId ?? 1,
+                        'changed_at'          => now(),
+                    ]);
+                } elseif ($status === 'passed' && in_array(strtolower($app->status), ['submitted', 'reviewed', 'pending'])) {
+                    // Fallback otomatis jika lulus KKM
+                    $app->update([
+                        'status' => 'Shortlisted',
+                        'notes'  => 'Lolos Ujian Seleksi Online (Nilai: ' . number_format($totalScore, 1) . ' / KKM: ' . number_format($passingScore, 0) . '). Siap untuk dijadwalkan wawancara.',
+                    ]);
+
+                    \App\Models\ApplicationStatusHistory::create([
+                        'job_applications_id' => $app->id,
+                        'status'              => 'Shortlisted',
+                        'notes'               => 'Lolos Ujian Seleksi Online (Nilai: ' . number_format($totalScore, 1) . ' / KKM: ' . number_format($passingScore, 0) . ').',
+                        'changed_by'          => $reviewerId ?? 1,
+                        'changed_at'          => now(),
+                    ]);
+                }
+            }
 
             DB::commit();
 

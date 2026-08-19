@@ -38,4 +38,9 @@ class Job extends Model
     {
         return $this->belongsToMany(Major::class, 'job_majors');
     }
+
+    public function tests()
+    {
+        return $this->hasMany(Test::class, 'job_id');
+    }
 }

@@ -58,6 +58,7 @@
             points: q.points || 1,
             options: opts,
             correct_option: correctIdx,
+            image_path: q.image_path || null,
             image_url: q.image_path ? '{{ asset("storage") }}/' + q.image_path : null
         };
         this.showEditModal = true;
@@ -78,10 +79,27 @@
             question: q.question,
             question_type: q.question_type,
             points: q.points || 1,
+            image_path: q.image_path || null,
             image_url: q.image_path ? '{{ asset("storage") }}/' + q.image_path : null,
             options: q.options || []
         };
         this.showDetailModal = true;
+    },
+
+    isImage(path) {
+        if (!path) return false;
+        const ext = path.split('.').pop().toLowerCase();
+        return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext);
+    },
+
+    getFileName(path) {
+        if (!path) return '';
+        return path.split('/').pop();
+    },
+
+    getFileExt(path) {
+        if (!path) return '';
+        return path.split('.').pop().toUpperCase();
     }
 }">
 
@@ -246,11 +264,22 @@
                                         {{ Str::limit(trim($q->question), 120) }}
                                     </p>
                                     @if ($q->image_path)
+                                        @php
+                                            $ext = strtolower(pathinfo($q->image_path, PATHINFO_EXTENSION));
+                                            $isImg = in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']);
+                                        @endphp
                                         <div class="flex items-center gap-1.5 text-[11px] text-indigo-600 dark:text-indigo-400">
-                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                            </svg>
-                                            <span>Memiliki Gambar Pendukung</span>
+                                            @if ($isImg)
+                                                <svg class="w-3.5 h-3.5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                </svg>
+                                                <span>Lampiran Gambar ({{ strtoupper($ext) }})</span>
+                                            @else
+                                                <svg class="w-3.5 h-3.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                                <span>Lampiran Berkas ({{ strtoupper($ext) }})</span>
+                                            @endif
                                         </div>
                                     @endif
                                     @if ($q->question_type === 'multiple_choice')
@@ -416,13 +445,14 @@
                             @enderror
                         </div>
 
-                        <!-- Upload Gambar Pendukung & Poin -->
+                        <!-- Upload File/Gambar Pendukung & Poin -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label for="create_image" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                    Gambar Pendukung (Opsional)
+                                    File / Gambar Pendukung (Opsional)
                                 </label>
-                                <input type="file" name="image" id="create_image" accept="image/*" class="w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 dark:file:bg-indigo-950 dark:file:text-indigo-300 hover:file:bg-indigo-100 transition">
+                                <input type="file" name="image" id="create_image" accept=".jpg,.jpeg,.png,.webp,.gif,.pdf,.doc,.docx,.xls,.xlsx,.csv" class="w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 dark:file:bg-indigo-950 dark:file:text-indigo-300 hover:file:bg-indigo-100 transition">
+                                <p class="mt-1 text-[10px] text-gray-400 dark:text-slate-500">Mendukung Gambar (JPG, PNG), PDF, Word (.docx), dan Excel (.xlsx). Maks 10 MB.</p>
                                 @error('image')
                                     <p class="mt-1 text-[11px] text-rose-500">{{ $message }}</p>
                                 @enderror
@@ -550,19 +580,33 @@
                             @enderror
                         </div>
 
-                        <!-- Upload Gambar Pendukung & Poin -->
+                        <!-- Upload File/Gambar Pendukung & Poin -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label for="edit_image" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                    Ganti Gambar (Opsional)
+                                    Ganti File / Gambar (Opsional)
                                 </label>
-                                <input type="file" name="image" id="edit_image" accept="image/*" class="w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 dark:file:bg-indigo-950 dark:file:text-indigo-300 hover:file:bg-indigo-100 transition">
+                                <input type="file" name="image" id="edit_image" accept=".jpg,.jpeg,.png,.webp,.gif,.pdf,.doc,.docx,.xls,.xlsx,.csv" class="w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 dark:file:bg-indigo-950 dark:file:text-indigo-300 hover:file:bg-indigo-100 transition">
+                                <p class="mt-1 text-[10px] text-gray-400 dark:text-slate-500">Mendukung Gambar (JPG, PNG), PDF, Word (.docx), dan Excel (.xlsx). Maks 10 MB.</p>
+                                
                                 <template x-if="editData.image_url">
-                                    <div class="mt-2 flex items-center gap-2">
-                                        <img :src="editData.image_url" alt="Preview Gambar" class="w-12 h-12 object-cover rounded-lg border border-gray-200 dark:border-slate-700">
-                                        <label class="flex items-center gap-1.5 text-xs text-rose-600 dark:text-rose-400 cursor-pointer">
+                                    <div class="mt-2.5 p-2 rounded-xl bg-gray-50 dark:bg-slate-800/80 border border-gray-200 dark:border-slate-700 flex items-center justify-between gap-3">
+                                        <div class="flex items-center gap-2 min-w-0">
+                                            <template x-if="isImage(editData.image_path)">
+                                                <img :src="editData.image_url" alt="Preview Gambar" class="w-10 h-10 object-cover rounded-lg border border-gray-200 dark:border-slate-700 shrink-0">
+                                            </template>
+                                            <template x-if="!isImage(editData.image_path)">
+                                                <div class="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-xs shrink-0" x-text="getFileExt(editData.image_path)">
+                                                </div>
+                                            </template>
+                                            <div class="min-w-0 text-left">
+                                                <a :href="editData.image_url" target="_blank" class="block text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline truncate" x-text="getFileName(editData.image_path)"></a>
+                                                <span class="block text-[10px] text-gray-400" x-text="isImage(editData.image_path) ? 'File Gambar' : 'Dokumen Terlampir'"></span>
+                                            </div>
+                                        </div>
+                                        <label class="flex items-center gap-1.5 text-xs text-rose-600 dark:text-rose-400 cursor-pointer shrink-0 font-medium">
                                             <input type="checkbox" name="remove_image" value="1" class="rounded text-rose-600 focus:ring-rose-500">
-                                            Hapus Gambar
+                                            Hapus File
                                         </label>
                                     </div>
                                 </template>
@@ -650,8 +694,30 @@
 
                     <template x-if="detailData.image_url">
                         <div>
-                            <h4 class="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2">Gambar Soal:</h4>
-                            <img :src="detailData.image_url" alt="Gambar Pendukung Soal" class="max-h-64 rounded-xl border border-gray-200 dark:border-slate-800 object-contain">
+                            <h4 class="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2">Lampiran Soal / File Pendukung:</h4>
+                            <template x-if="isImage(detailData.image_path)">
+                                <div class="rounded-xl border border-gray-200 dark:border-slate-800 p-2 bg-gray-50 dark:bg-slate-800/40 inline-block">
+                                    <img :src="detailData.image_url" alt="Gambar Pendukung Soal" class="max-h-64 rounded-lg object-contain">
+                                </div>
+                            </template>
+                            <template x-if="!isImage(detailData.image_path)">
+                                <div class="p-3.5 rounded-xl border border-indigo-200 dark:border-indigo-800/80 bg-indigo-50/60 dark:bg-indigo-950/40 flex items-center justify-between gap-3">
+                                    <div class="flex items-center gap-3 min-w-0">
+                                        <div class="w-10 h-10 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xs shrink-0" x-text="getFileExt(detailData.image_path)">
+                                        </div>
+                                        <div class="min-w-0 text-left">
+                                            <span class="block text-xs font-bold text-gray-900 dark:text-white truncate" x-text="getFileName(detailData.image_path)"></span>
+                                            <span class="block text-[11px] text-indigo-700 dark:text-indigo-300">File lampiran dokumen studi kasus / materi soal</span>
+                                        </div>
+                                    </div>
+                                    <a :href="detailData.image_url" target="_blank" download class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold shadow-sm transition flex items-center gap-1.5 shrink-0">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                        </svg>
+                                        <span>Unduh / Buka File</span>
+                                    </a>
+                                </div>
+                            </template>
                         </div>
                     </template>
 

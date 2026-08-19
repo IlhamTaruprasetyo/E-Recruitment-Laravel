@@ -90,49 +90,36 @@
         </div>
     </div>
 
-    <!-- Search & Filter Controls -->
-    <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700/80 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
-        <!-- Search Input -->
-        <div class="relative flex-1">
-            <svg class="w-4 h-4 text-gray-400 dark:text-gray-500 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari posisi pekerjaan, nama perusahaan, atau departemen..."
-                class="w-full pl-10 pr-4 py-2 text-xs rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition">
-            @if (!empty($search))
-                <button wire:click="$set('search', '')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            @endif
-        </div>
-
-        <!-- Filter Pills -->
-        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+    <!-- Filter Pills Status (Clean Horizontal Scrollbar) -->
+    <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl border border-gray-100 dark:border-gray-700/80 shadow-xs">
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar scroll-smooth">
             <button type="button" wire:click="$set('statusFilter', 'all')"
-                class="px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition {{ $statusFilter === 'all' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
-                Semua
+                class="px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-150 shrink-0 {{ $statusFilter === 'all' ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/20' : 'bg-gray-100 dark:bg-gray-700/70 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
+                Semua Status
             </button>
             <button type="button" wire:click="$set('statusFilter', 'Submitted')"
-                class="px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition {{ $statusFilter === 'Submitted' ? 'bg-blue-600 text-white shadow-xs' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
-                Submitted
+                class="px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-150 shrink-0 {{ $statusFilter === 'Submitted' ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20' : 'bg-gray-100 dark:bg-gray-700/70 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
+                Terkirim (Submitted)
             </button>
             <button type="button" wire:click="$set('statusFilter', 'Reviewed')"
-                class="px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition {{ $statusFilter === 'Reviewed' ? 'bg-amber-600 text-white shadow-xs' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
-                Reviewed
+                class="px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-150 shrink-0 {{ $statusFilter === 'Reviewed' ? 'bg-amber-600 text-white shadow-sm shadow-amber-500/20' : 'bg-gray-100 dark:bg-gray-700/70 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
+                Lolos Berkas / Tahap Tes (Reviewed)
+            </button>
+            <button type="button" wire:click="$set('statusFilter', 'Shortlisted')"
+                class="px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-150 shrink-0 {{ $statusFilter === 'Shortlisted' ? 'bg-purple-600 text-white shadow-sm shadow-purple-500/20' : 'bg-gray-100 dark:bg-gray-700/70 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
+                Lolos Ujian / Siap Wawancara (Shortlisted)
             </button>
             <button type="button" wire:click="$set('statusFilter', 'Interview')"
-                class="px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition {{ $statusFilter === 'Interview' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
-                Interview
+                class="px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-150 shrink-0 {{ $statusFilter === 'Interview' ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/20' : 'bg-gray-100 dark:bg-gray-700/70 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
+                Wawancara (Interview)
             </button>
             <button type="button" wire:click="$set('statusFilter', 'Accepted')"
-                class="px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition {{ $statusFilter === 'Accepted' ? 'bg-emerald-600 text-white shadow-xs' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
-                Accepted
+                class="px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-150 shrink-0 {{ $statusFilter === 'Accepted' ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/20' : 'bg-gray-100 dark:bg-gray-700/70 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
+                Diterima (Accepted)
             </button>
             <button type="button" wire:click="$set('statusFilter', 'Rejected')"
-                class="px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition {{ $statusFilter === 'Rejected' ? 'bg-rose-600 text-white shadow-xs' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
-                Rejected
+                class="px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-150 shrink-0 {{ $statusFilter === 'Rejected' ? 'bg-rose-600 text-white shadow-sm shadow-rose-500/20' : 'bg-gray-100 dark:bg-gray-700/70 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
+                Ditolak (Rejected)
             </button>
         </div>
     </div>
@@ -155,19 +142,23 @@
                     'Accepted', 'accepted' => 'Diterima (Accepted)',
                     'Rejected', 'rejected' => 'Tidak Lolos (Rejected)',
                     'Interview', 'interview' => 'Tahap Wawancara (Interview)',
-                    'Shortlisted', 'shortlisted' => 'Lolos Berkas (Shortlisted)',
-                    'Reviewed', 'reviewed' => 'Ditinjau HR (Reviewed)',
+                    'Shortlisted', 'shortlisted' => 'Lolos Ujian / Siap Wawancara (Shortlisted)',
+                    'Reviewed', 'reviewed' => 'Lolos Berkas / Tahap Ujian (Reviewed)',
                     default => 'Lamaran Diajukan (Submitted)',
                 };
 
-                // Determine step stage index (1: Submitted, 2: Reviewed/Shortlisted, 3: Interview/Test, 4: Accepted/Rejected)
+                // Determine step stage index (1: Submitted, 2: Lolos Berkas (Reviewed) / Ikut Tes, 3: Lolos Ujian (Shortlisted), 4: Wawancara, 5: Keputusan Akhir)
                 $stepStage = 1;
-                if (in_array(strtolower($status), ['reviewed', 'shortlisted'])) {
+                $hasCompletedTest = $app->testAttempts && $app->testAttempts->where('status', 'passed')->isNotEmpty();
+
+                if (in_array(strtolower($status), ['reviewed'])) {
                     $stepStage = 2;
-                } elseif (in_array(strtolower($status), ['interview', 'tes online', 'test'])) {
+                } elseif (in_array(strtolower($status), ['shortlisted'])) {
                     $stepStage = 3;
-                } elseif (in_array(strtolower($status), ['accepted', 'rejected'])) {
+                } elseif (in_array(strtolower($status), ['interview'])) {
                     $stepStage = 4;
+                } elseif (in_array(strtolower($status), ['accepted', 'rejected'])) {
+                    $stepStage = 5;
                 }
             @endphp
 
@@ -241,40 +232,66 @@
                     </div>
                 </div>
 
-                <!-- Middle Row: Visual Timeline Progress Bar -->
-                <div class="bg-gray-50 dark:bg-gray-900/50 p-3.5 rounded-xl border border-gray-100 dark:border-gray-800">
-                    <div class="grid grid-cols-4 gap-2 text-center relative">
-                        <!-- Step 1 -->
-                        <div class="space-y-1">
-                            <div class="mx-auto w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold {{ $stepStage >= 1 ? 'bg-indigo-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-500' }}">
+                <!-- Middle Row: Visual Timeline Progress Bar (Horizontal Connected Stepper) -->
+                <div class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-2xl border border-gray-100 dark:border-gray-800/80">
+                    <div class="relative flex items-center justify-between">
+                        <!-- Connecting Background Line -->
+                        <div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-gray-200 dark:bg-gray-700 -z-0"></div>
+                        
+                        <!-- Active Progress Line -->
+                        @php
+                            $progressWidths = [1 => '0%', 2 => '25%', 3 => '50%', 4 => '75%', 5 => '100%'];
+                            $activeWidth = $progressWidths[$stepStage] ?? '0%';
+                        @endphp
+                        <div class="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-500 transition-all duration-500 -z-0" style="width: {{ $activeWidth }};"></div>
+
+                        <!-- Step 1: Terkirim -->
+                        <div class="relative z-10 flex flex-col items-center group">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all shadow-sm {{ $stepStage >= 1 ? 'bg-indigo-600 text-white ring-4 ring-indigo-100 dark:ring-indigo-950/60' : 'bg-gray-200 dark:bg-gray-700 text-gray-500' }}">
                                 ✓
                             </div>
-                            <span class="block text-[10px] font-bold {{ $stepStage >= 1 ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-400' }}">Terkirim</span>
+                            <span class="text-[11px] font-bold mt-1.5 whitespace-nowrap {{ $stepStage >= 1 ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-400 dark:text-gray-500' }}">
+                                Terkirim
+                            </span>
                         </div>
 
-                        <!-- Step 2 -->
-                        <div class="space-y-1">
-                            <div class="mx-auto w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold {{ $stepStage >= 2 ? 'bg-indigo-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-500' }}">
+                        <!-- Step 2: Seleksi Berkas -->
+                        <div class="relative z-10 flex flex-col items-center group">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all shadow-sm {{ $stepStage >= 2 ? 'bg-indigo-600 text-white ring-4 ring-indigo-100 dark:ring-indigo-950/60' : 'bg-gray-200 dark:bg-gray-700 text-gray-500' }}">
                                 {{ $stepStage > 2 ? '✓' : '2' }}
                             </div>
-                            <span class="block text-[10px] font-bold {{ $stepStage >= 2 ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-400' }}">Seleksi Berkas</span>
+                            <span class="text-[11px] font-bold mt-1.5 whitespace-nowrap {{ $stepStage >= 2 ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-400 dark:text-gray-500' }}">
+                                Seleksi Berkas
+                            </span>
                         </div>
 
-                        <!-- Step 3 -->
-                        <div class="space-y-1">
-                            <div class="mx-auto w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold {{ $stepStage >= 3 ? 'bg-indigo-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-500' }}">
+                        <!-- Step 3: Tes Online -->
+                        <div class="relative z-10 flex flex-col items-center group">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all shadow-sm {{ $stepStage >= 3 ? 'bg-purple-600 text-white ring-4 ring-purple-100 dark:ring-purple-950/60 animate-pulse' : 'bg-gray-200 dark:bg-gray-700 text-gray-500' }}">
                                 {{ $stepStage > 3 ? '✓' : '3' }}
                             </div>
-                            <span class="block text-[10px] font-bold {{ $stepStage >= 3 ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-400' }}">Wawancara / Tes</span>
+                            <span class="text-[11px] font-bold mt-1.5 whitespace-nowrap {{ $stepStage >= 3 ? 'text-purple-600 dark:text-purple-400' : 'text-gray-400 dark:text-gray-500' }}">
+                                Tes Online
+                            </span>
                         </div>
 
-                        <!-- Step 4 -->
-                        <div class="space-y-1">
-                            <div class="mx-auto w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold {{ $stepStage >= 4 ? (strtolower($status) === 'accepted' ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white') : 'bg-gray-200 dark:bg-gray-700 text-gray-500' }}">
-                                {{ $stepStage >= 4 ? (strtolower($status) === 'accepted' ? '✓' : '✕') : '4' }}
+                        <!-- Step 4: Wawancara -->
+                        <div class="relative z-10 flex flex-col items-center group">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all shadow-sm {{ $stepStage >= 4 ? 'bg-indigo-600 text-white ring-4 ring-indigo-100 dark:ring-indigo-950/60' : 'bg-gray-200 dark:bg-gray-700 text-gray-500' }}">
+                                {{ $stepStage > 4 ? '✓' : '4' }}
                             </div>
-                            <span class="block text-[10px] font-bold {{ $stepStage >= 4 ? (strtolower($status) === 'accepted' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400') : 'text-gray-400' }}">
-                                {{ strtolower($status) === 'accepted' ? 'Diterima' : (strtolower($status) === 'rejected' ? 'Ditolak' : 'Keputusan') }}
+                            <span class="text-[11px] font-bold mt-1.5 whitespace-nowrap {{ $stepStage >= 4 ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-400 dark:text-gray-500' }}">
+                                Wawancara
+                            </span>
+                        </div>
+
+                        <!-- Step 5: Hasil Akhir -->
+                        <div class="relative z-10 flex flex-col items-center group">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all shadow-sm {{ $stepStage >= 5 ? (strtolower($status) === 'accepted' ? 'bg-emerald-600 text-white ring-4 ring-emerald-100' : 'bg-rose-600 text-white ring-4 ring-rose-100') : 'bg-gray-200 dark:bg-gray-700 text-gray-500' }}">
+                                {{ $stepStage >= 5 ? (strtolower($status) === 'accepted' ? '✓' : '✕') : '5' }}
+                            </div>
+                            <span class="text-[11px] font-bold mt-1.5 whitespace-nowrap {{ $stepStage >= 5 ? (strtolower($status) === 'accepted' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400') : 'text-gray-400 dark:text-gray-500' }}">
+                                {{ strtolower($status) === 'accepted' ? 'Diterima' : (strtolower($status) === 'rejected' ? 'Ditolak' : 'Hasil Akhir') }}
                             </span>
                         </div>
                     </div>
@@ -302,14 +319,52 @@
                         @endif
                     </div>
 
-                    <button wire:click="openDetail({{ $app->id }})"
-                        class="inline-flex items-center justify-center gap-1.5 px-4 py-2 border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-xs font-semibold rounded-xl transition shadow-2xs shrink-0">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
-                        <span>Lihat Detail Lamaran</span>
-                    </button>
+                    <div class="flex items-center gap-2 shrink-0">
+                        @php
+                            $availableTest = $app->job && $app->job->tests ? $app->job->tests->first() : null;
+                            $latestAttempt = $app->testAttempts ? $app->testAttempts->where('test_id', $availableTest?->id)->last() : null;
+                            $canTakeTest = in_array(strtolower($status), ['reviewed', 'shortlisted', 'interview', 'accepted']);
+                        @endphp
+
+                        @if ($availableTest && !in_array(strtolower($status), ['rejected']))
+                            @if ($latestAttempt && $latestAttempt->status !== 'in_progress')
+                                <!-- Sudah Mengerjakan Tes -->
+                                <a href="{{ route('applicant.test', ['applicationId' => $app->id, 'testId' => $availableTest->id]) }}"
+                                    class="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-xs font-semibold rounded-xl transition">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span>Lihat Hasil Tes</span>
+                                </a>
+                            @elseif ($canTakeTest || ($latestAttempt && $latestAttempt->status === 'in_progress'))
+                                <!-- Sudah Lolos Berkas / Diizinkan Ikut Tes -->
+                                <a href="{{ route('applicant.test', ['applicationId' => $app->id, 'testId' => $availableTest->id]) }}"
+                                    class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold rounded-xl shadow-md shadow-indigo-500/20 transition transform active:scale-95">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                    <span>{{ $latestAttempt ? 'Lanjutkan Ujian' : 'Mulai Ujian Online' }}</span>
+                                </a>
+                            @else
+                                <!-- Masih tahap awal Submitted (Belum Lolos Berkas) -->
+                                <div class="inline-flex items-center gap-1.5 px-3 py-2 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 text-xs font-medium rounded-xl" title="Ujian online akan terbuka setelah berkas lamaran Anda selesai diverifikasi & disetujui tim HR.">
+                                    <svg class="w-3.5 h-3.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                    </svg>
+                                    <span>Ujian: Menunggu Seleksi Berkas</span>
+                                </div>
+                            @endif
+                        @endif
+
+                        <button wire:click="openDetail({{ $app->id }})"
+                            class="inline-flex items-center justify-center gap-1.5 px-4 py-2 border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-xs font-semibold rounded-xl transition shadow-2xs">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            <span>Lihat Detail</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         @empty
@@ -394,7 +449,7 @@
                             </div>
                         </div>
 
-                        <!-- Section: Riwayat Perubahan Status (Timeline) -->
+                        <!-- Section: Riwayat Perubahan Status (Horizontal Timeline Tracker) -->
                         <div>
                             <h4 class="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-3 flex items-center gap-2">
                                 <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -404,27 +459,40 @@
                             </h4>
 
                             @if ($selectedApplication->statusHistories && $selectedApplication->statusHistories->isNotEmpty())
-                                <div class="relative pl-6 space-y-4 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-indigo-200 dark:before:bg-indigo-900">
-                                    @foreach ($selectedApplication->statusHistories->sortByDesc('changed_at') as $hist)
-                                        <div class="relative group">
-                                            <div class="absolute -left-6 top-1 w-2.5 h-2.5 rounded-full bg-indigo-600 ring-4 ring-white dark:ring-gray-800"></div>
-                                            <div class="p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-100 dark:border-gray-800 space-y-1">
-                                                <div class="flex items-center justify-between">
-                                                    <span class="text-xs font-bold text-gray-900 dark:text-white">
-                                                        Status: {{ $hist->status }}
-                                                    </span>
-                                                    <span class="text-[10px] text-gray-400">
-                                                        {{ \Carbon\Carbon::parse($hist->changed_at)->translatedFormat('d M Y, H:i') }}
-                                                    </span>
+                                <div class="overflow-x-auto pb-3 pt-1 scrollbar-thin">
+                                    <div class="flex items-start gap-4 min-w-max">
+                                        @foreach ($selectedApplication->statusHistories->sortBy('changed_at') as $index => $hist)
+                                            <div class="flex items-start gap-3">
+                                                <div class="w-64 p-3.5 bg-gray-50 dark:bg-gray-900/60 rounded-2xl border border-gray-100 dark:border-gray-800 space-y-1.5 shadow-2xs relative">
+                                                    <div class="flex items-center justify-between">
+                                                        <span class="px-2 py-0.5 rounded-lg text-[10px] font-extrabold bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                                                            {{ $hist->status }}
+                                                        </span>
+                                                        <span class="text-[10px] text-gray-400 font-mono">
+                                                            {{ \Carbon\Carbon::parse($hist->changed_at)->translatedFormat('d M Y, H:i') }}
+                                                        </span>
+                                                    </div>
+                                                    @if ($hist->notes)
+                                                        <p class="text-xs text-gray-600 dark:text-gray-300 line-clamp-3 leading-snug">
+                                                            {{ $hist->notes }}
+                                                        </p>
+                                                    @else
+                                                        <p class="text-[11px] text-gray-400 italic">
+                                                            Status diperbarui.
+                                                        </p>
+                                                    @endif
                                                 </div>
-                                                @if ($hist->notes)
-                                                    <p class="text-xs text-gray-600 dark:text-gray-300">
-                                                        {{ $hist->notes }}
-                                                    </p>
+
+                                                @if (!$loop->last)
+                                                    <div class="pt-6 text-gray-300 dark:text-gray-700">
+                                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                                                        </svg>
+                                                    </div>
                                                 @endif
                                             </div>
-                                        </div>
-                                    @endforeach
+                                        @endforeach
+                                    </div>
                                 </div>
                             @else
                                 <div class="p-3.5 bg-gray-50 dark:bg-gray-900/40 rounded-xl text-xs text-gray-400 text-center">

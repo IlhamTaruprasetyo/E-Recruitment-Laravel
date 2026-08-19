@@ -15,13 +15,35 @@ use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\CvController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\FrontendJobController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'welcome');
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('lowongan', [FrontendJobController::class, 'index'])->name('jobs.index');
+Route::get('lowongan/{id}', [FrontendJobController::class, 'show'])->name('jobs.show');
+Route::post('lowongan/{id}/apply', [JobApplicationController::class, 'store'])->middleware(['auth'])->name('jobs.apply');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+// Multi-user dashboard redirect based on role
+Route::get('dashboard', function () {
+    $user = auth()->user();
+    if (!$user) {
+        return redirect()->route('login');
+    }
+
+    $roleName = strtolower($user->role?->name ?? '');
+
+    if ($user->role_id == 1 || in_array($roleName, ['admin', 'superadmin'])) {
+        return redirect()->route('admin.dashboard');
+    }
+
+    if ($user->role_id == 2 || $roleName === 'recruiter') {
+        return redirect()->route('recruiter.dashboard');
+    }
+
+    // Role 3 or applicant/pelamar
+    return redirect()->route('profile');
+})->middleware(['auth'])->name('dashboard');
 
 // Recruiter Group Routes (/recruiter/*)
 Route::middleware(['auth', 'verified', RoleMiddleware::class . ':recruiter'])
@@ -120,6 +142,10 @@ Route::middleware(['auth', 'verified', RoleMiddleware::class . ':admin'])
 Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
+
+Route::get('profile/test/{applicationId}/{testId?}', \App\Livewire\Applicant\ApplicantOnlineTest::class)
+    ->middleware(['auth'])
+    ->name('applicant.test');
 
 Route::get('profile/cv/preview', [CvController::class, 'preview'])
     ->middleware(['auth'])

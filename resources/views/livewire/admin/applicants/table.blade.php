@@ -127,8 +127,8 @@
                         <div class="space-y-1.5 max-h-48 overflow-y-auto custom-scrollbar">
                             @foreach([
                                 'Submitted' => 'Submitted (Diajukan)',
-                                'Reviewed' => 'Reviewed (Ditinjau)',
-                                'Shortlisted' => 'Shortlisted (Lolos Berkas)',
+                                'Reviewed' => 'Reviewed (Lolos Berkas / Tahap Tes)',
+                                'Shortlisted' => 'Shortlisted (Lolos Ujian / Siap Wawancara)',
                                 'Interview' => 'Interview (Wawancara)',
                                 'Accepted' => 'Accepted (Diterima)',
                                 'Rejected' => 'Rejected (Ditolak)'
@@ -203,8 +203,8 @@
                     </div>
                 </div>
 
-                @if(!empty($selectedStatuses) || $search)
-                    <button wire:click="resetAllFilters" class="px-3 py-2 text-xs rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 transition">
+                @if(!empty($selectedStatuses) || $search || $sortField !== 'id')
+                    <button wire:click="resetAllFilters" class="px-3 py-2 text-xs rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 transition font-medium">
                         Reset Semua Filter
                     </button>
                 @endif
@@ -216,7 +216,7 @@
     <div class="relative bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
         
         <!-- Livewire Loading Overlay -->
-        <div wire:loading wire:target="search, statusFilter, selectedStatuses, selectedColumns, previousPage, nextPage, gotoPage" class="absolute inset-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-[1px] flex items-center justify-center z-10 transition">
+        <div wire:loading wire:target="search, statusFilter, sortField, sortDirection, sortBy, selectedStatuses, selectedColumns, previousPage, nextPage, gotoPage" class="absolute inset-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-[1px] flex items-center justify-center z-10 transition">
             <div class="flex items-center gap-2.5 px-4 py-2.5 bg-slate-900/90 dark:bg-slate-800/90 text-white rounded-xl shadow-xl text-xs font-semibold">
                 <svg class="animate-spin w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -231,19 +231,106 @@
                 <thead>
                     <tr class="border-b border-gray-200 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/50 text-gray-500 dark:text-slate-400 uppercase tracking-wider font-semibold">
                         @if(in_array('applicant', $selectedColumns))
-                            <th class="px-6 py-4">Pelamar</th>
+                            <th class="px-6 py-4 cursor-pointer select-none hover:text-indigo-600 dark:hover:text-indigo-400 transition" wire:click="sortBy('applicant')">
+                                <div class="flex items-center gap-1.5">
+                                    <span>Pelamar</span>
+                                    @if($sortField === 'applicant')
+                                        <svg class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            @if($sortDirection === 'asc')
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7" />
+                                            @else
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                                            @endif
+                                        </svg>
+                                    @else
+                                        <svg class="w-3 h-3 text-gray-300 dark:text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                                        </svg>
+                                    @endif
+                                </div>
+                            </th>
                         @endif
                         @if(in_array('contact', $selectedColumns))
                             <th class="px-6 py-4">Kontak & NIK</th>
                         @endif
                         @if(in_array('job', $selectedColumns))
-                            <th class="px-6 py-4">Posisi & Perusahaan</th>
+                            <th class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <button type="button" wire:click="sortBy('position')" class="flex items-center gap-1 cursor-pointer select-none hover:text-indigo-600 dark:hover:text-indigo-400 transition">
+                                        <span>Posisi</span>
+                                        @if($sortField === 'position')
+                                            <svg class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                @if($sortDirection === 'asc')
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7" />
+                                                @else
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                                                @endif
+                                            </svg>
+                                        @else
+                                            <svg class="w-3 h-3 text-gray-300 dark:text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                                            </svg>
+                                        @endif
+                                    </button>
+                                    <span class="text-gray-300 dark:text-slate-700">|</span>
+                                    <button type="button" wire:click="sortBy('company')" class="flex items-center gap-1 cursor-pointer select-none hover:text-indigo-600 dark:hover:text-indigo-400 transition">
+                                        <span>Perusahaan</span>
+                                        @if($sortField === 'company')
+                                            <svg class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                @if($sortDirection === 'asc')
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7" />
+                                                @else
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                                                @endif
+                                            </svg>
+                                        @else
+                                            <svg class="w-3 h-3 text-gray-300 dark:text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                                            </svg>
+                                        @endif
+                                    </button>
+                                </div>
+                            </th>
                         @endif
                         @if(in_array('applied_at', $selectedColumns))
-                            <th class="px-6 py-4">Tanggal Melamar</th>
+                            <th class="px-6 py-4 cursor-pointer select-none hover:text-indigo-600 dark:hover:text-indigo-400 transition" wire:click="sortBy('applied_at')">
+                                <div class="flex items-center gap-1.5">
+                                    <span>Tanggal Melamar</span>
+                                    @if($sortField === 'applied_at')
+                                        <svg class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            @if($sortDirection === 'asc')
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7" />
+                                            @else
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                                            @endif
+                                        </svg>
+                                    @else
+                                        <svg class="w-3 h-3 text-gray-300 dark:text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                                        </svg>
+                                    @endif
+                                </div>
+                            </th>
                         @endif
                         @if(in_array('status', $selectedColumns))
-                            <th class="px-6 py-4">Status & Catatan</th>
+                            <th class="px-6 py-4 cursor-pointer select-none hover:text-indigo-600 dark:hover:text-indigo-400 transition" wire:click="sortBy('status')">
+                                <div class="flex items-center gap-1.5">
+                                    <span>Status & Catatan</span>
+                                    @if($sortField === 'status')
+                                        <svg class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            @if($sortDirection === 'asc')
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7" />
+                                            @else
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                                            @endif
+                                        </svg>
+                                    @else
+                                        <svg class="w-3 h-3 text-gray-300 dark:text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                                        </svg>
+                                    @endif
+                                </div>
+                            </th>
                         @endif
                         @if(in_array('actions', $selectedColumns))
                             <th class="px-6 py-4 text-right">Aksi</th>
@@ -325,11 +412,11 @@
                                             </span>
                                         @elseif ($app->status === 'Shortlisted')
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800">
-                                                Shortlisted (Lolos Berkas)
+                                                Shortlisted (Lolos Ujian)
                                             </span>
                                         @elseif ($app->status === 'Reviewed')
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
-                                                Reviewed (Ditinjau)
+                                                Reviewed (Lolos Berkas)
                                             </span>
                                         @else
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
@@ -545,6 +632,45 @@
                             </template>
                         </div>
 
+                        <!-- 4.1 Prestasi & Penghargaan (achievements) -->
+                        <div>
+                            <h4 class="font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2 text-sm">
+                                <svg class="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                                </svg>
+                                Prestasi & Penghargaan
+                            </h4>
+                            <template x-if="detailData.applicant_profile && detailData.applicant_profile.achievements && detailData.applicant_profile.achievements.length > 0">
+                                <div class="space-y-2">
+                                    <template x-for="ach in detailData.applicant_profile.achievements" :key="ach.id">
+                                        <div class="p-3 bg-gray-50 dark:bg-slate-800/40 rounded-xl border border-gray-100 dark:border-slate-800 flex items-center justify-between gap-3">
+                                            <div class="min-w-0 flex-1">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="font-semibold text-gray-900 dark:text-white truncate" x-text="ach.name"></span>
+                                                    <span class="px-2 py-0.5 text-[10px] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 rounded-md border border-amber-200 dark:border-amber-800 shrink-0" x-text="ach.scale"></span>
+                                                </div>
+                                                <span class="text-gray-500 dark:text-slate-400 text-[11px]" x-text="(ach.month || '') + ' ' + (ach.year || '')"></span>
+                                            </div>
+                                            <template x-if="ach.certificate_path">
+                                                <a :href="ach.certificate_path.startsWith('http') ? ach.certificate_path : ('{{ asset('storage') }}/' + ach.certificate_path.replace(/^\/+/, ''))" 
+                                                   target="_blank" 
+                                                   class="px-2.5 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/80 rounded-lg border border-indigo-200/80 dark:border-indigo-800/80 transition shrink-0 flex items-center gap-1">
+                                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                    </svg>
+                                                    <span>Lihat Berkas</span>
+                                                </a>
+                                            </template>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                            <template x-if="!detailData.applicant_profile || !detailData.applicant_profile.achievements || detailData.applicant_profile.achievements.length === 0">
+                                <div class="p-3 bg-gray-50 dark:bg-slate-800/40 rounded-xl text-gray-400 italic text-[11px]">Belum ada prestasi dicantumkan.</div>
+                            </template>
+                        </div>
+
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <!-- 5. Sertifikasi (certifications) -->
                             <div>
@@ -557,9 +683,19 @@
                                 <template x-if="detailData.applicant_profile && detailData.applicant_profile.certifications && detailData.applicant_profile.certifications.length > 0">
                                     <div class="space-y-2">
                                         <template x-for="cert in detailData.applicant_profile.certifications" :key="cert.id">
-                                            <div class="p-3 bg-gray-50 dark:bg-slate-800/40 rounded-xl border border-gray-100 dark:border-slate-800 flex items-center justify-between">
-                                                <span class="font-semibold text-gray-900 dark:text-white" x-text="cert.name"></span>
-                                                <a x-show="cert.certificate_path" :href="cert.certificate_path" target="_blank" class="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline text-[11px]">Lihat</a>
+                                            <div class="p-3 bg-gray-50 dark:bg-slate-800/40 rounded-xl border border-gray-100 dark:border-slate-800 flex items-center justify-between gap-3">
+                                                <span class="font-semibold text-gray-900 dark:text-white truncate" x-text="cert.name"></span>
+                                                <template x-if="cert.certificate_path">
+                                                    <a :href="cert.certificate_path.startsWith('http') ? cert.certificate_path : ('{{ asset('storage') }}/' + cert.certificate_path.replace(/^\/+/, ''))" 
+                                                       target="_blank" 
+                                                       class="px-2.5 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/80 rounded-lg border border-indigo-200/80 dark:border-indigo-800/80 transition shrink-0 flex items-center gap-1">
+                                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                        </svg>
+                                                        <span>Lihat Berkas</span>
+                                                    </a>
+                                                </template>
                                             </div>
                                         </template>
                                     </div>
@@ -580,9 +716,19 @@
                                 <template x-if="detailData.applicant_profile && detailData.applicant_profile.trainings && detailData.applicant_profile.trainings.length > 0">
                                     <div class="space-y-2">
                                         <template x-for="tr in detailData.applicant_profile.trainings" :key="tr.id">
-                                            <div class="p-3 bg-gray-50 dark:bg-slate-800/40 rounded-xl border border-gray-100 dark:border-slate-800 flex items-center justify-between">
-                                                <span class="font-semibold text-gray-900 dark:text-white" x-text="tr.name"></span>
-                                                <a x-show="tr.certificate_path" :href="tr.certificate_path" target="_blank" class="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline text-[11px]">Lihat</a>
+                                            <div class="p-3 bg-gray-50 dark:bg-slate-800/40 rounded-xl border border-gray-100 dark:border-slate-800 flex items-center justify-between gap-3">
+                                                <span class="font-semibold text-gray-900 dark:text-white truncate" x-text="tr.name"></span>
+                                                <template x-if="tr.certificate_path">
+                                                    <a :href="tr.certificate_path.startsWith('http') ? tr.certificate_path : ('{{ asset('storage') }}/' + tr.certificate_path.replace(/^\/+/, ''))" 
+                                                       target="_blank" 
+                                                       class="px-2.5 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/80 rounded-lg border border-indigo-200/80 dark:border-indigo-800/80 transition shrink-0 flex items-center gap-1">
+                                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                        </svg>
+                                                        <span>Lihat Berkas</span>
+                                                    </a>
+                                                </template>
                                             </div>
                                         </template>
                                     </div>
@@ -756,8 +902,8 @@
                             </label>
                             <select name="status" id="status_select" x-model="statusData.status" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
                                 <option value="Submitted">Submitted (Diajukan)</option>
-                                <option value="Reviewed">Reviewed (Ditinjau)</option>
-                                <option value="Shortlisted">Shortlisted (Lolos Berkas)</option>
+                                <option value="Reviewed">Reviewed (Lolos Berkas / Tahap Tes)</option>
+                                <option value="Shortlisted">Shortlisted (Lolos Ujian / Siap Wawancara)</option>
                                 <option value="Interview">Interview (Wawancara)</option>
                                 <option value="Accepted">Accepted (Diterima)</option>
                                 <option value="Rejected">Rejected (Ditolak)</option>

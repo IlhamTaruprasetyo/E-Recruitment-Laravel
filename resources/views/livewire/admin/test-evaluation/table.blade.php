@@ -30,9 +30,26 @@
             essay_score: att.essay_score || 0,
             total_score: att.total_score || 0,
             status: att.status || 'in_progress',
-            answers: att.answers || []
+            application_status: att.job_application ? att.job_application.status : 'Reviewed',
+            application_notes: att.job_application ? (att.job_application.notes || '') : '',
+            answers: att.answers || [],
+            disc_result: att.disc_test_result || null
         };
         this.showGradingModal = true;
+    },
+
+    calcY(score) {
+        let val = Math.max(-8, Math.min(8, parseFloat(score) || 0));
+        return 80 - (val * 8.125);
+    },
+
+    getPolyline(scores) {
+        if (!scores) return '';
+        let dY = this.calcY(scores.D || 0);
+        let iY = this.calcY(scores.I || 0);
+        let sY = this.calcY(scores.S || 0);
+        let cY = this.calcY(scores.C || 0);
+        return `35,${dY} 85,${iY} 135,${sY} 185,${cY}`;
     }
 }">
 
@@ -190,14 +207,28 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="space-y-0.5">
-                                    <span class="block text-sm font-extrabold text-gray-900 dark:text-white">
-                                        {{ number_format($att->total_score ?? 0, 1) }}
-                                    </span>
-                                    <span class="text-[11px] text-gray-400">KKM: {{ number_format($att->test->passing_score ?? 0, 0) }}</span>
+                                    @if ($att->discTestResult)
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
+                                            DISC: {{ $att->discTestResult->discProfile->pattern_code ?? 'Profile' }}
+                                        </span>
+                                        <span class="block text-[11px] text-gray-400">Tes Kepribadian</span>
+                                    @else
+                                        <span class="block text-sm font-extrabold text-gray-900 dark:text-white">
+                                            {{ number_format($att->total_score ?? 0, 1) }}
+                                        </span>
+                                        <span class="text-[11px] text-gray-400">KKM: {{ number_format($att->test->passing_score ?? 0, 0) }}</span>
+                                    @endif
                                 </div>
                             </td>
                             <td class="px-6 py-4">
-                                @if ($hasUnreviewedEssay)
+                                @if ($att->discTestResult || ($att->test && str_contains(strtolower($att->test->title ?? ''), 'disc')))
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Profil Terbentuk
+                                    </span>
+                                @elseif ($hasUnreviewedEssay)
                                     <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 animate-pulse">
                                         Perlu Koreksi Essay
                                     </span>
@@ -217,17 +248,37 @@
                                         Sedang Pengerjaan
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 border border-gray-200 dark:border-slate-700">
-                                        {{ ucfirst($att->status) }}
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                                        Selesai (Completed)
                                     </span>
+                                @endif
+
+                                @if ($att->jobApplication)
+                                    @php
+                                        $appStatus = $att->jobApplication->status;
+                                        $badgeBg = match(strtolower($appStatus)) {
+                                            'accepted' => 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800',
+                                            'rejected' => 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/50 border-rose-200 dark:border-rose-800',
+                                            'interview' => 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 border-indigo-200 dark:border-indigo-800',
+                                            'shortlisted' => 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/50 border-purple-200 dark:border-purple-800',
+                                            'reviewed' => 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-800',
+                                            default => 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-800',
+                                        };
+                                    @endphp
+                                    <div class="mt-1">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border {{ $badgeBg }}">
+                                            Lamaran: {{ $appStatus }}
+                                        </span>
+                                    </div>
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <button @click="openGradingModal({{ json_encode($att) }})" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center justify-center gap-1.5 ml-auto">
                                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                     </svg>
-                                    <span>Evaluasi / Periksa</span>
+                                    <span>{{ $att->discTestResult ? 'Lihat Hasil DISC' : 'Evaluasi / Periksa' }}</span>
                                 </button>
                             </td>
                         </tr>
@@ -281,25 +332,218 @@
                         </button>
                     </div>
 
-                    <!-- Score Card Header -->
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 my-4">
-                        <div class="p-3 rounded-xl bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800">
-                            <span class="block text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase">Skor Pilihan Ganda</span>
-                            <span class="text-base font-extrabold text-indigo-900 dark:text-indigo-200" x-text="gradingData.objective_score"></span>
+                    <!-- DISC Personality Analysis Report (If DISC Result exists) -->
+                    <template x-if="gradingData.disc_result">
+                        <div class="my-4 p-5 rounded-2xl bg-purple-50/50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-800 space-y-4">
+                            <div class="flex items-center justify-between pb-3 border-b border-purple-200 dark:border-purple-800/80">
+                                <div>
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-purple-600 text-white uppercase tracking-wider">
+                                        Hasil Profil DISC Pelamar
+                                    </span>
+                                    <h4 class="text-sm font-bold text-gray-900 dark:text-white mt-1" x-text="gradingData.disc_result.disc_profile ? (gradingData.disc_result.disc_profile.pattern_code + ' - ' + gradingData.disc_result.disc_profile.title) : 'Tipe Kepribadian DISC'"></h4>
+                                </div>
+                                <span class="text-xs font-semibold text-purple-700 dark:text-purple-300">Self Inventory Personality Test</span>
+                            </div>
+
+                            <!-- DISC Score Table -->
+                            <div class="overflow-x-auto rounded-xl border border-purple-200 dark:border-purple-800/80 shadow-2xs">
+                                <table class="w-full text-xs text-center border-collapse bg-white dark:bg-slate-900">
+                                    <thead>
+                                        <tr class="bg-purple-600 text-white font-bold text-[11px]">
+                                            <th class="py-2 px-3 text-left">Line / Dimensi</th>
+                                            <th class="py-2 px-2">D</th>
+                                            <th class="py-2 px-2">I</th>
+                                            <th class="py-2 px-2">S</th>
+                                            <th class="py-2 px-2">C</th>
+                                            <th class="py-2 px-2">*</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-purple-100 dark:divide-purple-900/40 text-[11px] font-medium">
+                                        <tr>
+                                            <td class="py-1.5 px-3 text-left font-bold text-gray-700 dark:text-slate-300">1 (MOST - Public Self)</td>
+                                            <td class="py-1.5 px-2 font-bold" x-text="gradingData.disc_result.line_1_scores?.raw?.D ?? 0"></td>
+                                            <td class="py-1.5 px-2 font-bold" x-text="gradingData.disc_result.line_1_scores?.raw?.I ?? 0"></td>
+                                            <td class="py-1.5 px-2 font-bold" x-text="gradingData.disc_result.line_1_scores?.raw?.S ?? 0"></td>
+                                            <td class="py-1.5 px-2 font-bold" x-text="gradingData.disc_result.line_1_scores?.raw?.C ?? 0"></td>
+                                            <td class="py-1.5 px-2 text-gray-400" x-text="gradingData.disc_result.line_1_scores?.raw?.['*'] ?? 0"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-1.5 px-3 text-left font-bold text-gray-700 dark:text-slate-300">2 (LEAST - Core Self)</td>
+                                            <td class="py-1.5 px-2 font-bold" x-text="gradingData.disc_result.line_2_scores?.raw?.D ?? 0"></td>
+                                            <td class="py-1.5 px-2 font-bold" x-text="gradingData.disc_result.line_2_scores?.raw?.I ?? 0"></td>
+                                            <td class="py-1.5 px-2 font-bold" x-text="gradingData.disc_result.line_2_scores?.raw?.S ?? 0"></td>
+                                            <td class="py-1.5 px-2 font-bold" x-text="gradingData.disc_result.line_2_scores?.raw?.C ?? 0"></td>
+                                            <td class="py-1.5 px-2 text-gray-400" x-text="gradingData.disc_result.line_2_scores?.raw?.['*'] ?? 0"></td>
+                                        </tr>
+                                        <tr class="bg-purple-50/60 dark:bg-purple-950/40 font-bold">
+                                            <td class="py-1.5 px-3 text-left text-purple-700 dark:text-purple-300">3 (CHANGE - Perceived Self)</td>
+                                            <td class="py-1.5 px-2" x-text="gradingData.disc_result.line_3_scores?.raw?.D ?? 0"></td>
+                                            <td class="py-1.5 px-2" x-text="gradingData.disc_result.line_3_scores?.raw?.I ?? 0"></td>
+                                            <td class="py-1.5 px-2" x-text="gradingData.disc_result.line_3_scores?.raw?.S ?? 0"></td>
+                                            <td class="py-1.5 px-2" x-text="gradingData.disc_result.line_3_scores?.raw?.C ?? 0"></td>
+                                            <td class="py-1.5 px-2 text-gray-400">-</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- 3 Graph SVG Visualization Cards for Admin -->
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <!-- Graph 1: MOST -->
+                                <div class="p-3 rounded-xl bg-white dark:bg-slate-900 border border-rose-200 dark:border-rose-900/60 text-center space-y-2">
+                                    <span class="text-[10px] font-bold text-rose-600 uppercase">Graph 1 (MOST) - Mask / Public</span>
+                                    <div class="bg-rose-50/40 dark:bg-slate-950/40 rounded-lg p-1.5 border border-rose-100 dark:border-rose-950">
+                                        <svg viewBox="0 0 220 160" class="w-full h-36">
+                                            <!-- Grid Lines -->
+                                            <line x1="20" y1="15" x2="205" y2="15" stroke="#f43f5e" stroke-dasharray="2" stroke-opacity="0.3" />
+                                            <text x="5" y="18" fill="#9ca3af" font-size="8" font-family="monospace">+8</text>
+
+                                            <line x1="20" y1="80" x2="205" y2="80" stroke="#f43f5e" stroke-width="1.5" stroke-opacity="0.8" />
+                                            <text x="5" y="83" fill="#f43f5e" font-size="9" font-weight="bold" font-family="monospace">0</text>
+
+                                            <line x1="20" y1="145" x2="205" y2="145" stroke="#f43f5e" stroke-dasharray="2" stroke-opacity="0.3" />
+                                            <text x="5" y="148" fill="#9ca3af" font-size="8" font-family="monospace">-8</text>
+
+                                            <!-- Axes & Labels -->
+                                            <line x1="35" y1="10" x2="35" y2="148" stroke="#cbd5e1" stroke-dasharray="2" stroke-opacity="0.4" />
+                                            <text x="35" y="157" fill="#64748b" font-size="9" font-weight="bold" text-anchor="middle">D</text>
+
+                                            <line x1="85" y1="10" x2="85" y2="148" stroke="#cbd5e1" stroke-dasharray="2" stroke-opacity="0.4" />
+                                            <text x="85" y="157" fill="#64748b" font-size="9" font-weight="bold" text-anchor="middle">I</text>
+
+                                            <line x1="135" y1="10" x2="135" y2="148" stroke="#cbd5e1" stroke-dasharray="2" stroke-opacity="0.4" />
+                                            <text x="135" y="157" fill="#64748b" font-size="9" font-weight="bold" text-anchor="middle">S</text>
+
+                                            <line x1="185" y1="10" x2="185" y2="148" stroke="#cbd5e1" stroke-dasharray="2" stroke-opacity="0.4" />
+                                            <text x="185" y="157" fill="#64748b" font-size="9" font-weight="bold" text-anchor="middle">C</text>
+
+                                            <!-- Polyline -->
+                                            <polyline fill="none" stroke="#e11d48" stroke-width="2.2" :points="getPolyline(gradingData.disc_result.line_1_scores?.converted)" stroke-linecap="round" stroke-linejoin="round" />
+
+                                            <!-- Value Labels -->
+                                            <text x="35" :y="calcY(gradingData.disc_result.line_1_scores?.converted?.D) - 5" fill="#be123c" font-size="8" font-weight="bold" text-anchor="middle" x-text="parseFloat(gradingData.disc_result.line_1_scores?.converted?.D || 0).toFixed(1)"></text>
+                                            <text x="85" :y="calcY(gradingData.disc_result.line_1_scores?.converted?.I) - 5" fill="#be123c" font-size="8" font-weight="bold" text-anchor="middle" x-text="parseFloat(gradingData.disc_result.line_1_scores?.converted?.I || 0).toFixed(1)"></text>
+                                            <text x="135" :y="calcY(gradingData.disc_result.line_1_scores?.converted?.S) - 5" fill="#be123c" font-size="8" font-weight="bold" text-anchor="middle" x-text="parseFloat(gradingData.disc_result.line_1_scores?.converted?.S || 0).toFixed(1)"></text>
+                                            <text x="185" :y="calcY(gradingData.disc_result.line_1_scores?.converted?.C) - 5" fill="#be123c" font-size="8" font-weight="bold" text-anchor="middle" x-text="parseFloat(gradingData.disc_result.line_1_scores?.converted?.C || 0).toFixed(1)"></text>
+                                        </svg>
+                                    </div>
+                                </div>
+
+                                <!-- Graph 2: LEAST -->
+                                <div class="p-3 rounded-xl bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-900/60 text-center space-y-2">
+                                    <span class="text-[10px] font-bold text-amber-600 uppercase">Graph 2 (LEAST) - Core / Private</span>
+                                    <div class="bg-amber-50/40 dark:bg-slate-950/40 rounded-lg p-1.5 border border-amber-100 dark:border-amber-950">
+                                        <svg viewBox="0 0 220 160" class="w-full h-36">
+                                            <!-- Grid Lines -->
+                                            <line x1="20" y1="15" x2="205" y2="15" stroke="#f59e0b" stroke-dasharray="2" stroke-opacity="0.3" />
+                                            <text x="5" y="18" fill="#9ca3af" font-size="8" font-family="monospace">+8</text>
+
+                                            <line x1="20" y1="80" x2="205" y2="80" stroke="#f59e0b" stroke-width="1.5" stroke-opacity="0.8" />
+                                            <text x="5" y="83" fill="#f59e0b" font-size="9" font-weight="bold" font-family="monospace">0</text>
+
+                                            <line x1="20" y1="145" x2="205" y2="145" stroke="#f59e0b" stroke-dasharray="2" stroke-opacity="0.3" />
+                                            <text x="5" y="148" fill="#9ca3af" font-size="8" font-family="monospace">-8</text>
+
+                                            <!-- Axes & Labels -->
+                                            <line x1="35" y1="10" x2="35" y2="148" stroke="#cbd5e1" stroke-dasharray="2" stroke-opacity="0.4" />
+                                            <text x="35" y="157" fill="#64748b" font-size="9" font-weight="bold" text-anchor="middle">D</text>
+
+                                            <line x1="85" y1="10" x2="85" y2="148" stroke="#cbd5e1" stroke-dasharray="2" stroke-opacity="0.4" />
+                                            <text x="85" y="157" fill="#64748b" font-size="9" font-weight="bold" text-anchor="middle">I</text>
+
+                                            <line x1="135" y1="10" x2="135" y2="148" stroke="#cbd5e1" stroke-dasharray="2" stroke-opacity="0.4" />
+                                            <text x="135" y="157" fill="#64748b" font-size="9" font-weight="bold" text-anchor="middle">S</text>
+
+                                            <line x1="185" y1="10" x2="185" y2="148" stroke="#cbd5e1" stroke-dasharray="2" stroke-opacity="0.4" />
+                                            <text x="185" y="157" fill="#64748b" font-size="9" font-weight="bold" text-anchor="middle">C</text>
+
+                                            <!-- Polyline -->
+                                            <polyline fill="none" stroke="#d97706" stroke-width="2.2" :points="getPolyline(gradingData.disc_result.line_2_scores?.converted)" stroke-linecap="round" stroke-linejoin="round" />
+
+                                            <!-- Value Labels -->
+                                            <text x="35" :y="calcY(gradingData.disc_result.line_2_scores?.converted?.D) - 5" fill="#b45309" font-size="8" font-weight="bold" text-anchor="middle" x-text="parseFloat(gradingData.disc_result.line_2_scores?.converted?.D || 0).toFixed(1)"></text>
+                                            <text x="85" :y="calcY(gradingData.disc_result.line_2_scores?.converted?.I) - 5" fill="#b45309" font-size="8" font-weight="bold" text-anchor="middle" x-text="parseFloat(gradingData.disc_result.line_2_scores?.converted?.I || 0).toFixed(1)"></text>
+                                            <text x="135" :y="calcY(gradingData.disc_result.line_2_scores?.converted?.S) - 5" fill="#b45309" font-size="8" font-weight="bold" text-anchor="middle" x-text="parseFloat(gradingData.disc_result.line_2_scores?.converted?.S || 0).toFixed(1)"></text>
+                                            <text x="185" :y="calcY(gradingData.disc_result.line_2_scores?.converted?.C) - 5" fill="#b45309" font-size="8" font-weight="bold" text-anchor="middle" x-text="parseFloat(gradingData.disc_result.line_2_scores?.converted?.C || 0).toFixed(1)"></text>
+                                        </svg>
+                                    </div>
+                                </div>
+
+                                <!-- Graph 3: CHANGE -->
+                                <div class="p-3 rounded-xl bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-900/60 text-center space-y-2">
+                                    <span class="text-[10px] font-bold text-indigo-600 uppercase">Graph 3 (CHANGE) - Mirror / Perceived</span>
+                                    <div class="bg-indigo-50/40 dark:bg-slate-950/40 rounded-lg p-1.5 border border-indigo-100 dark:border-indigo-950">
+                                        <svg viewBox="0 0 220 160" class="w-full h-36">
+                                            <!-- Grid Lines -->
+                                            <line x1="20" y1="15" x2="205" y2="15" stroke="#6366f1" stroke-dasharray="2" stroke-opacity="0.3" />
+                                            <text x="5" y="18" fill="#9ca3af" font-size="8" font-family="monospace">+8</text>
+
+                                            <line x1="20" y1="80" x2="205" y2="80" stroke="#6366f1" stroke-width="1.5" stroke-opacity="0.8" />
+                                            <text x="5" y="83" fill="#6366f1" font-size="9" font-weight="bold" font-family="monospace">0</text>
+
+                                            <line x1="20" y1="145" x2="205" y2="145" stroke="#6366f1" stroke-dasharray="2" stroke-opacity="0.3" />
+                                            <text x="5" y="148" fill="#9ca3af" font-size="8" font-family="monospace">-8</text>
+
+                                            <!-- Axes & Labels -->
+                                            <line x1="35" y1="10" x2="35" y2="148" stroke="#cbd5e1" stroke-dasharray="2" stroke-opacity="0.4" />
+                                            <text x="35" y="157" fill="#64748b" font-size="9" font-weight="bold" text-anchor="middle">D</text>
+
+                                            <line x1="85" y1="10" x2="85" y2="148" stroke="#cbd5e1" stroke-dasharray="2" stroke-opacity="0.4" />
+                                            <text x="85" y="157" fill="#64748b" font-size="9" font-weight="bold" text-anchor="middle">I</text>
+
+                                            <line x1="135" y1="10" x2="135" y2="148" stroke="#cbd5e1" stroke-dasharray="2" stroke-opacity="0.4" />
+                                            <text x="135" y="157" fill="#64748b" font-size="9" font-weight="bold" text-anchor="middle">S</text>
+
+                                            <line x1="185" y1="10" x2="185" y2="148" stroke="#cbd5e1" stroke-dasharray="2" stroke-opacity="0.4" />
+                                            <text x="185" y="157" fill="#64748b" font-size="9" font-weight="bold" text-anchor="middle">C</text>
+
+                                            <!-- Polyline -->
+                                            <polyline fill="none" stroke="#4f46e5" stroke-width="2.2" :points="getPolyline(gradingData.disc_result.line_3_scores?.converted)" stroke-linecap="round" stroke-linejoin="round" />
+
+                                            <!-- Value Labels -->
+                                            <text x="35" :y="calcY(gradingData.disc_result.line_3_scores?.converted?.D) - 5" fill="#4338ca" font-size="8" font-weight="bold" text-anchor="middle" x-text="parseFloat(gradingData.disc_result.line_3_scores?.converted?.D || 0).toFixed(1)"></text>
+                                            <text x="85" :y="calcY(gradingData.disc_result.line_3_scores?.converted?.I) - 5" fill="#4338ca" font-size="8" font-weight="bold" text-anchor="middle" x-text="parseFloat(gradingData.disc_result.line_3_scores?.converted?.I || 0).toFixed(1)"></text>
+                                            <text x="135" :y="calcY(gradingData.disc_result.line_3_scores?.converted?.S) - 5" fill="#4338ca" font-size="8" font-weight="bold" text-anchor="middle" x-text="parseFloat(gradingData.disc_result.line_3_scores?.converted?.S || 0).toFixed(1)"></text>
+                                            <text x="185" :y="calcY(gradingData.disc_result.line_3_scores?.converted?.C) - 5" fill="#4338ca" font-size="8" font-weight="bold" text-anchor="middle" x-text="parseFloat(gradingData.disc_result.line_3_scores?.converted?.C || 0).toFixed(1)"></text>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Description (High Contrast Premium Card) -->
+                            <template x-if="gradingData.disc_result.disc_profile">
+                                <div class="p-4 rounded-xl bg-gradient-to-br from-slate-900 via-indigo-950 to-blue-950 text-white border border-indigo-500/40 shadow-md text-xs space-y-1.5">
+                                    <div class="flex items-center gap-2 pb-1.5 border-b border-indigo-800/60">
+                                        <span class="p-1 rounded bg-indigo-600 text-white text-[10px]">📖</span>
+                                        <span class="text-[10px] font-black text-indigo-300 uppercase tracking-wider">Deskripsi Kepribadian:</span>
+                                    </div>
+                                    <p class="text-indigo-100/90 leading-relaxed font-normal pt-0.5" x-text="gradingData.disc_result.disc_profile.general_description || 'Analisis kepribadian pelamar berhasil dibentuk.'"></p>
+                                </div>
+                            </template>
                         </div>
-                        <div class="p-3 rounded-xl bg-amber-50/60 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800">
-                            <span class="block text-[10px] font-semibold text-amber-600 dark:text-amber-400 uppercase">Skor Essay</span>
-                            <span class="text-base font-extrabold text-amber-900 dark:text-amber-200" x-text="gradingData.essay_score"></span>
+                    </template>
+
+                    <!-- Score Card Header (Untuk Tes Objektif / Essay) -->
+                    <template x-if="!gradingData.disc_result">
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 my-4">
+                            <div class="p-3 rounded-xl bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800">
+                                <span class="block text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase">Skor Pilihan Ganda</span>
+                                <span class="text-base font-extrabold text-indigo-900 dark:text-indigo-200" x-text="gradingData.objective_score"></span>
+                            </div>
+                            <div class="p-3 rounded-xl bg-amber-50/60 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800">
+                                <span class="block text-[10px] font-semibold text-amber-600 dark:text-amber-400 uppercase">Skor Essay</span>
+                                <span class="text-base font-extrabold text-amber-900 dark:text-amber-200" x-text="gradingData.essay_score"></span>
+                            </div>
+                            <div class="p-3 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800">
+                                <span class="block text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase">Total Skor Akhir</span>
+                                <span class="text-base font-extrabold text-emerald-900 dark:text-emerald-200" x-text="gradingData.total_score"></span>
+                            </div>
+                            <div class="p-3 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
+                                <span class="block text-[10px] font-semibold text-gray-500 uppercase">KKM Minimum</span>
+                                <span class="text-base font-extrabold text-gray-800 dark:text-slate-200" x-text="gradingData.passing_score + '%'"></span>
+                            </div>
                         </div>
-                        <div class="p-3 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800">
-                            <span class="block text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase">Total Skor Akhir</span>
-                            <span class="text-base font-extrabold text-emerald-900 dark:text-emerald-200" x-text="gradingData.total_score"></span>
-                        </div>
-                        <div class="p-3 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
-                            <span class="block text-[10px] font-semibold text-gray-500 uppercase">KKM Minimum</span>
-                            <span class="text-base font-extrabold text-gray-800 dark:text-slate-200" x-text="gradingData.passing_score + '%'"></span>
-                        </div>
-                    </div>
+                    </template>
 
                     <!-- Form Penilaian Essay -->
                     <form :action="'{{ url('admin/test-evaluations') }}/' + gradingData.id + '/grade'" method="POST" @submit="isSubmittingGrading = true" class="space-y-4">
@@ -350,8 +594,31 @@
                                         <div class="space-y-3">
                                             <div class="p-3 rounded-lg bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-xs">
                                                 <span class="block text-[11px] font-semibold text-gray-400 uppercase mb-1">Jawaban Teks Pelamar:</span>
-                                                <p class="font-medium text-gray-800 dark:text-slate-200 whitespace-pre-line" x-text="ans.essay_answer || '(Pelamar tidak mengisikan jawaban essay)'"></p>
+                                                <p class="font-medium text-gray-800 dark:text-slate-200 whitespace-pre-line" x-text="ans.essay_answer || '(Pelamar tidak mengisikan jawaban teks)'"></p>
                                             </div>
+
+                                            <!-- Lampiran File Pelamar (Local Storage) -->
+                                            <template x-if="ans.attachment_url">
+                                                <div class="flex items-center justify-between p-3 rounded-lg bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/60 text-xs">
+                                                    <div class="flex items-center gap-2.5 min-w-0">
+                                                        <div class="w-8 h-8 rounded-lg bg-indigo-600/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                                            </svg>
+                                                        </div>
+                                                        <div class="truncate">
+                                                            <span class="block font-semibold text-indigo-900 dark:text-indigo-200 truncate" x-text="ans.attachment_name || 'Lampiran File Jawaban'"></span>
+                                                            <span class="text-[10px] text-gray-500 dark:text-slate-400" x-text="(ans.attachment_size ? Math.round(ans.attachment_size / 1024) + ' KB • ' : '') + 'Lampiran Tersimpan'"></span>
+                                                        </div>
+                                                    </div>
+                                                    <a :href="ans.attachment_url" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg shadow-sm transition shrink-0 ml-2">
+                                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                        </svg>
+                                                        <span>Buka / Unduh File</span>
+                                                    </a>
+                                                </div>
+                                            </template>
 
                                             <div class="flex items-center justify-between bg-amber-100/50 dark:bg-amber-950/40 p-3 rounded-lg border border-amber-200 dark:border-amber-800/80">
                                                 <label :for="'score_' + ans.id" class="text-xs font-bold text-amber-900 dark:text-amber-200">
@@ -369,16 +636,55 @@
                             </template>
                         </div>
 
+                        <!-- KEPUTUSAN STATUS LAMARAN OLEH HR (ONE-STOP DECISION) -->
+                        <div class="mt-6 p-4 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800/60 space-y-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs font-bold shrink-0">
+                                    ✓
+                                </div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-gray-900 dark:text-white">
+                                        Tindakan & Keputusan Status Lamaran
+                                    </h4>
+                                    <p class="text-[11px] text-gray-500 dark:text-slate-400">
+                                        Perbarui status lamaran kandidat secara langsung setelah evaluasi ujian selesai
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                                <div>
+                                    <label for="eval_app_status" class="block text-[11px] font-bold text-gray-700 dark:text-slate-300 mb-1">
+                                        Pilih Status Lamaran:
+                                    </label>
+                                    <select name="application_status" id="eval_app_status" x-model="gradingData.application_status" class="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                        <option value="Reviewed">Reviewed (Lolos Berkas / Tahap Tes)</option>
+                                        <option value="Shortlisted">Shortlisted (Lolos Ujian / Siap Wawancara)</option>
+                                        <option value="Interview">Interview (Wawancara)</option>
+                                        <option value="Accepted">Accepted (Diterima)</option>
+                                        <option value="Rejected">Rejected (Ditolak)</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label for="eval_app_notes" class="block text-[11px] font-bold text-gray-700 dark:text-slate-300 mb-1">
+                                        Catatan / Feedback Evaluasi:
+                                    </label>
+                                    <input type="text" name="application_notes" id="eval_app_notes" x-model="gradingData.application_notes" placeholder="Contoh: Jawaban essay sangat analitis, siap dijadwalkan user interview..." class="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 dark:border-slate-800">
                             <button type="button" @click="showGradingModal = false" class="px-4 py-2 text-xs font-semibold text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition">
                                 Batal
                             </button>
-                            <button type="submit" :disabled="isSubmittingGrading" class="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-md shadow-indigo-500/20 transition flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+                            <button type="submit" :disabled="isSubmittingGrading" class="px-5 py-2.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-md shadow-indigo-500/20 transition flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
                                 <svg x-show="isSubmittingGrading" class="animate-spin w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
-                                <span x-text="isSubmittingGrading ? 'Menyimpan...' : 'Simpan Penilaian Essay'"></span>
+                                <span x-text="isSubmittingGrading ? 'Menyimpan...' : 'Simpan Evaluasi & Perbarui Status'"></span>
                             </button>
                         </div>
                     </form>
