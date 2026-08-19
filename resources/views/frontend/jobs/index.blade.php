@@ -5,16 +5,16 @@
 @section('content')
 <div class="relative py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
 
-    <!-- Page Header (Dark & #08CB00 Neon Gradient) -->
-    <div class="relative rounded-3xl bg-gradient-to-r from-[#051c05] via-[#072907] to-[#031103] border border-[#08CB00]/40 p-8 sm:p-12 mb-10 overflow-hidden shadow-2xl shadow-[#08CB00]/15">
-        <div class="absolute -right-20 -top-20 w-80 h-80 bg-[#08CB00]/15 rounded-full blur-3xl pointer-events-none"></div>
+    <!-- Page Header (Dark & #93F514 Neon Gradient) -->
+    <div class="relative rounded-3xl bg-gradient-to-r from-[#051c05] via-[#072907] to-[#031103] border border-[#93F514]/40 p-8 sm:p-12 mb-10 overflow-hidden shadow-2xl shadow-[#93F514]/15">
+        <div class="absolute -right-20 -top-20 w-80 h-80 bg-[#93F514]/15 rounded-full blur-3xl pointer-events-none"></div>
         <div class="relative z-10 max-w-2xl">
-            {{-- <div class="inline-flex items-center gap-2 text-[#08CB00] text-xs font-bold uppercase tracking-widest mb-3">
-                <span class="w-2 h-2 rounded-full bg-[#08CB00] animate-pulse"></span>
+            {{-- <div class="inline-flex items-center gap-2 text-[#93F514] text-xs font-bold uppercase tracking-widest mb-3">
+                <span class="w-2 h-2 rounded-full bg-[#93F514] animate-pulse"></span>
                 <span>Peluang Karir Terbuka</span>
             </div> --}}
             <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#EEEEEE] leading-tight">
-                Jelajahi <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#08CB00] via-[#52fa4d] to-[#adfcab]">Lowongan Pekerjaan</span>
+                Jelajahi <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#93F514] via-[#75f06a] to-[#5FE6B6]">Lowongan Pekerjaan</span>
             </h1>
             <p class="mt-3 text-sm sm:text-base text-gray-300">
                 Temukan posisi yang sesuai dengan keahlian, minat, dan kualifikasi Anda. Lamar sekarang dan ikuti tahapan seleksi terintegrasi.
@@ -78,12 +78,12 @@
                 <input type="hidden" name="company_id" :value="selected">
 
                 <button type="button" @click="open ? open = false : openDropdown()"
-                    :class="selected ? 'text-[#08CB00] font-bold' : 'text-gray-700'"
+                    :class="selected ? 'text-[#93F514] font-bold' : 'text-gray-700'"
                     class="w-full py-2.5 px-4 flex items-center justify-between text-left text-sm transition">
                     <div class="flex items-center gap-2 truncate">
                         <template x-if="selected">
                             <span
-                                class="w-5 h-5 rounded-full bg-[#08CB00] text-black font-extrabold text-xs flex items-center justify-center shrink-0 shadow-sm">
+                                class="w-5 h-5 rounded-full bg-[#93F514] text-black font-extrabold text-xs flex items-center justify-center shrink-0 shadow-sm">
                                 1
                             </span>
                         </template>
@@ -92,7 +92,7 @@
                         </span>
                     </div>
                     <svg class="w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200"
-                        :class="open ? 'rotate-180 text-[#08CB00]' : (selected ? 'text-[#08CB00]' : '')"
+                        :class="open ? 'rotate-180 text-[#93F514]' : (selected ? 'text-[#93F514]' : '')"
                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M19 9l-7 7-7-7" />
@@ -118,14 +118,14 @@
                             </svg>
                         </div>
                         <input type="text" x-model="search" placeholder="Temukan perusahaan..."
-                            class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#08CB00]/40 focus:border-[#08CB00]">
+                            class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#93F514]/40 focus:border-[#93F514]">
                     </div>
 
                     <!-- All Option -->
                     <label
                         class="flex items-center gap-3 py-2 px-1 text-xs font-semibold text-gray-700 hover:text-black cursor-pointer border-b border-gray-100">
                         <input type="radio" name="_jobs_temp_company" value="" x-model="tempSelected"
-                            class="w-4 h-4 rounded border-gray-300 text-[#08CB00] focus:ring-[#08CB00] cursor-pointer">
+                            class="w-4 h-4 rounded border-gray-300 text-[#93F514] focus:ring-[#93F514] cursor-pointer">
                         <span>Semua Perusahaan</span>
                     </label>
 
@@ -144,7 +144,7 @@
                                         x-show="!search || '{{ strtolower($comp->name) }}'.includes(search.toLowerCase())">
                                         <input type="radio" name="_jobs_temp_company"
                                             value="{{ $comp->id }}" x-model="tempSelected"
-                                            class="w-4 h-4 rounded border-gray-300 text-[#08CB00] focus:ring-[#08CB00] cursor-pointer shrink-0">
+                                            class="w-4 h-4 rounded border-gray-300 text-[#93F514] focus:ring-[#93F514] cursor-pointer shrink-0">
                                         <span class="truncate">{{ $comp->name }}</span>
                                     </label>
                                 @endforeach
@@ -155,11 +155,11 @@
                     <!-- Footer Buttons (Always Visible at Bottom) -->
                     <div class="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between gap-3">
                         <button type="button" @click="reset()"
-                            class="text-xs font-semibold text-gray-500 hover:text-[#08CB00] transition">
+                            class="text-xs font-semibold text-gray-500 hover:text-[#93F514] transition">
                             Atur Ulang
                         </button>
                         <button type="button" @click="apply()"
-                            class="px-5 py-2 rounded-xl bg-[#08CB00] hover:bg-[#07b500] text-black font-bold text-xs shadow-md shadow-[#08CB00]/25 transition">
+                            class="px-5 py-2 rounded-xl bg-[#93F514] hover:bg-[#7edc0b] text-black font-bold text-xs shadow-md shadow-[#93F514]/25 transition">
                             Pilih
                         </button>
                     </div>
@@ -203,12 +203,12 @@
                 <input type="hidden" name="department_id" :value="selected">
 
                 <button type="button" @click="open ? open = false : openDropdown()"
-                    :class="selected ? 'text-[#08CB00] font-bold' : 'text-gray-700'"
+                    :class="selected ? 'text-[#93F514] font-bold' : 'text-gray-700'"
                     class="w-full py-2.5 px-4 flex items-center justify-between text-left text-sm transition">
                     <div class="flex items-center gap-2 truncate">
                         <template x-if="selected">
                             <span
-                                class="w-5 h-5 rounded-full bg-[#08CB00] text-black font-extrabold text-xs flex items-center justify-center shrink-0 shadow-sm">
+                                class="w-5 h-5 rounded-full bg-[#93F514] text-black font-extrabold text-xs flex items-center justify-center shrink-0 shadow-sm">
                                 1
                             </span>
                         </template>
@@ -217,7 +217,7 @@
                         </span>
                     </div>
                     <svg class="w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200"
-                        :class="open ? 'rotate-180 text-[#08CB00]' : (selected ? 'text-[#08CB00]' : '')"
+                        :class="open ? 'rotate-180 text-[#93F514]' : (selected ? 'text-[#93F514]' : '')"
                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M19 9l-7 7-7-7" />
@@ -243,7 +243,7 @@
                             </svg>
                         </div>
                         <input type="text" x-model="search" placeholder="Temukan fungsi / departemen..."
-                            class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#08CB00]/40 focus:border-[#08CB00]">
+                            class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#93F514]/40 focus:border-[#93F514]">
                     </div>
 
                     <!-- All Option -->
@@ -251,7 +251,7 @@
                         class="flex items-center gap-3 py-2 px-1 text-xs font-semibold text-gray-700 hover:text-black cursor-pointer border-b border-gray-100">
                         <input type="radio" name="_jobs_temp_department" value=""
                             x-model="tempSelected"
-                            class="w-4 h-4 rounded border-gray-300 text-[#08CB00] focus:ring-[#08CB00] cursor-pointer">
+                            class="w-4 h-4 rounded border-gray-300 text-[#93F514] focus:ring-[#93F514] cursor-pointer">
                         <span>Semua Departemen</span>
                     </label>
 
@@ -270,7 +270,7 @@
                                         x-show="!search || '{{ strtolower($dept->name) }}'.includes(search.toLowerCase())">
                                         <input type="radio" name="_jobs_temp_department"
                                             value="{{ $dept->id }}" x-model="tempSelected"
-                                            class="w-4 h-4 rounded border-gray-300 text-[#08CB00] focus:ring-[#08CB00] cursor-pointer shrink-0">
+                                            class="w-4 h-4 rounded border-gray-300 text-[#93F514] focus:ring-[#93F514] cursor-pointer shrink-0">
                                         <span class="truncate">{{ $dept->name }}</span>
                                     </label>
                                 @endforeach
@@ -281,11 +281,11 @@
                     <!-- Footer Buttons (Always Visible at Bottom) -->
                     <div class="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between gap-3">
                         <button type="button" @click="reset()"
-                            class="text-xs font-semibold text-gray-500 hover:text-[#08CB00] transition">
+                            class="text-xs font-semibold text-gray-500 hover:text-[#93F514] transition">
                             Atur Ulang
                         </button>
                         <button type="button" @click="apply()"
-                            class="px-5 py-2 rounded-xl bg-[#08CB00] hover:bg-[#07b500] text-black font-bold text-xs shadow-md shadow-[#08CB00]/25 transition">
+                            class="px-5 py-2 rounded-xl bg-[#93F514] hover:bg-[#7edc0b] text-black font-bold text-xs shadow-md shadow-[#93F514]/25 transition">
                             Pilih
                         </button>
                     </div>
@@ -321,12 +321,12 @@
                 <input type="hidden" name="employment_type" :value="selected">
 
                 <button type="button" @click="open ? open = false : openDropdown()"
-                    :class="selected ? 'text-[#08CB00] font-bold' : 'text-gray-700'"
+                    :class="selected ? 'text-[#93F514] font-bold' : 'text-gray-700'"
                     class="w-full py-2.5 px-4 flex items-center justify-between text-left text-sm transition">
                     <div class="flex items-center gap-2 truncate">
                         <template x-if="selected">
                             <span
-                                class="w-5 h-5 rounded-full bg-[#08CB00] text-black font-extrabold text-xs flex items-center justify-center shrink-0 shadow-sm">
+                                class="w-5 h-5 rounded-full bg-[#93F514] text-black font-extrabold text-xs flex items-center justify-center shrink-0 shadow-sm">
                                 1
                             </span>
                         </template>
@@ -335,7 +335,7 @@
                         </span>
                     </div>
                     <svg class="w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200"
-                        :class="open ? 'rotate-180 text-[#08CB00]' : (selected ? 'text-[#08CB00]' : '')"
+                        :class="open ? 'rotate-180 text-[#93F514]' : (selected ? 'text-[#93F514]' : '')"
                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M19 9l-7 7-7-7" />
@@ -361,14 +361,14 @@
                             </svg>
                         </div>
                         <input type="text" x-model="search" placeholder="Temukan jenjang..."
-                            class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#08CB00]/40 focus:border-[#08CB00]">
+                            class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#93F514]/40 focus:border-[#93F514]">
                     </div>
 
                     <!-- All Option -->
                     <label
                         class="flex items-center gap-3 py-2 px-1 text-xs font-semibold text-gray-700 hover:text-black cursor-pointer border-b border-gray-100">
                         <input type="radio" name="_jobs_temp_type" value="" x-model="tempSelected"
-                            class="w-4 h-4 rounded border-gray-300 text-[#08CB00] focus:ring-[#08CB00] cursor-pointer">
+                            class="w-4 h-4 rounded border-gray-300 text-[#93F514] focus:ring-[#93F514] cursor-pointer">
                         <span>Semua Jenjang</span>
                     </label>
 
@@ -388,7 +388,7 @@
                                     x-show="!search || type.toLowerCase().includes(search.toLowerCase())">
                                     <input type="radio" name="_jobs_temp_type" :value="type"
                                         x-model="tempSelected"
-                                        class="w-4 h-4 rounded border-gray-300 text-[#08CB00] focus:ring-[#08CB00] cursor-pointer shrink-0">
+                                        class="w-4 h-4 rounded border-gray-300 text-[#93F514] focus:ring-[#93F514] cursor-pointer shrink-0">
                                     <span x-text="type" class="truncate"></span>
                                 </label>
                             </template>
@@ -398,11 +398,11 @@
                     <!-- Footer Buttons (Always Visible at Bottom) -->
                     <div class="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between gap-3">
                         <button type="button" @click="reset()"
-                            class="text-xs font-semibold text-gray-500 hover:text-[#08CB00] transition">
+                            class="text-xs font-semibold text-gray-500 hover:text-[#93F514] transition">
                             Atur Ulang
                         </button>
                         <button type="button" @click="apply()"
-                            class="px-5 py-2 rounded-xl bg-[#08CB00] hover:bg-[#07b500] text-black font-bold text-xs shadow-md shadow-[#08CB00]/25 transition">
+                            class="px-5 py-2 rounded-xl bg-[#93F514] hover:bg-[#7edc0b] text-black font-bold text-xs shadow-md shadow-[#93F514]/25 transition">
                             Pilih
                         </button>
                     </div>
@@ -412,8 +412,8 @@
             <!-- Actions (Submit & Reset) -->
             <div class="w-full lg:w-auto p-1 shrink-0 flex items-center gap-2">
                 <button type="submit" 
-                        class="w-full lg:w-auto py-2.5 px-6 rounded-xl lg:rounded-full bg-[#051405] hover:bg-[#08CB00] text-[#EEEEEE] hover:text-black border border-[#08CB00]/40 font-bold text-sm tracking-wide shadow-md shadow-black/25 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer outline-none group">
-                    <svg class="w-4 h-4 text-[#08CB00] group-hover:text-black transition-colors shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        class="w-full lg:w-auto py-2.5 px-6 rounded-xl lg:rounded-full bg-[#051405] hover:bg-[#93F514] text-[#EEEEEE] hover:text-black border border-[#93F514]/40 font-bold text-sm tracking-wide shadow-md shadow-black/25 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer outline-none group">
+                    <svg class="w-4 h-4 text-[#93F514] group-hover:text-black transition-colors shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                     <span class="whitespace-nowrap">Cari Lowongan</span>
@@ -436,18 +436,18 @@
         <div>
             <h2 class="text-xl sm:text-2xl font-bold text-[#EEEEEE]">
                 @if(request('company_id'))
-                    Lowongan di <span class="text-[#08CB00]">{{ $companies->firstWhere('id', request('company_id'))?->name ?? 'Perusahaan Terpilih' }}</span>
+                    Lowongan di <span class="text-[#93F514]">{{ $companies->firstWhere('id', request('company_id'))?->name ?? 'Perusahaan Terpilih' }}</span>
                 @else
-                    Daftar <span class="text-[#08CB00]">Semua Lowongan</span>
+                    Daftar <span class="text-[#93F514]">Semua Lowongan</span>
                 @endif
             </h2>
             <p class="text-xs sm:text-sm text-gray-400 mt-0.5">
-                Menampilkan total <strong class="text-[#08CB00]">{{ $jobs->total() }}</strong> posisi lowongan kerja
+                Menampilkan total <strong class="text-[#93F514]">{{ $jobs->total() }}</strong> posisi lowongan kerja
             </p>
         </div>
         @if(request('company_id') || request('search') || request('department_id') || request('employment_type'))
             <a href="{{ route('jobs.index') }}" 
-               class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#08CB00] hover:text-[#52fa4d] transition shrink-0">
+               class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#93F514] hover:text-[#52fa4d] transition shrink-0">
                 <span>Reset Filter</span>
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -459,19 +459,19 @@
     <!-- Jobs Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @forelse($jobs as $job)
-            <div class="group relative rounded-3xl bg-gradient-to-b from-[#061506] to-[#030803] border border-[#08CB00]/30 hover:border-[#08CB00] p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:shadow-[#08CB00]/20 hover:-translate-y-1">
+            <div class="group relative rounded-3xl bg-gradient-to-b from-[#061506] to-[#030803] border border-[#93F514]/30 hover:border-[#93F514] p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:shadow-[#93F514]/20 hover:-translate-y-1">
                 <div>
                     <!-- Header Card -->
                     <div class="flex items-start justify-between gap-3 mb-4">
                         <div class="flex items-center gap-3">
                             @if($job->company?->logo_url)
-                                <div class="w-12 h-12 rounded-2xl bg-[#051205] border border-[#08CB00]/40 p-1.5 flex items-center justify-center shrink-0 overflow-hidden shadow-md shadow-[#08CB00]/15">
+                                <div class="w-12 h-12 rounded-2xl bg-[#051205] border border-[#93F514]/40 p-1.5 flex items-center justify-center shrink-0 overflow-hidden shadow-md shadow-[#93F514]/15">
                                     <img src="{{ $job->company->logo_url }}" 
                                          alt="{{ $job->company->name }}" 
                                          class="w-full h-full object-contain">
                                 </div>
                             @else
-                                <div class="w-12 h-12 rounded-2xl bg-[#08CB00]/15 border border-[#08CB00]/40 flex items-center justify-center text-[#08CB00] font-extrabold text-lg shrink-0">
+                                <div class="w-12 h-12 rounded-2xl bg-[#93F514]/15 border border-[#93F514]/40 flex items-center justify-center text-[#93F514] font-extrabold text-lg shrink-0">
                                     {{ strtoupper(substr($job->company?->name ?? 'M', 0, 2)) }}
                                 </div>
                             @endif
@@ -479,19 +479,19 @@
                                 <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">
                                     {{ $job->company?->name ?? 'Perusahaan Mitra' }}
                                 </h4>
-                                <span class="text-xs text-[#08CB00] font-semibold">
+                                <span class="text-xs text-[#93F514] font-semibold">
                                     {{ $job->department?->name ?? 'Umum' }}
                                 </span>
                             </div>
                         </div>
-                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#08CB00]/15 border border-[#08CB00]/40 text-[#08CB00] shrink-0">
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] shrink-0">
                             {{ $job->employment_type }}
                         </span>
                     </div>
 
                     <!-- Job Title -->
                     <a href="{{ route('jobs.show', $job->id) }}">
-                        <h3 class="text-lg font-bold text-[#EEEEEE] group-hover:text-[#08CB00] transition-colors line-clamp-1">
+                        <h3 class="text-lg font-bold text-[#EEEEEE] group-hover:text-[#93F514] transition-colors line-clamp-1">
                             {{ $job->title }}
                         </h3>
                     </a>
@@ -502,17 +502,17 @@
                     </p>
 
                     <!-- Details -->
-                    <div class="mt-5 space-y-2.5 pt-4 border-t border-[#08CB00]/15">
+                    <div class="mt-5 space-y-2.5 pt-4 border-t border-[#93F514]/15">
                         <div class="flex items-center gap-2 text-xs text-gray-300">
-                            <svg class="w-4 h-4 text-[#08CB00] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg class="w-4 h-4 text-[#93F514] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                             </svg>
                             <span>{{ $job->location ?? 'Indonesia' }}</span>
                         </div>
 
                         @if($job->salary_min || $job->salary_max)
-                            <div class="flex items-center gap-2 text-xs text-[#08CB00] font-semibold">
-                                <svg class="w-4 h-4 text-[#08CB00] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <div class="flex items-center gap-2 text-xs text-[#93F514] font-semibold">
+                                <svg class="w-4 h-4 text-[#93F514] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                                 <span>
@@ -523,7 +523,7 @@
 
                         @if($job->deadline)
                             <div class="flex items-center gap-2 text-xs text-gray-400">
-                                <svg class="w-4 h-4 text-[#08CB00] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg class="w-4 h-4 text-[#93F514] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
                                 <span>Batas: {{ \Carbon\Carbon::parse($job->deadline)->format('d M Y') }}</span>
@@ -533,17 +533,17 @@
                 </div>
 
                 <!-- Footer Card Action -->
-                <div class="mt-6 pt-4 border-t border-[#08CB00]/15 flex items-center justify-between gap-3">
+                <div class="mt-6 pt-4 border-t border-[#93F514]/15 flex items-center justify-between gap-3">
                     <span class="text-xs text-gray-400">Kuota: <strong class="text-[#EEEEEE]">{{ $job->quota }}</strong></span>
                     <a href="{{ route('jobs.show', $job->id) }}" 
-                       class="px-4 py-2 rounded-full bg-[#08CB00] hover:bg-[#07b500] text-black font-extrabold text-xs shadow-md transition">
+                       class="px-4 py-2 rounded-full bg-[#93F514] hover:bg-[#7edc0b] text-black font-extrabold text-xs shadow-md transition">
                         Detail & Lamar
                     </a>
                 </div>
             </div>
         @empty
-            <div class="col-span-full py-16 text-center rounded-3xl bg-[#050e05] border border-[#08CB00]/30">
-                <div class="w-16 h-16 mx-auto rounded-full bg-[#08CB00]/15 flex items-center justify-center text-[#08CB00] mb-4">
+            <div class="col-span-full py-16 text-center rounded-3xl bg-[#050e05] border border-[#93F514]/30">
+                <div class="w-16 h-16 mx-auto rounded-full bg-[#93F514]/15 flex items-center justify-center text-[#93F514] mb-4">
                     <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -552,7 +552,7 @@
                 <p class="text-xs sm:text-sm text-gray-400 mt-1">
                     Silakan ubah filter atau kata kunci pencarian Anda.
                 </p>
-                <a href="{{ route('jobs.index') }}" class="inline-block mt-4 px-5 py-2 rounded-full bg-[#08CB00] text-black font-extrabold text-xs">
+                <a href="{{ route('jobs.index') }}" class="inline-block mt-4 px-5 py-2 rounded-full bg-[#93F514] text-black font-extrabold text-xs">
                     Reset Semua Filter
                 </a>
             </div>
@@ -566,15 +566,15 @@
 
     <!-- Temukan Lowongan Berdasarkan Perusahaan (Di Bawah Menu Daftar Lowongan & Rata Tengah) -->
     @if(isset($companies) && $companies->count() > 0)
-        <div class="pt-12 border-t border-[#08CB00]/20">
+        <div class="pt-12 border-t border-[#93F514]/20">
             <!-- Header Rata Tengah -->
             <div class="text-center max-w-2xl mx-auto mb-8">
-                {{-- <div class="inline-flex items-center gap-2 text-[#08CB00] text-xs font-bold uppercase tracking-wider mb-2">
-                    <span class="w-2 h-2 rounded-full bg-[#08CB00] animate-pulse"></span>
+                {{-- <div class="inline-flex items-center gap-2 text-[#93F514] text-xs font-bold uppercase tracking-wider mb-2">
+                    <span class="w-2 h-2 rounded-full bg-[#93F514] animate-pulse"></span>
                     <span>Perusahaan Mitra</span>
                 </div> --}}
                 <h2 class="text-2xl sm:text-3xl font-extrabold text-[#EEEEEE]">
-                    Temukan Lowongan Berdasarkan <span class="text-[#08CB00]">Perusahaan</span>
+                    Temukan Lowongan Berdasarkan <span class="text-[#93F514]">Perusahaan</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-400 mt-1.5">
                     Pilih perusahaan mitra untuk melihat lowongan kerja dan karir yang sedang dibuka
@@ -583,7 +583,7 @@
                 @if(request('company_id'))
                     <div class="mt-3">
                         <a href="{{ route('jobs.index', array_merge(request()->except('company_id', 'page'))) }}" 
-                           class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#08CB00] hover:text-[#52fa4d] bg-[#08CB00]/10 px-3 py-1 rounded-full border border-[#08CB00]/30 transition">
+                           class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#93F514] hover:text-[#52fa4d] bg-[#93F514]/10 px-3 py-1 rounded-full border border-[#93F514]/30 transition">
                             <span>Tampilkan Semua Perusahaan</span>
                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -603,26 +603,26 @@
                     <a href="{{ route('jobs.index', array_merge(request()->except('page'), ['company_id' => $comp->id])) }}"
                        class="group relative rounded-2xl p-5 border transition-all duration-300 flex flex-col justify-between
                               {{ $isActive 
-                                 ? 'bg-gradient-to-b from-[#0a2e0a] to-[#041404] border-[#08CB00] shadow-lg shadow-[#08CB00]/25 ring-1 ring-[#08CB00]' 
-                                 : 'bg-gradient-to-b from-[#061506] to-[#030a03] border-[#08CB00]/25 hover:border-[#08CB00] hover:shadow-xl hover:shadow-[#08CB00]/20 hover:-translate-y-1' }}">
+                                 ? 'bg-gradient-to-b from-[#0a2e0a] to-[#041404] border-[#93F514] shadow-lg shadow-[#93F514]/25 ring-1 ring-[#93F514]' 
+                                 : 'bg-gradient-to-b from-[#061506] to-[#030a03] border-[#93F514]/25 hover:border-[#93F514] hover:shadow-xl hover:shadow-[#93F514]/20 hover:-translate-y-1' }}">
                         
                         <div class="flex items-start gap-3.5">
                             <!-- Logo Perusahaan -->
                             @if($comp->logo_url)
-                                <div class="w-14 h-14 rounded-xl bg-[#051205] border border-[#08CB00]/30 p-2 flex items-center justify-center shrink-0 overflow-hidden shadow-sm group-hover:border-[#08CB00] transition-colors">
+                                <div class="w-14 h-14 rounded-xl bg-[#051205] border border-[#93F514]/30 p-2 flex items-center justify-center shrink-0 overflow-hidden shadow-sm group-hover:border-[#93F514] transition-colors">
                                     <img src="{{ $comp->logo_url }}" 
                                          alt="{{ $comp->name }}" 
                                          class="w-full h-full object-contain">
                                 </div>
                             @else
-                                <div class="w-14 h-14 rounded-xl bg-[#08CB00]/15 border border-[#08CB00]/40 flex items-center justify-center text-[#08CB00] font-extrabold text-lg shrink-0 group-hover:bg-[#08CB00]/25 transition-colors">
+                                <div class="w-14 h-14 rounded-xl bg-[#93F514]/15 border border-[#93F514]/40 flex items-center justify-center text-[#93F514] font-extrabold text-lg shrink-0 group-hover:bg-[#93F514]/25 transition-colors">
                                     {{ strtoupper(substr($comp->name, 0, 2)) }}
                                 </div>
                             @endif
 
                             <!-- Nama Perusahaan & Lokasi/Kota -->
                             <div class="flex-1 min-w-0">
-                                <h3 class="text-sm font-bold text-[#EEEEEE] group-hover:text-[#08CB00] transition-colors truncate">
+                                <h3 class="text-sm font-bold text-[#EEEEEE] group-hover:text-[#93F514] transition-colors truncate">
                                     {{ $comp->name }}
                                 </h3>
                                 <p class="text-xs text-gray-400 mt-0.5 truncate">
@@ -632,12 +632,12 @@
                         </div>
 
                         <!-- Footer: Lowongan Tersedia Badge -->
-                        <div class="mt-4 pt-3 border-t border-[#08CB00]/15 flex items-center justify-between">
-                            <span class="inline-flex items-center gap-1.5 text-xs {{ $jobCount > 0 ? 'text-[#08CB00] font-bold' : 'text-gray-400' }}">
+                        <div class="mt-4 pt-3 border-t border-[#93F514]/15 flex items-center justify-between">
+                            <span class="inline-flex items-center gap-1.5 text-xs {{ $jobCount > 0 ? 'text-[#93F514] font-bold' : 'text-gray-400' }}">
                                 <span>{{ $jobCount }} Lowongan Tersedia</span>
                             </span>
 
-                            <span class="text-xs text-gray-400 group-hover:text-[#08CB00] group-hover:translate-x-0.5 transition-all">
+                            <span class="text-xs text-gray-400 group-hover:text-[#93F514] group-hover:translate-x-0.5 transition-all">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                                 </svg>

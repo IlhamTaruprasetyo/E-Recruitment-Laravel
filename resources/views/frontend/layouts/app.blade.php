@@ -22,32 +22,32 @@
 
     <style>
         :root {
-            --primary-green: #08CB00;
-            --primary-green-glow: rgba(8, 203, 0, 0.4);
-            --primary-green-dark: #058500;
+            --primary-green: #93F514;
+            --primary-green-glow: rgba(147, 245, 20, 0.4);
+            --primary-green-dark: #6bbd08;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
         
-        /* Custom Neon Green #08CB00 Accents */
+        /* Custom Neon Green #93F514 Accents */
         .text-neon-green {
-            color: #08CB00;
-            text-shadow: 0 0 20px rgba(8, 203, 0, 0.6);
+            color: #93F514;
+            text-shadow: 0 0 20px rgba(147, 245, 20, 0.6);
         }
         .bg-neon-green {
-            background-color: #08CB00;
+            background-color: #93F514;
         }
         .glow-green {
-            box-shadow: 0 0 35px -5px rgba(8, 203, 0, 0.45);
+            box-shadow: 0 0 35px -5px rgba(147, 245, 20, 0.45);
         }
         .glow-green-lg {
-            box-shadow: 0 0 80px -10px rgba(8, 203, 0, 0.55);
+            box-shadow: 0 0 80px -10px rgba(147, 245, 20, 0.55);
         }
         .border-neon-green {
-            border-color: rgba(8, 203, 0, 0.4);
-            box-shadow: 0 0 15px rgba(8, 203, 0, 0.2);
+            border-color: rgba(147, 245, 20, 0.4);
+            box-shadow: 0 0 15px rgba(147, 245, 20, 0.2);
         }
         .bg-mesh-dark {
             background-color: #040804;
@@ -77,7 +77,7 @@
             50% {
                 transform: scale(1.08);
                 opacity: 1;
-                filter: drop-shadow(0 0 16px rgba(8, 203, 0, 0.8));
+                filter: drop-shadow(0 0 16px rgba(147, 245, 20, 0.8));
             }
         }
 
@@ -87,7 +87,7 @@
     </style>
 </head>
 
-<body class="antialiased bg-[#040804] text-[#EEEEEE] selection:bg-[#08CB00] selection:text-black min-h-screen flex flex-col justify-between"
+<body class="antialiased bg-[#040804] text-[#EEEEEE] selection:bg-[#93F514] selection:text-black min-h-screen flex flex-col justify-between"
       x-data="{ pageLoaded: false }" 
       x-init="window.addEventListener('load', () => setTimeout(() => pageLoaded = true, 200)); setTimeout(() => pageLoaded = true, 500)">
     
@@ -100,10 +100,10 @@
         
         <div class="relative flex items-center justify-center">
             <!-- Subtle Glow behind spinner -->
-            <div class="w-20 h-20 rounded-full bg-[#08CB00]/30 blur-xl absolute"></div>
+            <div class="w-20 h-20 rounded-full bg-[#93F514]/30 blur-xl absolute"></div>
             
             <!-- Sleek Rotating Neon Green Spinner -->
-            <div class="w-14 h-14 border-4 border-[#08CB00]/20 border-t-[#08CB00] rounded-full animate-spin"></div>
+            <div class="w-14 h-14 border-4 border-[#93F514]/20 border-t-[#93F514] rounded-full animate-spin"></div>
         </div>
     </div>
 

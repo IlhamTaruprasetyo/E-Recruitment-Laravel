@@ -97,11 +97,11 @@
 
     <!-- Breadcrumbs -->
     <nav class="flex items-center gap-2 text-xs text-gray-400 mb-8">
-        <a href="{{ route('home') }}" class="hover:text-[#08CB00] transition">Beranda</a>
+        <a href="{{ route('home') }}" class="hover:text-[#93F514] transition">Beranda</a>
         <span>/</span>
-        <a href="{{ route('jobs.index') }}" class="hover:text-[#08CB00] transition">Lowongan</a>
+        <a href="{{ route('jobs.index') }}" class="hover:text-[#93F514] transition">Lowongan</a>
         <span>/</span>
-        <span class="text-[#08CB00] font-medium truncate max-w-xs sm:max-w-md">{{ $job->title }}</span>
+        <span class="text-[#93F514] font-medium truncate max-w-xs sm:max-w-md">{{ $job->title }}</span>
     </nav>
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -111,30 +111,30 @@
 
             <!-- Job Header Card -->
             <div
-                class="rounded-3xl bg-gradient-to-b from-[#061506] to-[#040804] border border-[#08CB00]/30 p-6 sm:p-8 shadow-2xl shadow-[#08CB00]/15">
+                class="rounded-3xl bg-gradient-to-b from-[#061506] to-[#040804] border border-[#93F514]/30 p-6 sm:p-8 shadow-2xl shadow-[#93F514]/15">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                     <div class="flex items-start gap-4">
                         @if ($job->company?->logo_url)
                             <div
-                                class="w-16 h-16 rounded-2xl bg-[#051205] border border-[#08CB00]/40 p-2 flex items-center justify-center shadow-lg shadow-[#08CB00]/20 shrink-0 overflow-hidden">
+                                class="w-16 h-16 rounded-2xl bg-[#051205] border border-[#93F514]/40 p-2 flex items-center justify-center shadow-lg shadow-[#93F514]/20 shrink-0 overflow-hidden">
                                 <img src="{{ $job->company->logo_url }}" alt="{{ $job->company->name }}"
                                     class="w-full h-full object-contain">
                             </div>
                         @else
                             <div
-                                class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#08CB00] to-[#5ef558] flex items-center justify-center text-black font-extrabold text-2xl shadow-lg shadow-[#08CB00]/25 shrink-0">
+                                class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#93F514] to-[#5ef558] flex items-center justify-center text-black font-extrabold text-2xl shadow-lg shadow-[#93F514]/25 shrink-0">
                                 {{ strtoupper(substr($job->company?->name ?? 'M', 0, 2)) }}
                             </div>
                         @endif
                         <div>
                             <span
-                                class="px-3 py-1 rounded-full text-xs font-semibold bg-[#08CB00]/15 border border-[#08CB00]/40 text-[#08CB00]">
+                                class="px-3 py-1 rounded-full text-xs font-semibold bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514]">
                                 {{ $job->employment_type }}
                             </span>
                             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#EEEEEE] mt-2">
                                 {{ $job->title }}
                             </h1>
-                            <p class="text-sm text-[#08CB00] font-medium mt-1">
+                            <p class="text-sm text-[#93F514] font-medium mt-1">
                                 {{ $job->company?->name ?? 'Perusahaan Mitra' }} &bull; <span
                                     class="text-gray-400">{{ $job->department?->name ?? 'Umum' }}</span>
                             </p>
@@ -172,21 +172,21 @@
                             </div>
                         @elseif($hasApplied)
                             <div class="flex items-center gap-2.5">
-                                <div class="px-5 py-3 rounded-xl bg-[#08CB00]/15 border border-[#08CB00]/40 text-[#08CB00] font-bold text-xs flex items-center gap-2 shadow-lg shadow-[#08CB00]/15">
-                                    <svg class="w-4 h-4 text-[#08CB00]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <div class="px-5 py-3 rounded-xl bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] font-bold text-xs flex items-center gap-2 shadow-lg shadow-[#93F514]/15">
+                                    <svg class="w-4 h-4 text-[#93F514]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                                     </svg>
                                     <span>Sudah Dilamar</span>
                                 </div>
                                 <a href="{{ route('profile', ['tab' => 'riwayat']) }}" 
-                                   class="px-4 py-3 rounded-xl bg-[#051405] hover:bg-[#08CB00]/20 border border-[#08CB00]/30 text-gray-300 hover:text-[#08CB00] text-xs font-semibold transition">
+                                   class="px-4 py-3 rounded-xl bg-[#051405] hover:bg-[#93F514]/20 border border-[#93F514]/30 text-gray-300 hover:text-[#93F514] text-xs font-semibold transition">
                                     Pantau Status
                                 </a>
                             </div>
                         @else
                             <button type="button" 
                                     @click="handleApplyClick()"
-                                    class="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-[#08CB00] to-[#5ef558] hover:from-[#07b500] hover:to-[#43e63d] text-black font-extrabold text-sm shadow-xl shadow-[#08CB00]/30 text-center transition cursor-pointer flex items-center justify-center gap-2">
+                                    class="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-[#93F514] to-[#5FE6B6] hover:brightness-110 text-black font-extrabold text-sm shadow-xl shadow-[#93F514]/30 text-center transition cursor-pointer flex items-center justify-center gap-2">
                                 <svg class="w-4 h-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
                                 </svg>
@@ -195,22 +195,22 @@
                         @endif
                     @else
                         <a href="{{ route('login') }}"
-                            class="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-[#08CB00] to-[#5ef558] hover:from-[#07b500] hover:to-[#43e63d] text-black font-extrabold text-sm shadow-xl shadow-[#08CB00]/30 text-center transition flex items-center justify-center gap-2">
+                            class="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-[#93F514] to-[#5FE6B6] hover:brightness-110 text-black font-extrabold text-sm shadow-xl shadow-[#93F514]/30 text-center transition flex items-center justify-center gap-2">
                             <span>Masuk & Lamar</span>
                         </a>
                     @endauth
                 </div>
 
                     <!-- Info Highlights Grid -->
-                    <div class="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-[#08CB00]/15">
-                        <div class="p-3 rounded-xl bg-[#050c05] border border-[#08CB00]/20">
+                    <div class="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-[#93F514]/15">
+                        <div class="p-3 rounded-xl bg-[#050c05] border border-[#93F514]/20">
                             <span class="text-[11px] text-gray-400 block">Lokasi</span>
                             <span
                                 class="text-xs sm:text-sm font-bold text-[#EEEEEE] mt-0.5 block">{{ $job->location ?? 'Indonesia' }}</span>
                         </div>
-                        <div class="p-3 rounded-xl bg-[#050c05] border border-[#08CB00]/20">
+                        <div class="p-3 rounded-xl bg-[#050c05] border border-[#93F514]/20">
                             <span class="text-[11px] text-gray-400 block">Estimasi Gaji</span>
-                            <span class="text-xs sm:text-sm font-bold text-[#08CB00] mt-0.5 block">
+                            <span class="text-xs sm:text-sm font-bold text-[#93F514] mt-0.5 block">
                                 @if ($job->salary_min || $job->salary_max)
                                     Rp {{ number_format($job->salary_min / 1000000, 1) }} -
                                     {{ number_format($job->salary_max / 1000000, 1) }} Juta
@@ -219,12 +219,12 @@
                                 @endif
                             </span>
                         </div>
-                        <div class="p-3 rounded-xl bg-[#050c05] border border-[#08CB00]/20">
+                        <div class="p-3 rounded-xl bg-[#050c05] border border-[#93F514]/20">
                             <span class="text-[11px] text-gray-400 block">Kuota Diterima</span>
                             <span class="text-xs sm:text-sm font-bold text-[#EEEEEE] mt-0.5 block">{{ $job->quota }}
                                 Orang</span>
                         </div>
-                        <div class="p-3 rounded-xl bg-[#050c05] border border-[#08CB00]/20">
+                        <div class="p-3 rounded-xl bg-[#050c05] border border-[#93F514]/20">
                             <span class="text-[11px] text-gray-400 block">Batas Lamaran</span>
                             <span class="text-xs sm:text-sm font-bold text-[#EEEEEE] mt-0.5 block">
                                 {{ $job->deadline ? \Carbon\Carbon::parse($job->deadline)->format('d M Y') : 'Hingga Terpenuhi' }}
@@ -234,7 +234,7 @@
                 </div>
 
                 <!-- Job Description Content -->
-                <div class="rounded-3xl bg-[#050e05] border border-[#08CB00]/25 p-6 sm:p-8 space-y-6">
+                <div class="rounded-3xl bg-[#050e05] border border-[#93F514]/25 p-6 sm:p-8 space-y-6">
                     @php
                         $rawDesc = $job->description ?? '';
                         $isHtml =
@@ -267,7 +267,7 @@
                         @if ($descPart)
                             <div>
                                 <h2 class="text-lg sm:text-xl font-extrabold text-[#EEEEEE] mb-3 flex items-center gap-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-[#08CB00]"></span>
+                                    <span class="w-2.5 h-2.5 rounded-full bg-[#93F514]"></span>
                                     Deskripsi Pekerjaan
                                 </h2>
                                 <div class="text-sm text-gray-300 leading-relaxed whitespace-pre-line">
@@ -278,9 +278,9 @@
 
                         <!-- 2. Persyaratan Pekerjaan (Legacy Plain Text) -->
                         @if ($reqPart)
-                            <div class="pt-6 border-t border-[#08CB00]/15">
+                            <div class="pt-6 border-t border-[#93F514]/15">
                                 <h2 class="text-lg sm:text-xl font-extrabold text-[#EEEEEE] mb-3 flex items-center gap-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-[#08CB00]"></span>
+                                    <span class="w-2.5 h-2.5 rounded-full bg-[#93F514]"></span>
                                     Persyaratan & Kualifikasi
                                 </h2>
                                 <div class="text-sm text-gray-300 leading-relaxed whitespace-pre-line">
@@ -297,12 +297,12 @@
                     @endif
 
                     @if ($job->degrees->isNotEmpty())
-                        <div class="pt-6 border-t border-[#08CB00]/15">
+                        <div class="pt-6 border-t border-[#93F514]/15">
                             <h3 class="text-base font-bold text-[#EEEEEE] mb-3">Kualifikasi Pendidikan:</h3>
                             <div class="flex flex-wrap gap-2">
                                 @foreach ($job->degrees as $deg)
                                     <span
-                                        class="px-3 py-1.5 rounded-lg bg-[#08CB00]/15 border border-[#08CB00]/40 text-[#08CB00] text-xs font-semibold">
+                                        class="px-3 py-1.5 rounded-lg bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] text-xs font-semibold">
                                         {{ $deg->name }}
                                     </span>
                                 @endforeach
@@ -311,12 +311,12 @@
                     @endif
 
                     @if ($job->majors->isNotEmpty())
-                        <div class="pt-6 border-t border-[#08CB00]/15">
+                        <div class="pt-6 border-t border-[#93F514]/15">
                             <h3 class="text-base font-bold text-[#EEEEEE] mb-3">Jurusan yang Dicari:</h3>
                             <div class="flex flex-wrap gap-2">
                                 @foreach ($job->majors as $maj)
                                     <span
-                                        class="px-3 py-1.5 rounded-lg bg-[#08CB00]/15 border border-[#08CB00]/40 text-[#08CB00] text-xs font-semibold">
+                                        class="px-3 py-1.5 rounded-lg bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] text-xs font-semibold">
                                         {{ $maj->name }}
                                     </span>
                                 @endforeach
@@ -331,20 +331,20 @@
             <div class="lg:col-span-4 space-y-6">
 
                 <!-- Company Card -->
-                <div class="rounded-3xl bg-[#050e05] border border-[#08CB00]/25 p-6 space-y-4">
+                <div class="rounded-3xl bg-[#050e05] border border-[#93F514]/25 p-6 space-y-4">
                     <h3 class="text-base font-bold text-[#EEEEEE]">
                         Tentang Perusahaan
                     </h3>
                     <div class="flex items-center gap-3">
                         @if ($job->company?->logo_url)
                             <div
-                                class="w-12 h-12 rounded-xl bg-[#051205] border border-[#08CB00]/40 p-1.5 flex items-center justify-center shrink-0 overflow-hidden shadow-md shadow-[#08CB00]/15">
+                                class="w-12 h-12 rounded-xl bg-[#051205] border border-[#93F514]/40 p-1.5 flex items-center justify-center shrink-0 overflow-hidden shadow-md shadow-[#93F514]/15">
                                 <img src="{{ $job->company->logo_url }}" alt="{{ $job->company->name }}"
                                     class="w-full h-full object-contain">
                             </div>
                         @else
                             <div
-                                class="w-12 h-12 rounded-xl bg-[#08CB00]/15 border border-[#08CB00]/40 flex items-center justify-center text-[#08CB00] font-bold text-lg shrink-0">
+                                class="w-12 h-12 rounded-xl bg-[#93F514]/15 border border-[#93F514]/40 flex items-center justify-center text-[#93F514] font-bold text-lg shrink-0">
                                 {{ strtoupper(substr($job->company?->name ?? 'M', 0, 2)) }}
                             </div>
                         @endif
@@ -359,8 +359,8 @@
 
                     @if ($job->company?->address)
                         <div
-                            class="p-3 rounded-xl bg-[#030803] border border-[#08CB00]/15 text-xs text-gray-300 flex items-start gap-2.5">
-                            <svg class="w-4 h-4 text-[#08CB00] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24"
+                            class="p-3 rounded-xl bg-[#030803] border border-[#93F514]/15 text-xs text-gray-300 flex items-start gap-2.5">
+                            <svg class="w-4 h-4 text-[#93F514] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -384,7 +384,7 @@
                         @endphp
                         <div class="pt-2">
                             <a href="{{ $webUrl }}" target="_blank" rel="noopener noreferrer"
-                                class="w-full py-2.5 px-4 rounded-xl bg-[#08CB00]/10 hover:bg-[#08CB00] border border-[#08CB00]/40 text-[#08CB00] hover:text-black font-bold text-xs transition flex items-center justify-center gap-2 group">
+                                class="w-full py-2.5 px-4 rounded-xl bg-[#93F514]/10 hover:bg-[#93F514] border border-[#93F514]/40 text-[#93F514] hover:text-black font-bold text-xs transition flex items-center justify-center gap-2 group">
                                 <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -403,15 +403,15 @@
 
                 <!-- Other Open Jobs -->
                 @if ($relatedJobs->isNotEmpty())
-                    <div class="rounded-3xl bg-[#050e05] border border-[#08CB00]/25 p-6 space-y-4">
+                    <div class="rounded-3xl bg-[#050e05] border border-[#93F514]/25 p-6 space-y-4">
                         <h3 class="text-base font-bold text-[#EEEEEE]">Lowongan Terkait Lainnya</h3>
                         <div class="space-y-3">
                             @foreach ($relatedJobs as $rJob)
                                 <a href="{{ route('jobs.show', $rJob->id) }}"
-                                    class="block p-3.5 rounded-xl bg-[#030803] border border-[#08CB00]/15 hover:border-[#08CB00]/50 transition">
-                                    <h4 class="text-xs font-bold text-[#EEEEEE] hover:text-[#08CB00] transition truncate">
+                                    class="block p-3.5 rounded-xl bg-[#030803] border border-[#93F514]/15 hover:border-[#93F514]/50 transition">
+                                    <h4 class="text-xs font-bold text-[#EEEEEE] hover:text-[#93F514] transition truncate">
                                         {{ $rJob->title }}</h4>
-                                    <span class="text-[11px] text-[#08CB00]/80 block mt-1">{{ $rJob->company?->name }}
+                                    <span class="text-[11px] text-[#93F514]/80 block mt-1">{{ $rJob->company?->name }}
                                         &bull; {{ $rJob->location }}</span>
                                 </a>
                             @endforeach
@@ -452,13 +452,13 @@
                      x-transition:leave="ease-in duration-200" 
                      x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" 
                      x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
-                     class="inline-block align-bottom bg-[#061506] rounded-3xl text-left overflow-hidden shadow-2xl border border-[#08CB00]/40 transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+                     class="inline-block align-bottom bg-[#061506] rounded-3xl text-left overflow-hidden shadow-2xl border border-[#93F514]/40 transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
                     
                     <div class="p-6 sm:p-8 space-y-6">
                         <!-- Modal Header -->
                         <div class="flex items-start justify-between gap-4">
                             <div class="flex items-center gap-3.5">
-                                <div class="w-12 h-12 rounded-2xl bg-[#08CB00]/15 border border-[#08CB00]/40 flex items-center justify-center text-[#08CB00] shadow-lg shadow-[#08CB00]/20 shrink-0">
+                                <div class="w-12 h-12 rounded-2xl bg-[#93F514]/15 border border-[#93F514]/40 flex items-center justify-center text-[#93F514] shadow-lg shadow-[#93F514]/20 shrink-0">
                                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                     </svg>
@@ -478,16 +478,16 @@
                         </div>
 
                         <!-- Job & Applicant Summary Box -->
-                        <div class="p-4 rounded-2xl bg-[#040a04] border border-[#08CB00]/20 space-y-3 text-xs">
-                            <div class="flex items-center justify-between pb-2 border-b border-[#08CB00]/15">
+                        <div class="p-4 rounded-2xl bg-[#040a04] border border-[#93F514]/20 space-y-3 text-xs">
+                            <div class="flex items-center justify-between pb-2 border-b border-[#93F514]/15">
                                 <span class="text-gray-400">Posisi yang Dilamar</span>
                                 <span class="font-bold text-[#EEEEEE]">{{ $job->title }}</span>
                             </div>
-                            <div class="flex items-center justify-between pb-2 border-b border-[#08CB00]/15">
+                            <div class="flex items-center justify-between pb-2 border-b border-[#93F514]/15">
                                 <span class="text-gray-400">Perusahaan</span>
-                                <span class="font-semibold text-[#08CB00]">{{ $job->company?->name ?? 'Perusahaan Mitra' }}</span>
+                                <span class="font-semibold text-[#93F514]">{{ $job->company?->name ?? 'Perusahaan Mitra' }}</span>
                             </div>
-                            <div class="flex items-center justify-between pb-2 border-b border-[#08CB00]/15">
+                            <div class="flex items-center justify-between pb-2 border-b border-[#93F514]/15">
                                 <span class="text-gray-400">Penempatan & Tipe</span>
                                 <span class="text-gray-300">{{ $job->location ?? 'Indonesia' }} ({{ $job->employment_type }})</span>
                             </div>
@@ -498,8 +498,8 @@
                         </div>
 
                         <!-- Statement Alert -->
-                        <div class="p-3.5 rounded-xl bg-[#08CB00]/10 border border-[#08CB00]/30 text-gray-300 text-xs flex items-start gap-2.5">
-                            <svg class="w-4 h-4 text-[#08CB00] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div class="p-3.5 rounded-xl bg-[#93F514]/10 border border-[#93F514]/30 text-gray-300 text-xs flex items-start gap-2.5">
+                            <svg class="w-4 h-4 text-[#93F514] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                             <p class="leading-relaxed">
@@ -517,7 +517,7 @@
                             </button>
                             <button type="submit" 
                                     :disabled="isSubmitting"
-                                    class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#08CB00] to-[#5ef558] hover:from-[#07b500] hover:to-[#43e63d] text-black font-extrabold text-xs shadow-lg shadow-[#08CB00]/30 transition flex items-center gap-2 cursor-pointer disabled:opacity-50">
+                                    class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#93F514] to-[#5FE6B6] hover:brightness-110 text-black font-extrabold text-xs shadow-lg shadow-[#93F514]/30 transition flex items-center gap-2 cursor-pointer disabled:opacity-50">
                                 <svg x-show="isSubmitting" class="animate-spin w-4 h-4 text-black" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>

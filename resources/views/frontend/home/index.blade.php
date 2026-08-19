@@ -21,18 +21,18 @@
             <div class="absolute inset-0 z-0 bg-black/35"></div>
             <div class="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,_transparent_40%,_#040804_95%)]"></div>
 
-            <!-- Ambient Green Glow #08CB00 (Gentle Edge Highlights) -->
+            <!-- Ambient Green Glow #93F514 (Gentle Edge Highlights) -->
             <div
-                class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[250px] bg-[#08CB00]/15 rounded-full blur-[100px] pointer-events-none z-0">
+                class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[250px] bg-[#93F514]/15 rounded-full blur-[100px] pointer-events-none z-0">
             </div>
 
             <div class="relative max-w-5xl mx-auto text-center z-10 flex flex-col items-center">
 
-                <!-- Main Headline Hero with Neon #08CB00 & White Gradients -->
+                <!-- Main Headline Hero with Neon #93F514 & White Gradients -->
                 <h1
                     class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-[#EEEEEE] leading-tight sm:leading-none max-w-4xl drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]">
                     Temukan Karir Impian, <br>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#08CB00] via-[#52fa4d] to-[#adfcab] drop-shadow-[0_0_25px_rgba(8,203,0,0.4)]">
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#93F514] via-[#75f06a] to-[#5FE6B6] drop-shadow-[0_0_25px_rgba(147,245,20,0.4)]">
                         Wujudkan Potensi Terbaikmu
                     </span>
                 </h1>
@@ -100,12 +100,12 @@
                             <input type="hidden" name="company_id" :value="selected">
 
                             <button type="button" @click="open ? open = false : openDropdown()"
-                                :class="selected ? 'text-[#08CB00] font-bold' : 'text-gray-700'"
+                                :class="selected ? 'text-[#93F514] font-bold' : 'text-gray-700'"
                                 class="w-full py-2.5 px-4 flex items-center justify-between text-left text-sm transition">
                                 <div class="flex items-center gap-2 truncate">
                                     <template x-if="selected">
                                         <span
-                                            class="w-5 h-5 rounded-full bg-[#08CB00] text-black font-extrabold text-xs flex items-center justify-center shrink-0 shadow-sm">
+                                            class="w-5 h-5 rounded-full bg-[#93F514] text-black font-extrabold text-xs flex items-center justify-center shrink-0 shadow-sm">
                                             1
                                         </span>
                                     </template>
@@ -114,7 +114,7 @@
                                     </span>
                                 </div>
                                 <svg class="w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200"
-                                    :class="open ? 'rotate-180 text-[#08CB00]' : (selected ? 'text-[#08CB00]' : '')"
+                                    :class="open ? 'rotate-180 text-[#93F514]' : (selected ? 'text-[#93F514]' : '')"
                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M19 9l-7 7-7-7" />
@@ -140,14 +140,14 @@
                                         </svg>
                                     </div>
                                     <input type="text" x-model="search" placeholder="Temukan perusahaan..."
-                                        class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#08CB00]/40 focus:border-[#08CB00]">
+                                        class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#93F514]/40 focus:border-[#93F514]">
                                 </div>
 
                                 <!-- All Option -->
                                 <label
                                     class="flex items-center gap-3 py-2 px-1 text-xs font-semibold text-gray-700 hover:text-black cursor-pointer border-b border-gray-100">
                                     <input type="radio" name="_home_temp_company" value="" x-model="tempSelected"
-                                        class="w-4 h-4 rounded border-gray-300 text-[#08CB00] focus:ring-[#08CB00] cursor-pointer">
+                                        class="w-4 h-4 rounded border-gray-300 text-[#93F514] focus:ring-[#93F514] cursor-pointer">
                                     <span>Semua Perusahaan</span>
                                 </label>
 
@@ -166,7 +166,7 @@
                                                     x-show="!search || '{{ strtolower($comp->name) }}'.includes(search.toLowerCase())">
                                                     <input type="radio" name="_home_temp_company"
                                                         value="{{ $comp->id }}" x-model="tempSelected"
-                                                        class="w-4 h-4 rounded border-gray-300 text-[#08CB00] focus:ring-[#08CB00] cursor-pointer shrink-0">
+                                                        class="w-4 h-4 rounded border-gray-300 text-[#93F514] focus:ring-[#93F514] cursor-pointer shrink-0">
                                                     <span class="truncate">{{ $comp->name }}</span>
                                                 </label>
                                             @endforeach
@@ -177,11 +177,11 @@
                                 <!-- Footer Buttons (Always Visible at Bottom) -->
                                 <div class="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between gap-3">
                                     <button type="button" @click="reset()"
-                                        class="text-xs font-semibold text-gray-500 hover:text-[#08CB00] transition">
+                                        class="text-xs font-semibold text-gray-500 hover:text-[#93F514] transition">
                                         Atur Ulang
                                     </button>
                                     <button type="button" @click="apply()"
-                                        class="px-5 py-2 rounded-xl bg-[#08CB00] hover:bg-[#07b500] text-black font-bold text-xs shadow-md shadow-[#08CB00]/25 transition">
+                                        class="px-5 py-2 rounded-xl bg-[#93F514] hover:bg-[#7edc0b] text-black font-bold text-xs shadow-md shadow-[#93F514]/25 transition">
                                         Pilih
                                     </button>
                                 </div>
@@ -225,12 +225,12 @@
                             <input type="hidden" name="department_id" :value="selected">
 
                             <button type="button" @click="open ? open = false : openDropdown()"
-                                :class="selected ? 'text-[#08CB00] font-bold' : 'text-gray-700'"
+                                :class="selected ? 'text-[#93F514] font-bold' : 'text-gray-700'"
                                 class="w-full py-2.5 px-4 flex items-center justify-between text-left text-sm transition">
                                 <div class="flex items-center gap-2 truncate">
                                     <template x-if="selected">
                                         <span
-                                            class="w-5 h-5 rounded-full bg-[#08CB00] text-black font-extrabold text-xs flex items-center justify-center shrink-0 shadow-sm">
+                                            class="w-5 h-5 rounded-full bg-[#93F514] text-black font-extrabold text-xs flex items-center justify-center shrink-0 shadow-sm">
                                             1
                                         </span>
                                     </template>
@@ -239,7 +239,7 @@
                                     </span>
                                 </div>
                                 <svg class="w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200"
-                                    :class="open ? 'rotate-180 text-[#08CB00]' : (selected ? 'text-[#08CB00]' : '')"
+                                    :class="open ? 'rotate-180 text-[#93F514]' : (selected ? 'text-[#93F514]' : '')"
                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M19 9l-7 7-7-7" />
@@ -265,7 +265,7 @@
                                         </svg>
                                     </div>
                                     <input type="text" x-model="search" placeholder="Temukan fungsi / departemen..."
-                                        class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#08CB00]/40 focus:border-[#08CB00]">
+                                        class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#93F514]/40 focus:border-[#93F514]">
                                 </div>
 
                                 <!-- All Option -->
@@ -273,7 +273,7 @@
                                     class="flex items-center gap-3 py-2 px-1 text-xs font-semibold text-gray-700 hover:text-black cursor-pointer border-b border-gray-100">
                                     <input type="radio" name="_home_temp_department" value=""
                                         x-model="tempSelected"
-                                        class="w-4 h-4 rounded border-gray-300 text-[#08CB00] focus:ring-[#08CB00] cursor-pointer">
+                                        class="w-4 h-4 rounded border-gray-300 text-[#93F514] focus:ring-[#93F514] cursor-pointer">
                                     <span>Semua Departemen</span>
                                 </label>
 
@@ -292,7 +292,7 @@
                                                     x-show="!search || '{{ strtolower($dept->name) }}'.includes(search.toLowerCase())">
                                                     <input type="radio" name="_home_temp_department"
                                                         value="{{ $dept->id }}" x-model="tempSelected"
-                                                        class="w-4 h-4 rounded border-gray-300 text-[#08CB00] focus:ring-[#08CB00] cursor-pointer shrink-0">
+                                                        class="w-4 h-4 rounded border-gray-300 text-[#93F514] focus:ring-[#93F514] cursor-pointer shrink-0">
                                                     <span class="truncate">{{ $dept->name }}</span>
                                                 </label>
                                             @endforeach
@@ -303,11 +303,11 @@
                                 <!-- Footer Buttons (Always Visible at Bottom) -->
                                 <div class="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between gap-3">
                                     <button type="button" @click="reset()"
-                                        class="text-xs font-semibold text-gray-500 hover:text-[#08CB00] transition">
+                                        class="text-xs font-semibold text-gray-500 hover:text-[#93F514] transition">
                                         Atur Ulang
                                     </button>
                                     <button type="button" @click="apply()"
-                                        class="px-5 py-2 rounded-xl bg-[#08CB00] hover:bg-[#07b500] text-black font-bold text-xs shadow-md shadow-[#08CB00]/25 transition">
+                                        class="px-5 py-2 rounded-xl bg-[#93F514] hover:bg-[#7edc0b] text-black font-bold text-xs shadow-md shadow-[#93F514]/25 transition">
                                         Pilih
                                     </button>
                                 </div>
@@ -343,12 +343,12 @@
                             <input type="hidden" name="employment_type" :value="selected">
 
                             <button type="button" @click="open ? open = false : openDropdown()"
-                                :class="selected ? 'text-[#08CB00] font-bold' : 'text-gray-700'"
+                                :class="selected ? 'text-[#93F514] font-bold' : 'text-gray-700'"
                                 class="w-full py-2.5 px-4 flex items-center justify-between text-left text-sm transition">
                                 <div class="flex items-center gap-2 truncate">
                                     <template x-if="selected">
                                         <span
-                                            class="w-5 h-5 rounded-full bg-[#08CB00] text-black font-extrabold text-xs flex items-center justify-center shrink-0 shadow-sm">
+                                            class="w-5 h-5 rounded-full bg-[#93F514] text-black font-extrabold text-xs flex items-center justify-center shrink-0 shadow-sm">
                                             1
                                         </span>
                                     </template>
@@ -357,7 +357,7 @@
                                     </span>
                                 </div>
                                 <svg class="w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200"
-                                    :class="open ? 'rotate-180 text-[#08CB00]' : (selected ? 'text-[#08CB00]' : '')"
+                                    :class="open ? 'rotate-180 text-[#93F514]' : (selected ? 'text-[#93F514]' : '')"
                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M19 9l-7 7-7-7" />
@@ -383,14 +383,14 @@
                                         </svg>
                                     </div>
                                     <input type="text" x-model="search" placeholder="Temukan jenjang..."
-                                        class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#08CB00]/40 focus:border-[#08CB00]">
+                                        class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#93F514]/40 focus:border-[#93F514]">
                                 </div>
 
                                 <!-- All Option -->
                                 <label
                                     class="flex items-center gap-3 py-2 px-1 text-xs font-semibold text-gray-700 hover:text-black cursor-pointer border-b border-gray-100">
                                     <input type="radio" name="_home_temp_type" value="" x-model="tempSelected"
-                                        class="w-4 h-4 rounded border-gray-300 text-[#08CB00] focus:ring-[#08CB00] cursor-pointer">
+                                        class="w-4 h-4 rounded border-gray-300 text-[#93F514] focus:ring-[#93F514] cursor-pointer">
                                     <span>Semua Jenjang</span>
                                 </label>
 
@@ -409,7 +409,7 @@
                                                 class="flex items-center gap-2.5 py-1.5 px-1.5 rounded-lg text-xs text-gray-600 hover:text-black hover:bg-gray-50 cursor-pointer transition">
                                                 <input type="radio" name="_home_temp_type" :value="type"
                                                     x-model="tempSelected"
-                                                    class="w-4 h-4 rounded border-gray-300 text-[#08CB00] focus:ring-[#08CB00] cursor-pointer shrink-0">
+                                                    class="w-4 h-4 rounded border-gray-300 text-[#93F514] focus:ring-[#93F514] cursor-pointer shrink-0">
                                                 <span x-text="type" class="truncate"></span>
                                             </label>
                                         </template>
@@ -419,11 +419,11 @@
                                 <!-- Footer Buttons (Always Visible at Bottom) -->
                                 <div class="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between gap-3">
                                     <button type="button" @click="reset()"
-                                        class="text-xs font-semibold text-gray-500 hover:text-[#08CB00] transition">
+                                        class="text-xs font-semibold text-gray-500 hover:text-[#93F514] transition">
                                         Atur Ulang
                                     </button>
                                     <button type="button" @click="apply()"
-                                        class="px-5 py-2 rounded-xl bg-[#08CB00] hover:bg-[#07b500] text-black font-bold text-xs shadow-md shadow-[#08CB00]/25 transition">
+                                        class="px-5 py-2 rounded-xl bg-[#93F514] hover:bg-[#7edc0b] text-black font-bold text-xs shadow-md shadow-[#93F514]/25 transition">
                                         Pilih
                                     </button>
                                 </div>
@@ -433,8 +433,8 @@
                         <!-- Actions (Submit & Reset) -->
                         <div class="w-full lg:w-auto p-1 shrink-0 flex items-center gap-2">
                             <button type="submit"
-                                class="w-full lg:w-auto py-2.5 px-6 rounded-xl lg:rounded-full bg-[#051405] hover:bg-[#08CB00] text-[#EEEEEE] hover:text-black border border-[#08CB00]/40 font-bold text-sm tracking-wide shadow-md shadow-black/25 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer outline-none group">
-                                <svg class="w-4 h-4 text-[#08CB00] group-hover:text-black transition-colors shrink-0"
+                                class="w-full lg:w-auto py-2.5 px-6 rounded-xl lg:rounded-full bg-[#051405] hover:bg-[#93F514] text-[#EEEEEE] hover:text-black border border-[#93F514]/40 font-bold text-sm tracking-wide shadow-md shadow-black/25 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer outline-none group">
+                                <svg class="w-4 h-4 text-[#93F514] group-hover:text-black transition-colors shrink-0"
                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -456,42 +456,42 @@
 
                 <!-- Popular Searches tags -->
                 <div class="mt-5 flex flex-wrap items-center justify-center gap-2 text-xs text-gray-400">
-                    <span class="font-bold text-[#08CB00]">Pencarian Populer:</span>
+                    <span class="font-bold text-[#93F514]">Pencarian Populer:</span>
                     <a href="{{ route('jobs.index', ['search' => 'Software Engineer']) }}"
-                        class="px-3 py-1 rounded-full bg-[#051205] hover:bg-[#08CB00]/20 border border-[#08CB00]/30 text-gray-300 hover:text-[#08CB00] transition">Software
+                        class="px-3 py-1 rounded-full bg-[#051205] hover:bg-[#93F514]/20 border border-[#93F514]/30 text-gray-300 hover:text-[#93F514] transition">Software
                         Engineer</a>
                     <a href="{{ route('jobs.index', ['search' => 'Staff']) }}"
-                        class="px-3 py-1 rounded-full bg-[#051205] hover:bg-[#08CB00]/20 border border-[#08CB00]/30 text-gray-300 hover:text-[#08CB00] transition">Staff
+                        class="px-3 py-1 rounded-full bg-[#051205] hover:bg-[#93F514]/20 border border-[#93F514]/30 text-gray-300 hover:text-[#93F514] transition">Staff
                         Administrasi</a>
                     <a href="{{ route('jobs.index', ['search' => 'Marketing']) }}"
-                        class="px-3 py-1 rounded-full bg-[#051205] hover:bg-[#08CB00]/20 border border-[#08CB00]/30 text-gray-300 hover:text-[#08CB00] transition">Digital
+                        class="px-3 py-1 rounded-full bg-[#051205] hover:bg-[#93F514]/20 border border-[#93F514]/30 text-gray-300 hover:text-[#93F514] transition">Digital
                         Marketing</a>
                     <a href="{{ route('jobs.index', ['location' => 'Remote']) }}"
-                        class="px-3 py-1 rounded-full bg-[#051205] hover:bg-[#08CB00]/20 border border-[#08CB00]/30 text-gray-300 hover:text-[#08CB00] transition">Remote</a>
+                        class="px-3 py-1 rounded-full bg-[#051205] hover:bg-[#93F514]/20 border border-[#93F514]/30 text-gray-300 hover:text-[#93F514] transition">Remote</a>
                 </div>
 
                 <!-- Quick Stats Summary -->
                 <div
-                    class="mt-14 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 w-full max-w-4xl border-t border-[#08CB00]/20 pt-8">
+                    class="mt-14 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 w-full max-w-4xl border-t border-[#93F514]/20 pt-8">
                     <div
-                        class="p-4 rounded-2xl bg-gradient-to-b from-[#061506] to-[#040804] border border-[#08CB00]/30 hover:border-[#08CB00]/60 transition shadow-lg shadow-black/40">
+                        class="p-4 rounded-2xl bg-gradient-to-b from-[#061506] to-[#040804] border border-[#93F514]/30 hover:border-[#93F514]/60 transition shadow-lg shadow-black/40">
                         <div class="text-2xl sm:text-3xl font-black text-[#EEEEEE]">{{ $totalJobsCount ?? 0 }}+</div>
-                        <div class="text-xs text-[#08CB00] font-semibold mt-1">Lowongan Aktif</div>
+                        <div class="text-xs text-[#93F514] font-semibold mt-1">Lowongan Aktif</div>
                     </div>
                     <div
-                        class="p-4 rounded-2xl bg-gradient-to-b from-[#061506] to-[#040804] border border-[#08CB00]/30 hover:border-[#08CB00]/60 transition shadow-lg shadow-black/40">
+                        class="p-4 rounded-2xl bg-gradient-to-b from-[#061506] to-[#040804] border border-[#93F514]/30 hover:border-[#93F514]/60 transition shadow-lg shadow-black/40">
                         <div class="text-2xl sm:text-3xl font-black text-[#EEEEEE]">{{ $companiesCount ?? 0 }}+</div>
-                        <div class="text-xs text-[#08CB00] font-semibold mt-1">Perusahaan Mitra</div>
+                        <div class="text-xs text-[#93F514] font-semibold mt-1">Perusahaan Mitra</div>
                     </div>
                     <div
-                        class="p-4 rounded-2xl bg-gradient-to-b from-[#061506] to-[#040804] border border-[#08CB00]/30 hover:border-[#08CB00]/60 transition shadow-lg shadow-black/40">
+                        class="p-4 rounded-2xl bg-gradient-to-b from-[#061506] to-[#040804] border border-[#93F514]/30 hover:border-[#93F514]/60 transition shadow-lg shadow-black/40">
                         <div class="text-2xl sm:text-3xl font-black text-[#EEEEEE]">{{ $departmentsCount ?? 0 }}+</div>
-                        <div class="text-xs text-[#08CB00] font-semibold mt-1">Bidang / Departemen</div>
+                        <div class="text-xs text-[#93F514] font-semibold mt-1">Bidang / Departemen</div>
                     </div>
                     <div
-                        class="p-4 rounded-2xl bg-gradient-to-b from-[#061506] to-[#040804] border border-[#08CB00]/30 hover:border-[#08CB00]/60 transition shadow-lg shadow-black/40">
+                        class="p-4 rounded-2xl bg-gradient-to-b from-[#061506] to-[#040804] border border-[#93F514]/30 hover:border-[#93F514]/60 transition shadow-lg shadow-black/40">
                         <div class="text-2xl sm:text-3xl font-black text-[#EEEEEE]">{{ $totalQuotaCount ?? 0 }}+</div>
-                        <div class="text-xs text-[#08CB00] font-semibold mt-1">Total Kuota Formasi</div>
+                        <div class="text-xs text-[#93F514] font-semibold mt-1">Total Kuota Formasi</div>
                     </div>
                 </div>
 
@@ -588,29 +588,29 @@
 
             <!-- Background Decorative Patterns -->
             <div
-                class="absolute inset-0 bg-gradient-to-b from-[#040804] via-[#051405] to-[#040804] rounded-3xl sm:rounded-[2.5rem] border border-[#08CB00]/25 shadow-2xl shadow-black/80 overflow-hidden pointer-events-none">
+                class="absolute inset-0 bg-gradient-to-b from-[#040804] via-[#051405] to-[#040804] rounded-3xl sm:rounded-[2.5rem] border border-[#93F514]/25 shadow-2xl shadow-black/80 overflow-hidden pointer-events-none">
                 <!-- Hexagon Pattern Overlay -->
                 <div
-                    class="absolute inset-0 opacity-[0.07] bg-[radial-gradient(#08CB00_1.5px,transparent_1.5px)] [background-size:24px_24px]">
+                    class="absolute inset-0 opacity-[0.07] bg-[radial-gradient(#93F514_1.5px,transparent_1.5px)] [background-size:24px_24px]">
                 </div>
 
                 <!-- Concentric Circular Background Ripples -->
                 <div
-                    class="absolute -bottom-24 -left-24 w-96 h-96 rounded-full border border-[#08CB00]/15 pointer-events-none">
+                    class="absolute -bottom-24 -left-24 w-96 h-96 rounded-full border border-[#93F514]/15 pointer-events-none">
                 </div>
                 <div
-                    class="absolute -bottom-40 -left-40 w-[30rem] h-[30rem] rounded-full border border-[#08CB00]/10 pointer-events-none">
+                    class="absolute -bottom-40 -left-40 w-[30rem] h-[30rem] rounded-full border border-[#93F514]/10 pointer-events-none">
                 </div>
                 <div
-                    class="absolute -bottom-56 -left-56 w-[40rem] h-[40rem] rounded-full border border-[#08CB00]/5 pointer-events-none">
+                    class="absolute -bottom-56 -left-56 w-[40rem] h-[40rem] rounded-full border border-[#93F514]/5 pointer-events-none">
                 </div>
 
                 <!-- Soft Ambient Glows -->
                 <div
-                    class="absolute top-0 right-1/4 w-80 h-80 bg-[#08CB00]/10 rounded-full blur-[100px] pointer-events-none">
+                    class="absolute top-0 right-1/4 w-80 h-80 bg-[#93F514]/10 rounded-full blur-[100px] pointer-events-none">
                 </div>
                 <div
-                    class="absolute bottom-0 left-1/3 w-72 h-72 bg-[#08CB00]/10 rounded-full blur-[90px] pointer-events-none">
+                    class="absolute bottom-0 left-1/3 w-72 h-72 bg-[#93F514]/10 rounded-full blur-[90px] pointer-events-none">
                 </div>
             </div>
 
@@ -632,8 +632,8 @@
                             <div>
                                 <!-- Tag / Category Header -->
                                 <div
-                                    class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#08CB00]/15 border border-[#08CB00]/40 text-[#08CB00] text-xs font-bold uppercase tracking-wider mb-4">
-                                    {{-- <span class="w-2 h-2 rounded-full bg-[#08CB00] animate-pulse"></span> --}}
+                                    class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] text-xs font-bold uppercase tracking-wider mb-4">
+                                    {{-- <span class="w-2 h-2 rounded-full bg-[#93F514] animate-pulse"></span> --}}
                                     <span x-text="slide.tag"></span>
                                 </div>
 
@@ -642,7 +642,7 @@
                                     x-text="slide.title">
                                 </h2>
 
-                                <div class="w-16 h-1 bg-gradient-to-r from-[#08CB00] to-transparent rounded-full my-4">
+                                <div class="w-16 h-1 bg-gradient-to-r from-[#93F514] to-transparent rounded-full my-4">
                                 </div>
 
                                 <!-- Slide Paragraph -->
@@ -654,7 +654,7 @@
                             <!-- Left-Bottom Controls & Actions -->
                             <div class="pt-4 flex flex-wrap items-center gap-3">
                                 <a href="{{ route('jobs.index') }}"
-                                    class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#08CB00] hover:bg-[#07b500] text-black font-extrabold text-xs sm:text-sm tracking-wide shadow-lg shadow-[#08CB00]/30 transition duration-200">
+                                    class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#93F514] hover:bg-[#7edc0b] text-black font-extrabold text-xs sm:text-sm tracking-wide shadow-lg shadow-[#93F514]/30 transition duration-200">
                                     <span>Lihat Lowongan</span>
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
@@ -664,8 +664,8 @@
 
                                 <template x-if="companyWebsite">
                                     <a :href="companyWebsite" target="_blank" rel="noopener noreferrer"
-                                        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-[#08CB00]/40 text-[#EEEEEE] hover:text-[#08CB00] font-semibold text-xs sm:text-sm transition duration-200 backdrop-blur-sm">
-                                        <svg class="w-4 h-4 text-[#08CB00]" fill="none" viewBox="0 0 24 24"
+                                        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-[#93F514]/40 text-[#EEEEEE] hover:text-[#93F514] font-semibold text-xs sm:text-sm transition duration-200 backdrop-blur-sm">
+                                        <svg class="w-4 h-4 text-[#93F514]" fill="none" viewBox="0 0 24 24"
                                             stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
@@ -688,7 +688,7 @@
 
                                 <!-- Main Large Photo (Left Background Layer) -->
                                 <div
-                                    class="absolute left-0 top-6 w-[56%] sm:w-[58%] h-[260px] sm:h-[310px] rounded-2xl sm:rounded-3xl p-1.5 bg-gradient-to-br from-[#08CB00]/50 via-white/10 to-transparent shadow-2xl shadow-black/80 group">
+                                    class="absolute left-0 top-6 w-[56%] sm:w-[58%] h-[260px] sm:h-[310px] rounded-2xl sm:rounded-3xl p-1.5 bg-gradient-to-br from-[#93F514]/50 via-white/10 to-transparent shadow-2xl shadow-black/80 group">
                                     <div
                                         class="w-full h-full rounded-[14px] sm:rounded-[22px] overflow-hidden bg-black/40 border border-white/20">
                                         <img :src="slide.img1" alt="Team Collaboration"
@@ -698,7 +698,7 @@
 
                                 <!-- Top-Right Secondary Photo Layer -->
                                 <div
-                                    class="absolute right-0 top-0 w-[48%] sm:w-[50%] h-[200px] sm:h-[235px] rounded-2xl sm:rounded-3xl p-1.5 bg-gradient-to-bl from-[#08CB00]/60 via-white/15 to-transparent shadow-2xl shadow-black/90 group z-10">
+                                    class="absolute right-0 top-0 w-[48%] sm:w-[50%] h-[200px] sm:h-[235px] rounded-2xl sm:rounded-3xl p-1.5 bg-gradient-to-bl from-[#93F514]/60 via-white/15 to-transparent shadow-2xl shadow-black/90 group z-10">
                                     <div
                                         class="w-full h-full rounded-[14px] sm:rounded-[22px] overflow-hidden bg-black/40 border border-white/20">
                                         <img :src="slide.img2" alt="Professional Presentation"
@@ -708,7 +708,7 @@
 
                                 <!-- Bottom Center/Right Overlapping Tertiary Photo -->
                                 <div
-                                    class="absolute left-[35%] sm:left-[32%] bottom-0 w-[50%] sm:w-[52%] h-[190px] sm:h-[220px] rounded-2xl sm:rounded-3xl p-1.5 bg-gradient-to-tr from-[#08CB00]/60 via-white/15 to-transparent shadow-2xl shadow-black/95 group z-20">
+                                    class="absolute left-[35%] sm:left-[32%] bottom-0 w-[50%] sm:w-[52%] h-[190px] sm:h-[220px] rounded-2xl sm:rounded-3xl p-1.5 bg-gradient-to-tr from-[#93F514]/60 via-white/15 to-transparent shadow-2xl shadow-black/95 group z-20">
                                     <div
                                         class="w-full h-full rounded-[14px] sm:rounded-[22px] overflow-hidden bg-black/40 border border-white/25">
                                         <img :src="slide.img3" alt="Meeting and Discussion"
@@ -720,10 +720,10 @@
                                 <div
                                     class="absolute -right-1 sm:-right-3 bottom-2 z-30 transform hover:scale-105 transition-transform">
                                     <div
-                                        class="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl bg-[#061806]/85 border border-[#08CB00]/50 shadow-lg shadow-black/60 backdrop-blur-md flex items-center gap-2.5">
-                                        <div class="w-2 h-2 rounded-full bg-[#08CB00] animate-ping"></div>
+                                        class="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl bg-[#061806]/85 border border-[#93F514]/50 shadow-lg shadow-black/60 backdrop-blur-md flex items-center gap-2.5">
+                                        <div class="w-2 h-2 rounded-full bg-[#93F514] animate-ping"></div>
                                         <div>
-                                            <div class="text-[11px] sm:text-xs font-bold tracking-wider text-[#08CB00] leading-none"
+                                            <div class="text-[11px] sm:text-xs font-bold tracking-wider text-[#93F514] leading-none"
                                                 x-text="slide.badgeTitle">CAREER.</div>
                                             <div class="text-[10px] text-gray-300 font-medium mt-0.5 leading-none"
                                                 x-text="slide.badgeSub">Growth & Development</div>
@@ -739,25 +739,25 @@
 
                 <!-- Bottom Navigation Bar: Arrows + Live Animated Progress Indicator Lines -->
                 <div
-                    class="mt-8 pt-6 border-t border-[#08CB00]/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    class="mt-8 pt-6 border-t border-[#93F514]/20 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <!-- Prev / Next Navigation Arrows -->
                     <div class="flex items-center gap-3">
                         <button @click="prev()" aria-label="Previous Slide"
-                            class="w-10 h-10 rounded-xl bg-[#061506] hover:bg-[#08CB00] text-gray-300 hover:text-black border border-[#08CB00]/40 transition-all flex items-center justify-center cursor-pointer shadow-md">
+                            class="w-10 h-10 rounded-xl bg-[#061506] hover:bg-[#93F514] text-gray-300 hover:text-black border border-[#93F514]/40 transition-all flex items-center justify-center cursor-pointer shadow-md">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                     d="M15 19l-7-7 7-7" />
                             </svg>
                         </button>
                         <button @click="next()" aria-label="Next Slide"
-                            class="w-10 h-10 rounded-xl bg-[#061506] hover:bg-[#08CB00] text-gray-300 hover:text-black border border-[#08CB00]/40 transition-all flex items-center justify-center cursor-pointer shadow-md">
+                            class="w-10 h-10 rounded-xl bg-[#061506] hover:bg-[#93F514] text-gray-300 hover:text-black border border-[#93F514]/40 transition-all flex items-center justify-center cursor-pointer shadow-md">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                     d="M9 5l7 7-7 7" />
                             </svg>
                         </button>
                         <span class="text-xs text-gray-400 font-semibold ml-2">
-                            <span class="text-[#08CB00] font-bold" x-text="currentSlide + 1"></span> / <span
+                            <span class="text-[#93F514] font-bold" x-text="currentSlide + 1"></span> / <span
                                 x-text="slides.length"></span>
                         </span>
                     </div>
@@ -768,7 +768,7 @@
                             <button @click="goTo(index)" :aria-label="'Go to slide ' + (index + 1)"
                                 class="h-1.5 sm:h-2 flex-1 rounded-full transition-all duration-300 cursor-pointer overflow-hidden relative bg-white/10 hover:bg-white/20">
                                 <!-- Background fill for active slide with smooth real-time progress -->
-                                <div class="h-full bg-gradient-to-r from-[#08CB00] to-[#5ef558] rounded-full transition-[width] ease-linear shadow-[0_0_10px_rgba(8,203,0,0.8)]"
+                                <div class="h-full bg-gradient-to-r from-[#93F514] to-[#5ef558] rounded-full transition-[width] ease-linear shadow-[0_0_10px_rgba(147, 245, 20,0.8)]"
                                     :style="currentSlide === index ?
                                         `width: ${progress}%; transition-duration: ${isPaused ? '0ms' : '50ms'};` : (
                                             currentSlide > index ? 'width: 100%; transition-duration: 0ms;' :
@@ -784,11 +784,11 @@
 
         <!-- ==================== ALUR PENDAFTARAN DINAMIS ==================== -->
         <section id="alur-pendaftaran"
-            class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative border-t border-[#08CB00]/20"
+            class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative border-t border-[#93F514]/20"
             x-data="{ activeStep: 1 }">
             <div class="text-center max-w-3xl mx-auto mb-14">
-                {{-- <div class="inline-flex items-center gap-2 text-[#08CB00] text-xs font-bold uppercase tracking-widest mb-3">
-                <span class="w-2 h-2 rounded-full bg-[#08CB00] animate-ping"></span>
+                {{-- <div class="inline-flex items-center gap-2 text-[#93F514] text-xs font-bold uppercase tracking-widest mb-3">
+                <span class="w-2 h-2 rounded-full bg-[#93F514] animate-ping"></span>
                 <span>Proses Seleksi Praktis</span>
             </div> --}}
                 <h2 class="text-3xl sm:text-4xl font-extrabold text-[#EEEEEE]">Alur Pendaftaran & Seleksi</h2>
@@ -798,31 +798,31 @@
 
                 <!-- Dynamic Tab Step Switchers -->
                 <div
-                    class="mt-8 inline-flex p-1.5 rounded-2xl bg-[#061206] border border-[#08CB00]/30 shadow-lg gap-1.5 flex-wrap justify-center">
+                    class="mt-8 inline-flex p-1.5 rounded-2xl bg-[#061206] border border-[#93F514]/30 shadow-lg gap-1.5 flex-wrap justify-center">
                     <button @click="activeStep = 1"
                         :class="activeStep === 1 ?
-                            'bg-gradient-to-r from-[#08CB00] to-[#5ef558] text-black font-extrabold shadow-md shadow-[#08CB00]/30' :
+                            'bg-gradient-to-r from-[#93F514] to-[#5ef558] text-black font-extrabold shadow-md shadow-[#93F514]/30' :
                             'text-gray-400 hover:text-[#EEEEEE]'"
                         class="px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm transition-all duration-200 cursor-pointer">
                         1. Registrasi Akun
                     </button>
                     <button @click="activeStep = 2"
                         :class="activeStep === 2 ?
-                            'bg-gradient-to-r from-[#08CB00] to-[#5ef558] text-black font-extrabold shadow-md shadow-[#08CB00]/30' :
+                            'bg-gradient-to-r from-[#93F514] to-[#5ef558] text-black font-extrabold shadow-md shadow-[#93F514]/30' :
                             'text-gray-400 hover:text-[#EEEEEE]'"
                         class="px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm transition-all duration-200 cursor-pointer">
                         2. Lengkapi Data & CV
                     </button>
                     <button @click="activeStep = 3"
                         :class="activeStep === 3 ?
-                            'bg-gradient-to-r from-[#08CB00] to-[#5ef558] text-black font-extrabold shadow-md shadow-[#08CB00]/30' :
+                            'bg-gradient-to-r from-[#93F514] to-[#5ef558] text-black font-extrabold shadow-md shadow-[#93F514]/30' :
                             'text-gray-400 hover:text-[#EEEEEE]'"
                         class="px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm transition-all duration-200 cursor-pointer">
                         3. Tes & Seleksi Online
                     </button>
                     <button @click="activeStep = 4"
                         :class="activeStep === 4 ?
-                            'bg-gradient-to-r from-[#08CB00] to-[#5ef558] text-black font-extrabold shadow-md shadow-[#08CB00]/30' :
+                            'bg-gradient-to-r from-[#93F514] to-[#5ef558] text-black font-extrabold shadow-md shadow-[#93F514]/30' :
                             'text-gray-400 hover:text-[#EEEEEE]'"
                         class="px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm transition-all duration-200 cursor-pointer">
                         4. Hasil & Penawaran
@@ -832,9 +832,9 @@
 
             <!-- Dynamic Step Content Display -->
             <div
-                class="relative rounded-3xl bg-gradient-to-b from-[#071a07] via-[#051105] to-[#040804] border border-[#08CB00]/40 p-8 sm:p-12 shadow-2xl shadow-[#08CB00]/20 overflow-hidden">
+                class="relative rounded-3xl bg-gradient-to-b from-[#071a07] via-[#051105] to-[#040804] border border-[#93F514]/40 p-8 sm:p-12 shadow-2xl shadow-[#93F514]/20 overflow-hidden">
                 <div
-                    class="absolute -top-24 -right-24 w-72 h-72 bg-[#08CB00]/15 rounded-full blur-3xl pointer-events-none">
+                    class="absolute -top-24 -right-24 w-72 h-72 bg-[#93F514]/15 rounded-full blur-3xl pointer-events-none">
                 </div>
 
                 <!-- Step 1 Content -->
@@ -843,7 +843,7 @@
                     class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                     <div class="lg:col-span-7 space-y-4">
                         <div
-                            class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#08CB00]/15 border border-[#08CB00]/40 text-[#08CB00] text-xs font-bold">
+                            class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] text-xs font-bold">
                             Tahap 01 - Registrasi Pengguna
                         </div>
                         <h3 class="text-2xl sm:text-3xl font-extrabold text-[#EEEEEE]">Buat Akun Pelamar dengan Mudah</h3>
@@ -854,12 +854,12 @@
                         <ul class="space-y-2.5 text-xs sm:text-sm text-gray-300 pt-2">
                             <li class="flex items-center gap-2.5">
                                 <span
-                                    class="w-5 h-5 rounded-full bg-[#08CB00]/20 text-[#08CB00] flex items-center justify-center font-bold text-xs">&check;</span>
+                                    class="w-5 h-5 rounded-full bg-[#93F514]/20 text-[#93F514] flex items-center justify-center font-bold text-xs">&check;</span>
                                 <span>Verifikasi data diri yang cepat dan aman</span>
                             </li>
                             <li class="flex items-center gap-2.5">
                                 <span
-                                    class="w-5 h-5 rounded-full bg-[#08CB00]/20 text-[#08CB00] flex items-center justify-center font-bold text-xs">&check;</span>
+                                    class="w-5 h-5 rounded-full bg-[#93F514]/20 text-[#93F514] flex items-center justify-center font-bold text-xs">&check;</span>
                                 <span>Dapat diakses kapan saja melalui smartphone atau desktop</span>
                             </li>
                         </ul>
@@ -882,12 +882,12 @@
                                         : route('profile');
                                 @endphp
                                 <a href="{{ $dashRoute }}"
-                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#08CB00] text-black font-bold text-xs sm:text-sm hover:bg-[#07b500] transition shadow-lg shadow-[#08CB00]/30">
+                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-lg shadow-[#93F514]/30">
                                     {{ $isAdminOrRecruiter ? 'Buka Dashboard Admin' : 'Buka Profil Saya' }}
                                 </a>
                             @else
                                 <a href="{{ route('register') }}"
-                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#08CB00] text-black font-bold text-xs sm:text-sm hover:bg-[#07b500] transition shadow-lg shadow-[#08CB00]/30">
+                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-lg shadow-[#93F514]/30">
                                     Daftar Akun Sekarang &rarr;
                                 </a>
                             @endauth
@@ -895,9 +895,9 @@
                     </div>
                     <div class="lg:col-span-5 flex justify-center">
                         <div
-                            class="w-full max-w-sm p-6 rounded-2xl bg-[#050e05] border border-[#08CB00]/30 shadow-xl space-y-4">
+                            class="w-full max-w-sm p-6 rounded-2xl bg-[#050e05] border border-[#93F514]/30 shadow-xl space-y-4">
                             <div
-                                class="w-12 h-12 rounded-xl bg-[#08CB00]/15 border border-[#08CB00]/40 flex items-center justify-center text-[#08CB00]">
+                                class="w-12 h-12 rounded-xl bg-[#93F514]/15 border border-[#93F514]/40 flex items-center justify-center text-[#93F514]">
                                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
@@ -918,7 +918,7 @@
                     class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                     <div class="lg:col-span-7 space-y-4">
                         <div
-                            class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#08CB00]/15 border border-[#08CB00]/40 text-[#08CB00] text-xs font-bold">
+                            class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] text-xs font-bold">
                             Tahap 02 - Kelengkapan Profil
                         </div>
                         <h3 class="text-2xl sm:text-3xl font-extrabold text-[#EEEEEE]">Lengkapi Biodata, Riwayat & CV</h3>
@@ -929,21 +929,21 @@
                         <ul class="space-y-2.5 text-xs sm:text-sm text-gray-300 pt-2">
                             <li class="flex items-center gap-2.5">
                                 <span
-                                    class="w-5 h-5 rounded-full bg-[#08CB00]/20 text-[#08CB00] flex items-center justify-center font-bold text-xs">&check;</span>
+                                    class="w-5 h-5 rounded-full bg-[#93F514]/20 text-[#93F514] flex items-center justify-center font-bold text-xs">&check;</span>
                                 <span>Fitur Generate & Preview CV otomatis</span>
                             </li>
                             <li class="flex items-center gap-2.5">
                                 <span
-                                    class="w-5 h-5 rounded-full bg-[#08CB00]/20 text-[#08CB00] flex items-center justify-center font-bold text-xs">&check;</span>
+                                    class="w-5 h-5 rounded-full bg-[#93F514]/20 text-[#93F514] flex items-center justify-center font-bold text-xs">&check;</span>
                                 <span>Pembaruan profil fleksibel setiap saat</span>
                             </li>
                         </ul>
                     </div>
                     <div class="lg:col-span-5 flex justify-center">
                         <div
-                            class="w-full max-w-sm p-6 rounded-2xl bg-[#050e05] border border-[#08CB00]/30 shadow-xl space-y-4">
+                            class="w-full max-w-sm p-6 rounded-2xl bg-[#050e05] border border-[#93F514]/30 shadow-xl space-y-4">
                             <div
-                                class="w-12 h-12 rounded-xl bg-[#08CB00]/15 border border-[#08CB00]/40 flex items-center justify-center text-[#08CB00]">
+                                class="w-12 h-12 rounded-xl bg-[#93F514]/15 border border-[#93F514]/40 flex items-center justify-center text-[#93F514]">
                                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -964,7 +964,7 @@
                     class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                     <div class="lg:col-span-7 space-y-4">
                         <div
-                            class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#08CB00]/15 border border-[#08CB00]/40 text-[#08CB00] text-xs font-bold">
+                            class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] text-xs font-bold">
                             Tahap 03 - Asesmen Online
                         </div>
                         <h3 class="text-2xl sm:text-3xl font-extrabold text-[#EEEEEE]">Ikuti Ujian CBT Terintegrasi</h3>
@@ -975,21 +975,21 @@
                         <ul class="space-y-2.5 text-xs sm:text-sm text-gray-300 pt-2">
                             <li class="flex items-center gap-2.5">
                                 <span
-                                    class="w-5 h-5 rounded-full bg-[#08CB00]/20 text-[#08CB00] flex items-center justify-center font-bold text-xs">&check;</span>
+                                    class="w-5 h-5 rounded-full bg-[#93F514]/20 text-[#93F514] flex items-center justify-center font-bold text-xs">&check;</span>
                                 <span>Timer pengerjaan real-time dan penilaian transparan</span>
                             </li>
                             <li class="flex items-center gap-2.5">
                                 <span
-                                    class="w-5 h-5 rounded-full bg-[#08CB00]/20 text-[#08CB00] flex items-center justify-center font-bold text-xs">&check;</span>
+                                    class="w-5 h-5 rounded-full bg-[#93F514]/20 text-[#93F514] flex items-center justify-center font-bold text-xs">&check;</span>
                                 <span>Kategori soal disesuaikan dengan posisi lamaran</span>
                             </li>
                         </ul>
                     </div>
                     <div class="lg:col-span-5 flex justify-center">
                         <div
-                            class="w-full max-w-sm p-6 rounded-2xl bg-[#050e05] border border-[#08CB00]/30 shadow-xl space-y-4">
+                            class="w-full max-w-sm p-6 rounded-2xl bg-[#050e05] border border-[#93F514]/30 shadow-xl space-y-4">
                             <div
-                                class="w-12 h-12 rounded-xl bg-[#08CB00]/15 border border-[#08CB00]/40 flex items-center justify-center text-[#08CB00]">
+                                class="w-12 h-12 rounded-xl bg-[#93F514]/15 border border-[#93F514]/40 flex items-center justify-center text-[#93F514]">
                                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
@@ -1010,7 +1010,7 @@
                     class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                     <div class="lg:col-span-7 space-y-4">
                         <div
-                            class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#08CB00]/15 border border-[#08CB00]/40 text-[#08CB00] text-xs font-bold">
+                            class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] text-xs font-bold">
                             Tahap 04 - Hasil & Penawaran
                         </div>
                         <h3 class="text-2xl sm:text-3xl font-extrabold text-[#EEEEEE]">Pengumuman & Penawaran Karir</h3>
@@ -1021,21 +1021,21 @@
                         <ul class="space-y-2.5 text-xs sm:text-sm text-gray-300 pt-2">
                             <li class="flex items-center gap-2.5">
                                 <span
-                                    class="w-5 h-5 rounded-full bg-[#08CB00]/20 text-[#08CB00] flex items-center justify-center font-bold text-xs">&check;</span>
+                                    class="w-5 h-5 rounded-full bg-[#93F514]/20 text-[#93F514] flex items-center justify-center font-bold text-xs">&check;</span>
                                 <span>Notifikasi hasil evaluasi langsung ke akun Anda</span>
                             </li>
                             <li class="flex items-center gap-2.5">
                                 <span
-                                    class="w-5 h-5 rounded-full bg-[#08CB00]/20 text-[#08CB00] flex items-center justify-center font-bold text-xs">&check;</span>
+                                    class="w-5 h-5 rounded-full bg-[#93F514]/20 text-[#93F514] flex items-center justify-center font-bold text-xs">&check;</span>
                                 <span>Proses terstruktur tanpa biaya pendaftaran (Gratis)</span>
                             </li>
                         </ul>
                     </div>
                     <div class="lg:col-span-5 flex justify-center">
                         <div
-                            class="w-full max-w-sm p-6 rounded-2xl bg-[#050e05] border border-[#08CB00]/30 shadow-xl space-y-4">
+                            class="w-full max-w-sm p-6 rounded-2xl bg-[#050e05] border border-[#93F514]/30 shadow-xl space-y-4">
                             <div
-                                class="w-12 h-12 rounded-xl bg-[#08CB00]/15 border border-[#08CB00]/40 flex items-center justify-center text-[#08CB00]">
+                                class="w-12 h-12 rounded-xl bg-[#93F514]/15 border border-[#93F514]/40 flex items-center justify-center text-[#93F514]">
                                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
@@ -1055,10 +1055,10 @@
 
         <!-- ==================== KATEGORI DEPARTEMEN ==================== -->
         <section id="kategori"
-            class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative border-t border-[#08CB00]/20">
+            class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative border-t border-[#93F514]/20">
             <div class="mb-8">
-                {{-- <div class="inline-flex items-center gap-2 text-[#08CB00] text-xs font-bold uppercase tracking-widest mb-2">
-                <span class="w-2 h-2 rounded-full bg-[#08CB00]"></span> Bidang Karir
+                {{-- <div class="inline-flex items-center gap-2 text-[#93F514] text-xs font-bold uppercase tracking-widest mb-2">
+                <span class="w-2 h-2 rounded-full bg-[#93F514]"></span> Bidang Karir
             </div> --}}
                 <h2 class="text-2xl sm:text-3xl font-extrabold text-[#EEEEEE]">Kategori Departemen</h2>
             </div>
@@ -1066,9 +1066,9 @@
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                 @forelse($departments as $dept)
                     <a href="{{ route('jobs.index', ['department_id' => $dept->id]) }}"
-                        class="group p-5 rounded-2xl bg-gradient-to-b from-[#061506] to-[#040804] border border-[#08CB00]/30 hover:border-[#08CB00] hover:shadow-xl hover:shadow-[#08CB00]/20 transition-all duration-300 flex flex-col justify-between">
+                        class="group p-5 rounded-2xl bg-gradient-to-b from-[#061506] to-[#040804] border border-[#93F514]/30 hover:border-[#93F514] hover:shadow-xl hover:shadow-[#93F514]/20 transition-all duration-300 flex flex-col justify-between">
                         <div
-                            class="w-10 h-10 rounded-xl bg-[#08CB00]/15 border border-[#08CB00]/40 flex items-center justify-center text-[#08CB00] group-hover:bg-[#08CB00] group-hover:text-black transition-all">
+                            class="w-10 h-10 rounded-xl bg-[#93F514]/15 border border-[#93F514]/40 flex items-center justify-center text-[#93F514] group-hover:bg-[#93F514] group-hover:text-black transition-all">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -1076,7 +1076,7 @@
                         </div>
                         <div class="mt-4">
                             <h3
-                                class="font-bold text-[#EEEEEE] group-hover:text-[#08CB00] transition-colors text-sm sm:text-base">
+                                class="font-bold text-[#EEEEEE] group-hover:text-[#93F514] transition-colors text-sm sm:text-base">
                                 {{ $dept->name }}
                             </h3>
                         </div>
@@ -1090,7 +1090,7 @@
         <!-- ==================== CALL TO ACTION BANNER ==================== -->
         <section class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
             <div
-                class="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#041a04] via-[#062906] to-[#031203] border border-[#08CB00]/50 p-8 sm:p-12 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-8 shadow-2xl shadow-[#08CB00]/20">
+                class="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#041a04] via-[#062906] to-[#031203] border border-[#93F514]/50 p-8 sm:p-12 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-8 shadow-2xl shadow-[#93F514]/20">
                 <div class="max-w-xl z-10">
                     <h2 class="text-2xl sm:text-3xl font-extrabold text-[#EEEEEE] leading-tight">
                         Siap Memulai Karir Baru Bersama Kami?
@@ -1119,16 +1119,16 @@
                                 : route('profile');
                         @endphp
                         <a href="{{ $dashRoute }}"
-                            class="px-8 py-3.5 rounded-full bg-gradient-to-r from-[#08CB00] to-[#5ef558] hover:from-[#07b500] hover:to-[#43e63d] text-black font-extrabold text-sm shadow-xl shadow-[#08CB00]/30 transition-all duration-300">
+                            class="px-8 py-3.5 rounded-full bg-gradient-to-r from-[#93F514] to-[#5ef558] hover:from-[#7edc0b] hover:to-[#43e63d] text-black font-extrabold text-sm shadow-xl shadow-[#93F514]/30 transition-all duration-300">
                             {{ $isAdminOrRecruiter ? 'Buka Panel Dashboard' : 'Buka Profil Pelamar' }}
                         </a>
                     @else
                         <a href="{{ route('register') }}"
-                            class="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-[#08CB00] to-[#5ef558] hover:from-[#07b500] hover:to-[#43e63d] text-black font-extrabold text-sm shadow-xl shadow-[#08CB00]/30 transition-all duration-300 text-center">
+                            class="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-[#93F514] to-[#5ef558] hover:from-[#7edc0b] hover:to-[#43e63d] text-black font-extrabold text-sm shadow-xl shadow-[#93F514]/30 transition-all duration-300 text-center">
                             Daftar Akun Sekarang
                         </a>
                         <a href="{{ route('login') }}"
-                            class="w-full sm:w-auto px-6 py-3.5 rounded-full bg-black/50 hover:bg-black/80 border border-[#08CB00]/50 text-[#EEEEEE] font-semibold text-sm transition text-center">
+                            class="w-full sm:w-auto px-6 py-3.5 rounded-full bg-black/50 hover:bg-black/80 border border-[#93F514]/50 text-[#EEEEEE] font-semibold text-sm transition text-center">
                             Masuk Akun
                         </a>
                     @endauth
