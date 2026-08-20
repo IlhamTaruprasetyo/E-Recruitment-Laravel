@@ -30,22 +30,23 @@
 
                 <!-- Main Headline Hero with Neon #93F514 & White Gradients -->
                 <h1
-                    class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-[#EEEEEE] leading-tight sm:leading-none max-w-4xl drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]">
+                    class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#EEEEEE] leading-tight sm:leading-none max-w-4xl drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]">
                     Temukan Karir Impian, <br>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#93F514] via-[#75f06a] to-[#5FE6B6] drop-shadow-[0_0_25px_rgba(147,245,20,0.4)]">
+                    <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-[#93F514] via-[#75f06a] to-[#5FE6B6] drop-shadow-[0_0_25px_rgba(147,245,20,0.4)]">
                         Wujudkan Potensi Terbaikmu
                     </span>
                 </h1>
 
                 <!-- Subtitle Description / Slogan Layer -->
-                <p class="mt-6 text-base sm:text-xl text-gray-200 max-w-2xl font-normal leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+                <p
+                    class="mt-6 text-base sm:text-xl text-gray-200 max-w-2xl font-normal leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
                     Bergabunglah bersama ribuan profesional bertalenta. Jelajahi lowongan kerja, ikuti tes seleksi online
                     terintegrasi, dan raih karir masa depan sekarang.
                 </p>
 
                 <!-- Search Bar Form (Clean Segmented Solid Light Pill Bar) -->
-                <div
-                    class="w-full max-w-5xl mt-10 p-2 sm:p-2.5 rounded-2xl lg:rounded-full bg-[#EEEEEE] text-gray-800 shadow-2xl shadow-black/80 border border-white/40"
+                <div class="w-full max-w-5xl mt-10 p-2 sm:p-2.5 rounded-2xl lg:rounded-full bg-[#EEEEEE] text-gray-800 shadow-2xl shadow-black/80 border border-white/40"
                     style="background-color: #EEEEEE !important;">
                     <form action="{{ route('jobs.index') }}" method="GET"
                         class="flex flex-col lg:flex-row items-center gap-2 lg:gap-0 divide-y lg:divide-y-0 lg:divide-x divide-gray-300">
@@ -109,8 +110,9 @@
                                             1
                                         </span>
                                     </template>
-                                    <span class="truncate" x-text="selected ? (selectedName || '1 Perusahaan') : 'Semua Perusahaan'">
-                                        {{ request('company_id') ? ($companies->firstWhere('id', request('company_id'))?->name ?? '1 Perusahaan') : 'Semua Perusahaan' }}
+                                    <span class="truncate"
+                                        x-text="selected ? (selectedName || '1 Perusahaan') : 'Semua Perusahaan'">
+                                        {{ request('company_id') ? $companies->firstWhere('id', request('company_id'))?->name ?? '1 Perusahaan' : 'Semua Perusahaan' }}
                                     </span>
                                 </div>
                                 <svg class="w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200"
@@ -118,7 +120,7 @@
                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M19 9l-7 7-7-7" />
-                                 </svg>
+                                </svg>
                             </button>
 
                             <!-- Popover Panel -->
@@ -234,8 +236,9 @@
                                             1
                                         </span>
                                     </template>
-                                    <span class="truncate" x-text="selected ? (selectedName || '1 Departemen') : 'Semua Departemen'">
-                                        {{ request('department_id') ? ($departments->firstWhere('id', request('department_id'))?->name ?? '1 Departemen') : 'Semua Departemen' }}
+                                    <span class="truncate"
+                                        x-text="selected ? (selectedName || '1 Departemen') : 'Semua Departemen'">
+                                        {{ request('department_id') ? $departments->firstWhere('id', request('department_id'))?->name ?? '1 Departemen' : 'Semua Departemen' }}
                                     </span>
                                 </div>
                                 <svg class="w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200"

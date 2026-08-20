@@ -54,6 +54,8 @@ Route::middleware(['auth', 'verified', RoleMiddleware::class . ':recruiter'])
         Route::view('applicants', 'livewire.admin.applicants.index')->name('application');
         Route::put('applicants/{id}', [JobApplicationController::class, 'update'])->name('application.update');
         Route::view('candidates', 'livewire.admin.candidates.index')->name('candidate');
+        Route::view('test-evaluations', 'livewire.admin.test-evaluation.index')->name('test_evaluation');
+        Route::put('test-evaluations/{id}/grade', [TestEvaluationController::class, 'updateGrade'])->name('test_evaluation.grade');
         Route::view('profile', 'profile')->name('profile');
     });
 

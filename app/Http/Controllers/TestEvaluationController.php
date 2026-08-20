@@ -110,13 +110,21 @@ class TestEvaluationController extends Controller
                 }
             }
 
+            $user = auth()->user();
+            $isRecruiter = $user && ($user->role_id == 2 || strtolower($user->role?->name ?? '') === 'recruiter');
+            $redirectRoute = $isRecruiter ? 'recruiter.test_evaluation' : 'admin.test_evaluation';
+
             DB::commit();
 
-            return redirect()->route('admin.test_evaluation')
+            return redirect()->route($redirectRoute)
                 ->with('update', 'Penilaian essay pelamar berhasil disimpan dan total skor telah diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('admin.test_evaluation')
+            $user = auth()->user();
+            $isRecruiter = $user && ($user->role_id == 2 || strtolower($user->role?->name ?? '') === 'recruiter');
+            $redirectRoute = $isRecruiter ? 'recruiter.test_evaluation' : 'admin.test_evaluation';
+
+            return redirect()->route($redirectRoute)
                 ->with('error', 'Gagal menyimpan penilaian essay: ' . $e->getMessage());
         }
     }

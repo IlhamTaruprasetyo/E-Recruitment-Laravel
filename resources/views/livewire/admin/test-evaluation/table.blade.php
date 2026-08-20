@@ -545,8 +545,12 @@
                         </div>
                     </template>
 
+                    @php
+                        $isRecruiter = auth()->check() && (auth()->user()->role_id == 2 || strtolower(auth()->user()->role?->name ?? '') === 'recruiter');
+                        $gradeActionPrefix = $isRecruiter ? '/recruiter/test-evaluations/' : '/admin/test-evaluations/';
+                    @endphp
                     <!-- Form Penilaian Essay -->
-                    <form :action="'{{ url('admin/test-evaluations') }}/' + gradingData.id + '/grade'" method="POST" @submit="isSubmittingGrading = true" class="space-y-4">
+                    <form :action="'{{ $gradeActionPrefix }}' + gradingData.id + '/grade'" method="POST" @submit="isSubmittingGrading = true" class="space-y-4">
                         @csrf
                         @method('PUT')
 
