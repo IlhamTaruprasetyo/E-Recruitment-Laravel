@@ -24,73 +24,267 @@ new #[Layout('layouts.guest')] class extends Component
     }
 }; ?>
 
-<div>
-    <!-- Tombol Kembali ke Halaman Utama -->
-    <div class="mb-4">
-        <a href="{{ url('/') }}" wire:navigate class="inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors duration-150">
-            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-            </svg>
-            {{ __('Kembali ke Beranda') }}
-        </a>
-    </div>
+<div class="w-full max-w-5xl mx-auto">
+    <!-- Main 2-Column Card Container -->
+    <div class="glass-card-main rounded-[2rem] sm:rounded-[2.5rem] p-3 sm:p-4 md:p-6 shadow-2xl relative overflow-hidden">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
+            
+            <!-- LEFT COLUMN: Banner / Illustration Showcase (5 Cols) -->
+            <div class="lg:col-span-5 banner-gradient rounded-[1.75rem] p-6 sm:p-8 lg:p-9 flex flex-col justify-between relative overflow-hidden min-h-[360px] lg:min-h-[540px]">
+                
+                <!-- Ambient Glow inside Left Panel -->
+                <div class="absolute -top-20 -left-20 w-52 h-52 bg-[#93F514]/20 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -bottom-20 -right-20 w-52 h-52 bg-[#46ee40]/15 rounded-full blur-3xl pointer-events-none"></div>
 
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
-
-    <form wire:submit="login">
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input wire:model="form.email" id="email" class="block mt-1 w-full" type="email" name="email" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('form.email')" class="mt-2" />
-        </div>
-
-        <!-- Password -->
-        <div class="mt-4" x-data="{ showPassword: false }">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <div class="relative mt-1">
-                <x-text-input wire:model="form.password" id="password" class="block w-full pe-10"
-                                x-bind:type="showPassword ? 'text' : 'password'"
-                                type="password"
-                                name="password"
-                                required autocomplete="current-password" />
-
-                <button type="button" @click="showPassword = !showPassword" class="absolute inset-y-0 end-0 flex items-center pe-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none" title="Tampilkan/Sembunyikan Kata Sandi">
-                    <!-- Eye Icon (Password Hidden) -->
-                    <svg x-show="!showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                <!-- Hexagon Background Motifs (Subtle) -->
+                <div class="absolute inset-0 opacity-10 pointer-events-none flex items-center justify-center">
+                    <svg class="w-full h-full text-[#93F514]" viewBox="0 0 400 400" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <polygon points="200,60 280,105 280,195 200,240 120,195 120,105"/>
+                        <polygon points="320,130 380,165 380,235 320,270 260,235 260,165"/>
+                        <polygon points="80,130 140,165 140,235 80,270 20,235 20,165"/>
+                        <polygon points="200,220 280,265 280,355 200,400 120,355 120,265"/>
                     </svg>
-                    <!-- Eye Slash Icon (Password Visible) -->
-                    <svg x-show="showPassword" x-cloak class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858-5.908a10.025 10.025 0 013.682-.813c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21M3 3l18 18" />
-                    </svg>
-                </button>
+                </div>
+
+                <!-- Top Area: Brand Logo & Tagline -->
+                <div class="relative z-10">
+                    <a href="{{ url('/') }}" wire:navigate class="inline-flex items-center gap-3 group">
+                        <div class="p-2 rounded-xl bg-black/40 border border-[#93F514]/30 shadow-md group-hover:scale-105 transition-transform duration-200">
+                            <img src="{{ asset('storage/logo/mikaaaa.png') }}" 
+                                 alt="Logo MIKA" 
+                                 class="h-8 w-auto object-contain rounded-lg">
+                        </div>
+                        <div>
+                            <span class="heading-font text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-1">
+                                MIKA <span class="text-[#93F514]">CAREER</span>
+                            </span>
+                            <span class="block text-[10px] text-gray-400 font-normal">
+                                Portal Rekrutmen Online
+                            </span>
+                        </div>
+                    </a>
+
+                    <!-- Slogan Heading -->
+                    <div class="mt-8">
+                        {{-- <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-[#93F514]/15 text-[#93F514] border border-[#93F514]/30 mb-3">
+                            Portal Rekrutmen
+                        </span> --}}
+                        <h2 class="heading-font text-2xl sm:text-3xl font-bold text-white leading-tight">
+                            One click to step into your <br>
+                            <span class="text-[#93F514]">
+                                dream career.
+                            </span>
+                        </h2>
+                    </div>
+                </div>
+
+                <!-- Middle / Bottom Illustration -->
+                <div class="relative z-10 my-auto py-6 flex items-center justify-center">
+                    <div class="relative w-full max-w-[280px]">
+                        <!-- Dashboard UI Preview Mockup Card -->
+                        <div class="bg-[#051406]/95 backdrop-blur-md rounded-2xl border border-[#93F514]/30 p-4 shadow-2xl">
+                            <!-- Mockup Window Bar -->
+                            <div class="flex items-center justify-between pb-2 mb-3 border-b border-white/10">
+                                <div class="flex items-center gap-1.5">
+                                    <div class="w-2 h-2 rounded-full bg-red-400"></div>
+                                    <div class="w-2 h-2 rounded-full bg-yellow-400"></div>
+                                    <div class="w-2 h-2 rounded-full bg-[#93F514]"></div>
+                                </div>
+                                <div class="h-1.5 w-14 bg-white/15 rounded-full"></div>
+                            </div>
+                            
+                            <!-- Mockup Dashboard Content -->
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-lg bg-[#93F514]/20 border border-[#93F514]/40 flex items-center justify-center text-[#93F514]">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                    </div>
+                                    <div class="flex-1 space-y-1.5">
+                                        <div class="h-2 w-24 bg-white/30 rounded-full"></div>
+                                        <div class="h-1.5 w-16 bg-[#93F514]/60 rounded-full"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Mock Chart -->
+                                <div class="p-2.5 rounded-lg bg-black/60 border border-white/5 flex items-end justify-between h-14 px-3">
+                                    <div class="w-3 bg-white/20 rounded-t h-4"></div>
+                                    <div class="w-3 bg-[#93F514]/40 rounded-t h-7"></div>
+                                    <div class="w-3 bg-white/20 rounded-t h-5"></div>
+                                    <div class="w-3 bg-[#93F514] rounded-t h-10 shadow-[0_0_10px_#93F514]"></div>
+                                    <div class="w-3 bg-white/20 rounded-t h-6"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Floating Badge -->
+                        {{-- <div class="absolute -bottom-2.5 -right-1 bg-black/90 backdrop-blur-md border border-[#93F514]/40 rounded-xl px-3 py-1.5 shadow-lg flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-[#93F514]"></span>
+                            <span class="text-xs font-semibold text-white">Lowongan Aktif</span>
+                        </div> --}}
+                    </div>
+                </div>
+
+                <!-- Bottom Back Link in Left Side -->
+                <div class="relative z-10 pt-2">
+                    <a href="{{ url('/') }}" wire:navigate 
+                       class="inline-flex items-center gap-2 text-xs font-medium text-gray-300 hover:text-[#93F514] transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                        </svg>
+                        <span>Kembali ke Beranda</span>
+                    </a>
+                </div>
             </div>
 
-            <x-input-error :messages="$errors->get('form.password')" class="mt-2" />
+            <!-- RIGHT COLUMN: Sign In Form (7 Cols) -->
+            <div class="lg:col-span-7 p-4 sm:p-6 lg:p-8 flex flex-col justify-center relative z-10">
+                
+                <!-- Form Header -->
+                <div class="mb-7">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <h1 class="heading-font text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                            Selamat Datang
+                        </h1>
+                        {{-- <span class="text-xs font-medium px-3 py-1 rounded-full bg-[#93F514]/10 text-[#93F514] border border-[#93F514]/30">
+                            Masuk
+                        </span> --}}
+                    </div>
+                    <p class="text-sm text-gray-400 font-normal">
+                        Masuk ke akun <span class="text-white font-medium">MIKA CAREER</span> untuk melanjutkan lamaran Anda.
+                    </p>
+                </div>
+
+                <!-- Session Status Message -->
+                @if (session('status'))
+                    <div class="mb-5 p-3.5 rounded-xl bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] text-xs font-medium flex items-center gap-2">
+                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>{{ session('status') }}</span>
+                    </div>
+                @endif
+
+                <form wire:submit="login" class="space-y-4 sm:space-y-5">
+                    <!-- Email Address -->
+                    <div>
+                        <label for="email" class="block text-xs font-semibold text-gray-300 mb-1.5">
+                            Alamat Email
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                                </svg>
+                            </div>
+                            <input wire:model="form.email" 
+                                   id="email" 
+                                   type="email" 
+                                   name="email" 
+                                   required 
+                                   autofocus 
+                                   autocomplete="username" 
+                                   placeholder="nama@email.com"
+                                   class="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-black/40 border border-white/15 focus:border-[#93F514] focus:ring-1 focus:ring-[#93F514] rounded-xl text-sm text-white placeholder-gray-500 transition outline-none" />
+                        </div>
+                        @if ($errors->has('form.email'))
+                            <p class="mt-1.5 text-xs text-red-400 font-normal flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                {{ $errors->first('form.email') }}
+                            </p>
+                        @endif
+                    </div>
+
+                    <!-- Password -->
+                    <div x-data="{ showPassword: false }">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <label for="password" class="block text-xs font-semibold text-gray-300">
+                                Kata Sandi
+                            </label>
+                            @if (Route::has('password.request'))
+                                <a href="{{ route('password.request') }}" wire:navigate 
+                                   class="text-xs text-gray-400 hover:text-[#93F514] transition">
+                                    Lupa kata sandi?
+                                </a>
+                            @endif
+                        </div>
+
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                            </div>
+                            
+                            <input wire:model="form.password" 
+                                   id="password" 
+                                   x-bind:type="showPassword ? 'text' : 'password'"
+                                   type="password" 
+                                   name="password" 
+                                   required 
+                                   autocomplete="current-password" 
+                                   placeholder="••••••••"
+                                   class="w-full pl-10 pr-11 py-2.5 sm:py-3 bg-black/40 border border-white/15 focus:border-[#93F514] focus:ring-1 focus:ring-[#93F514] rounded-xl text-sm text-white placeholder-gray-500 transition outline-none" />
+
+                            <button type="button" @click="showPassword = !showPassword" 
+                                    class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-[#93F514] transition focus:outline-none" 
+                                    title="Tampilkan/Sembunyikan Kata Sandi">
+                                <svg x-show="!showPassword" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                                <svg x-show="showPassword" x-cloak class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858-5.908a10.025 10.025 0 013.682-.813c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21M3 3l18 18" />
+                                </svg>
+                            </button>
+                        </div>
+                        @if ($errors->has('form.password'))
+                            <p class="mt-1.5 text-xs text-red-400 font-normal flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                {{ $errors->first('form.password') }}
+                            </p>
+                        @endif
+                    </div>
+
+                    <!-- Remember Me -->
+                    <div class="flex items-center justify-between pt-1">
+                        <label for="remember" class="inline-flex items-center cursor-pointer select-none">
+                            <input wire:model="form.remember" 
+                                   id="remember" 
+                                   type="checkbox" 
+                                   class="w-4 h-4 rounded bg-black/50 border-white/20 text-[#93F514] focus:ring-[#93F514] focus:ring-offset-0 transition" 
+                                   name="remember">
+                            <span class="ms-2 text-xs text-gray-300">Ingat saya</span>
+                        </label>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="pt-2">
+                        <button type="submit" 
+                                class="w-full py-3 px-4 bg-[#93F514] hover:bg-[#82dc0e] active:scale-[0.99] text-black font-semibold text-sm rounded-xl shadow-lg shadow-[#93F514]/20 hover:shadow-[#93F514]/30 transition flex items-center justify-center gap-2 group cursor-pointer">
+                            <span>Masuk</span>
+                            <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Divider & Register Link -->
+                <div class="mt-6 pt-5 border-t border-white/10 text-center">
+                    <p class="text-xs text-gray-400">
+                        Belum punya akun?
+                        <a href="{{ route('register') }}" wire:navigate 
+                           class="font-semibold text-[#93F514] hover:underline ml-1">
+                            Daftar Sekarang
+                        </a>
+                    </p>
+                </div>
+
+            </div>
+
         </div>
 
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember" class="inline-flex items-center">
-                <input wire:model="form.remember" id="remember" type="checkbox" class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" name="remember">
-                <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
-            </label>
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('password.request') }}" wire:navigate>
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
-
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
-    </form>
+    </div>
 </div>
+

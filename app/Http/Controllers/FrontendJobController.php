@@ -26,11 +26,16 @@ class FrontendJobController extends Controller
             ->where('status', 'Open');
 
         if ($search) {
-            $jobsQuery->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhereHas('company', function ($cq) use ($search) {
-                      $cq->where('name', 'like', "%{$search}%");
+            $searchLower = mb_strtolower($search);
+            $jobsQuery->where(function ($q) use ($searchLower) {
+                $q->whereRaw('LOWER(title) LIKE ?', ["%{$searchLower}%"])
+                  ->orWhereRaw('LOWER(location) LIKE ?', ["%{$searchLower}%"])
+                  ->orWhereRaw('LOWER(employment_type) LIKE ?', ["%{$searchLower}%"])
+                  ->orWhereHas('company', function ($cq) use ($searchLower) {
+                      $cq->whereRaw('LOWER(name) LIKE ?', ["%{$searchLower}%"]);
+                  })
+                  ->orWhereHas('department', function ($dq) use ($searchLower) {
+                      $dq->whereRaw('LOWER(name) LIKE ?', ["%{$searchLower}%"]);
                   });
             });
         }

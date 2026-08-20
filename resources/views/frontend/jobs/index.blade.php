@@ -568,16 +568,16 @@
     @if(isset($companies) && $companies->count() > 0)
         <div class="pt-12 border-t border-[#93F514]/20">
             <!-- Header Rata Tengah -->
-            <div class="text-center max-w-2xl mx-auto mb-8">
+            <div class="text-center max-w-3xl mx-auto mb-8">
                 {{-- <div class="inline-flex items-center gap-2 text-[#93F514] text-xs font-bold uppercase tracking-wider mb-2">
                     <span class="w-2 h-2 rounded-full bg-[#93F514] animate-pulse"></span>
                     <span>Perusahaan Mitra</span>
                 </div> --}}
-                <h2 class="text-2xl sm:text-3xl font-extrabold text-[#EEEEEE]">
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-[#EEEEEE]">
                     Temukan Lowongan Berdasarkan <span class="text-[#93F514]">Perusahaan</span>
                 </h2>
-                <p class="text-xs sm:text-sm text-gray-400 mt-1.5">
-                    Pilih perusahaan mitra untuk melihat lowongan kerja dan karir yang sedang dibuka
+                <p class="mt-3 text-sm sm:text-base text-gray-300 leading-relaxed">
+                    Pilih perusahaan mitra untuk melihat lowongan kerja dan karir yang sedang dibuka.
                 </p>
 
                 @if(request('company_id'))

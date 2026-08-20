@@ -39,8 +39,31 @@
             
         </nav>
 
-        <!-- Authentication Actions -->
+        <!-- Authentication Actions & Theme Toggle -->
         <div class="hidden md:flex items-center gap-3">
+
+            <!-- Theme Toggle Button -->
+            <button type="button"
+                    class="theme-toggle-btn"
+                    @click="$store.theme.toggle()"
+                    :title="$store.theme.isDark ? 'Aktifkan Light Mode' : 'Aktifkan Dark Mode'"
+                    x-data>
+                <!-- Moon icon (shown in dark mode) -->
+                <svg x-show="$store.theme.isDark" x-cloak
+                     x-data class="w-4.5 h-4.5" style="width:18px;height:18px"
+                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                </svg>
+                <!-- Sun icon (shown in light mode) -->
+                <svg x-show="!$store.theme.isDark" x-cloak
+                     x-data class="w-4.5 h-4.5" style="width:18px;height:18px;color:#5a9e08"
+                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 3v1m0 16v1m8.66-9H21M3 12H2m15.07-6.07-.71.71M7.64 16.36l-.71.71M18.36 16.36l-.71.71M6.34 7.64l-.71-.71M12 7a5 5 0 100 10A5 5 0 0012 7z"/>
+                </svg>
+            </button>
+
             @auth
                 @php
                     $isAdminUser = auth()->user()->role_id == 1 || in_array(strtolower(auth()->user()->role?->name ?? ''), ['admin', 'superadmin']);
@@ -101,6 +124,26 @@
             </a>
         </div>
         <div class="pt-3 border-t border-[#93F514]/20 flex flex-col gap-2">
+
+            <!-- Theme Toggle (Mobile) -->
+            <button type="button"
+                    @click="$store.theme.toggle()"
+                    x-data
+                    class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl border border-[#93F514]/30 text-sm font-semibold transition"
+                    :class="$store.theme.isDark ? 'text-gray-300 bg-transparent' : 'text-[#5a9e08] bg-[#f0fde4]'">
+                <!-- Moon -->
+                <svg x-show="$store.theme.isDark" x-cloak x-data style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                </svg>
+                <!-- Sun -->
+                <svg x-show="!$store.theme.isDark" x-cloak x-data style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 3v1m0 16v1m8.66-9H21M3 12H2m15.07-6.07-.71.71M7.64 16.36l-.71.71M18.36 16.36l-.71.71M6.34 7.64l-.71-.71M12 7a5 5 0 100 10A5 5 0 0012 7z"/>
+                </svg>
+                <span x-text="$store.theme.isDark ? 'Aktifkan Light Mode' : 'Aktifkan Dark Mode'"></span>
+            </button>
+
             @auth
                 <a href="{{ $targetDashboard }}" 
                    class="w-full text-center px-4 py-2.5 rounded-2xl bg-[#93F514] text-black font-extrabold text-sm shadow-md truncate">
