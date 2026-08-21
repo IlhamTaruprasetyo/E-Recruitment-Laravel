@@ -27,6 +27,104 @@
         </div>
     </div>
 
+    <!-- Peringatan & Notifikasi Jadwal Wawancara Aktif -->
+    @if ($upcomingInterviews && $upcomingInterviews->isNotEmpty())
+        <div class="space-y-3">
+            @foreach ($upcomingInterviews as $interview)
+                @php
+                    $job = $interview->jobApplication->job ?? null;
+                    $company = $job->company ?? null;
+                    $dateObj = \Carbon\Carbon::parse($interview->interview_date);
+                    $isToday = $dateObj->isToday();
+                    $isTomorrow = $dateObj->isTomorrow();
+                    $diffText = $isToday ? 'HARI INI' : ($isTomorrow ? 'BESOK' : $dateObj->translatedFormat('d M Y'));
+                    $isOnline = !empty($interview->meeting_link) || str_contains(strtolower($interview->location ?? ''), 'online');
+                @endphp
+                <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-900 via-indigo-800 to-purple-900 text-white p-5 sm:p-6 shadow-xl border-2 border-indigo-400/40 ring-4 ring-indigo-500/10 animate-fade-in">
+                    <!-- Glow decoration effect -->
+                    <div class="absolute -right-10 -bottom-10 w-48 h-48 rounded-full bg-purple-500/20 blur-2xl pointer-events-none"></div>
+                    <div class="absolute -left-10 -top-10 w-48 h-48 rounded-full bg-indigo-500/20 blur-2xl pointer-events-none"></div>
+
+                    <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
+                        <div class="flex items-start gap-4">
+                            <!-- Animated Bell Icon -->
+                            <div class="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-amber-300 shrink-0 shadow-inner">
+                                <svg class="w-6 h-6 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                </svg>
+                            </div>
+
+                            <div class="space-y-1.5">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-400 text-gray-950 shadow-sm flex items-center gap-1">
+                                        {{-- <span class="w-1.5 h-1.5 rounded-full bg-red-600 animate-ping"></span> --}}
+                                        Jadwal Wawancara {{ $diffText }}
+                                    </span>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/15 backdrop-blur-sm text-indigo-100 border border-white/10">
+                                        Status: {{ $interview->status }}
+                                    </span>
+                                </div>
+
+                                <h3 class="text-base sm:text-lg font-black text-white leading-tight">
+                                    Wawancara: {{ $job->title ?? 'Posisi Pekerjaan' }}
+                                </h3>
+                                <p class="text-xs text-indigo-200">
+                                    {{ $company->name ?? 'Perusahaan' }} • Pewawancara: <strong>{{ $interview->user->name ?? 'Tim HR / Rekruter' }}</strong>
+                                </p>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 text-xs text-indigo-100">
+                                    <div class="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-xl backdrop-blur-xs">
+                                        <svg class="w-4 h-4 text-amber-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        <span class="font-bold text-white">
+                                            {{ $dateObj->translatedFormat('l, d F Y • H:i') }} WIB
+                                        </span>
+                                    </div>
+
+                                    <div class="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-xl backdrop-blur-xs">
+                                        @if ($isOnline)
+                                            <svg class="w-4 h-4 text-emerald-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                            </svg>
+                                            <span class="truncate font-semibold text-emerald-200">Online Video Meeting</span>
+                                        @else
+                                            <svg class="w-4 h-4 text-purple-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                            <span class="truncate font-semibold text-purple-200">{{ $interview->location }}</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex flex-row md:flex-col items-stretch gap-2 shrink-0 pt-2 md:pt-0">
+                            @if ($isOnline && $interview->meeting_link)
+                                <a href="{{ $interview->meeting_link }}" target="_blank" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-black text-xs shadow-lg shadow-emerald-500/30 transition transform hover:-translate-y-0.5 active:translate-y-0 text-center">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                    </svg>
+                                    <span>Buka Link Meeting</span>
+                                </a>
+                            @endif
+
+                            <button type="button" wire:click="openDetail({{ $interview->job_applications_id }})" class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs border border-white/20 transition backdrop-blur-md text-center">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                                <span>Lihat Rincian</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    @endif
+
     <!-- Quick Stats Cards -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <!-- Total Lamaran -->
@@ -297,6 +395,51 @@
                     </div>
                 </div>
 
+                <!-- Active Interview Alert Box (jika ada jadwal wawancara untuk lowongan ini) -->
+                @php
+                    $appActiveInterview = $app->interviewSchedules ? $app->interviewSchedules->whereIn('status', ['Scheduled', 'Rescheduled'])->last() : null;
+                @endphp
+                @if ($appActiveInterview)
+                    @php
+                        $intDate = \Carbon\Carbon::parse($appActiveInterview->interview_date);
+                        $isOnlineInt = !empty($appActiveInterview->meeting_link) || str_contains(strtolower($appActiveInterview->location ?? ''), 'online');
+                    @endphp
+                    <div class="p-4 rounded-2xl bg-indigo-50/90 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex items-start gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+                                <svg class="w-5 h-5 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <div class="space-y-0.5">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-bold text-indigo-900 dark:text-indigo-200">
+                                        Jadwal Wawancara ({{ $appActiveInterview->status }})
+                                    </span>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $isOnlineInt ? 'bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300' : 'bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300' }}">
+                                        {{ $isOnlineInt ? 'Online Video' : 'Tatap Muka' }}
+                                    </span>
+                                </div>
+                                <p class="text-xs font-semibold text-gray-800 dark:text-gray-200">
+                                    {{ $intDate->translatedFormat('l, d F Y • H:i') }} WIB
+                                </p>
+                                <p class="text-[11px] text-gray-500 dark:text-gray-400">
+                                    {{ $isOnlineInt ? 'Tautan meeting telah tersedia' : 'Lokasi: ' . $appActiveInterview->location }}
+                                </p>
+                            </div>
+                        </div>
+
+                        @if ($isOnlineInt && $appActiveInterview->meeting_link)
+                            <a href="{{ $appActiveInterview->meeting_link }}" target="_blank" class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-sm transition shrink-0">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                <span>Buka Link Meeting</span>
+                            </a>
+                        @endif
+                    </div>
+                @endif
+
                 <!-- Bottom Row: Notes & Detail Button -->
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1 border-t border-gray-100 dark:border-gray-700/60">
                     <div class="min-w-0 flex-1">
@@ -508,28 +651,41 @@
                                     <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
-                                    <span>Jadwal Wawancara</span>
+                                    <span>Jadwal & Agenda Wawancara</span>
                                 </h4>
-                                <div class="space-y-2">
+                                <div class="space-y-3">
                                     @foreach ($selectedApplication->interviewSchedules as $interview)
-                                        <div class="p-4 bg-emerald-50/50 dark:bg-emerald-950/30 rounded-xl border border-emerald-200/80 dark:border-emerald-900/50 space-y-2">
+                                        @php
+                                            $isModalOnline = !empty($interview->meeting_link) || str_contains(strtolower($interview->location ?? ''), 'online');
+                                            $isModalActive = in_array($interview->status, ['Scheduled', 'Rescheduled']);
+                                        @endphp
+                                        <div class="p-4 rounded-2xl border {{ $isModalActive ? 'bg-indigo-50/70 dark:bg-indigo-950/40 border-indigo-200 dark:border-indigo-800 ring-2 ring-indigo-500/10' : 'bg-gray-50 dark:bg-gray-900/40 border-gray-100 dark:border-gray-800' }} space-y-2.5">
                                             <div class="flex items-center justify-between">
-                                                <span class="text-xs font-bold text-emerald-800 dark:text-emerald-300">
-                                                    Waktu: {{ \Carbon\Carbon::parse($interview->interview_date)->translatedFormat('l, d F Y - H:i') }} WIB
+                                                <span class="text-xs font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
+                                                    <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    {{ \Carbon\Carbon::parse($interview->interview_date)->translatedFormat('l, d F Y • H:i') }} WIB
                                                 </span>
-                                                <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300">
+                                                <span class="px-2.5 py-0.5 text-[10px] font-extrabold rounded-full {{ $interview->status === 'Completed' ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300' : 'bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300' }}">
                                                     {{ $interview->status }}
                                                 </span>
                                             </div>
                                             <div class="text-xs text-gray-700 dark:text-gray-300 space-y-1">
-                                                <p><strong>Lokasi:</strong> {{ $interview->location }}</p>
+                                                <p><strong>Metode & Lokasi:</strong> {{ $isModalOnline ? 'Online Video Meeting' : $interview->location }}</p>
+                                                <p><strong>Pewawancara:</strong> {{ $interview->user->name ?? 'Tim HR / Rekruter' }}</p>
+                                                @if ($interview->notes)
+                                                    <p class="text-gray-600 dark:text-gray-400"><strong>Catatan:</strong> {{ $interview->notes }}</p>
+                                                @endif
                                                 @if ($interview->meeting_link)
-                                                    <p>
-                                                        <strong>Link Meeting:</strong>
-                                                        <a href="{{ $interview->meeting_link }}" target="_blank" class="text-indigo-600 dark:text-indigo-400 underline font-semibold break-all">
-                                                            {{ $interview->meeting_link }}
+                                                    <div class="pt-1.5">
+                                                        <a href="{{ $interview->meeting_link }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-xs transition">
+                                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                                            </svg>
+                                                            <span>Buka Tautan Video Meeting</span>
                                                         </a>
-                                                    </p>
+                                                    </div>
                                                 @endif
                                             </div>
                                         </div>

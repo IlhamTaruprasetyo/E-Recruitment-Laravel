@@ -46,7 +46,7 @@
                 </p>
 
                 <!-- Search Bar Form (Clean Segmented Solid Light Pill Bar) -->
-                <div class="w-full max-w-5xl mt-10 p-2 sm:p-2.5 rounded-2xl lg:rounded-full bg-[#EEEEEE] text-gray-800 shadow-2xl shadow-black/80 border border-white/40"
+                <div class="w-full max-w-5xl mt-10 p-2 sm:p-2.5 rounded-2xl lg:rounded-full bg-[#EEEEEE] text-gray-800 shadow-2xl shadow-black/80 border border-white/40 relative z-30"
                     style="background-color: #EEEEEE !important;">
                     <form action="{{ route('jobs.index') }}" method="GET"
                         class="flex flex-col lg:flex-row items-center gap-2 lg:gap-0 divide-y lg:divide-y-0 lg:divide-x divide-gray-300">
@@ -65,7 +65,7 @@
                         </div>
 
                         <!-- Dropdown Semua Perusahaan -->
-                        <div class="w-full lg:w-56 relative" x-data="{
+                        <div class="w-full lg:w-56 relative" :class="open ? 'z-50' : 'z-10'" x-data="{
                             open: false,
                             search: '',
                             selected: '{{ request('company_id', '') }}',
@@ -191,7 +191,7 @@
                         </div>
 
                         <!-- Dropdown Semua Departemen / Fungsi -->
-                        <div class="w-full lg:w-56 relative" x-data="{
+                        <div class="w-full lg:w-56 relative" :class="open ? 'z-50' : 'z-10'" x-data="{
                             open: false,
                             search: '',
                             selected: '{{ request('department_id', '') }}',
@@ -318,7 +318,7 @@
                         </div>
 
                         <!-- Dropdown Semua Jenjang (Employment Type) -->
-                        <div class="w-full lg:w-48 relative" x-data="{
+                        <div class="w-full lg:w-48 relative" :class="open ? 'z-50' : 'z-10'" x-data="{
                             open: false,
                             search: '',
                             selected: '{{ request('employment_type', '') }}',
@@ -477,22 +477,26 @@
                 <div
                     class="mt-14 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 w-full max-w-4xl border-t border-[#93F514]/20 pt-8">
                     <div
-                        class="p-4 rounded-2xl bg-gradient-to-b from-[#061506] to-[#040804] border border-[#93F514]/30 hover:border-[#93F514]/60 transition shadow-lg shadow-black/40">
+                        class="reveal-on-scroll p-4 rounded-2xl bg-gradient-to-b from-[#061506] to-[#040804] border border-[#93F514]/30 hover:border-[#93F514]/60 transition shadow-lg shadow-black/40"
+                        data-delay="100">
                         <div class="text-2xl sm:text-3xl font-black text-[#EEEEEE]">{{ $totalJobsCount ?? 0 }}+</div>
                         <div class="text-xs text-[#93F514] font-semibold mt-1">Lowongan Aktif</div>
                     </div>
                     <div
-                        class="p-4 rounded-2xl bg-gradient-to-b from-[#061506] to-[#040804] border border-[#93F514]/30 hover:border-[#93F514]/60 transition shadow-lg shadow-black/40">
+                        class="reveal-on-scroll p-4 rounded-2xl bg-gradient-to-b from-[#061506] to-[#040804] border border-[#93F514]/30 hover:border-[#93F514]/60 transition shadow-lg shadow-black/40"
+                        data-delay="200">
                         <div class="text-2xl sm:text-3xl font-black text-[#EEEEEE]">{{ $companiesCount ?? 0 }}+</div>
                         <div class="text-xs text-[#93F514] font-semibold mt-1">Perusahaan Mitra</div>
                     </div>
                     <div
-                        class="p-4 rounded-2xl bg-gradient-to-b from-[#061506] to-[#040804] border border-[#93F514]/30 hover:border-[#93F514]/60 transition shadow-lg shadow-black/40">
+                        class="reveal-on-scroll p-4 rounded-2xl bg-gradient-to-b from-[#061506] to-[#040804] border border-[#93F514]/30 hover:border-[#93F514]/60 transition shadow-lg shadow-black/40"
+                        data-delay="300">
                         <div class="text-2xl sm:text-3xl font-black text-[#EEEEEE]">{{ $departmentsCount ?? 0 }}+</div>
                         <div class="text-xs text-[#93F514] font-semibold mt-1">Bidang / Departemen</div>
                     </div>
                     <div
-                        class="p-4 rounded-2xl bg-gradient-to-b from-[#061506] to-[#040804] border border-[#93F514]/30 hover:border-[#93F514]/60 transition shadow-lg shadow-black/40">
+                        class="reveal-on-scroll p-4 rounded-2xl bg-gradient-to-b from-[#061506] to-[#040804] border border-[#93F514]/30 hover:border-[#93F514]/60 transition shadow-lg shadow-black/40"
+                        data-delay="400">
                         <div class="text-2xl sm:text-3xl font-black text-[#EEEEEE]">{{ $totalQuotaCount ?? 0 }}+</div>
                         <div class="text-xs text-[#93F514] font-semibold mt-1">Total Kuota Formasi</div>
                     </div>
@@ -502,7 +506,7 @@
         </section>
 
         <!-- ==================== SHOWCASE / ABOUT COMPANY CAROUSEL SECTION ==================== -->
-        <section class="relative py-16 sm:py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden"
+        <section class="reveal-on-scroll relative py-16 sm:py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden"
             x-data="{
                 currentSlide: 0,
                 companyName: '{{ isset($mainCompany) ? $mainCompany->name : 'Mitra Karya Analitika' }}',
@@ -540,7 +544,7 @@
                 ],
                 autoplayTimer: null,
                 progressTimer: null,
-                duration: 7000,
+                duration: 6000,
                 progress: 0,
                 isPaused: false,
                 init() {
@@ -787,7 +791,7 @@
 
         <!-- ==================== ALUR PENDAFTARAN DINAMIS ==================== -->
         <section id="alur-pendaftaran"
-            class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative border-t border-[#93F514]/20"
+            class="reveal-on-scroll py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative border-t border-[#93F514]/20"
             x-data="{ activeStep: 1 }">
             <div class="text-center max-w-3xl mx-auto mb-14">
                 {{-- <div class="inline-flex items-center gap-2 text-[#93F514] text-xs font-bold uppercase tracking-widest mb-3">
@@ -1058,7 +1062,7 @@
 
         <!-- ==================== KATEGORI DEPARTEMEN ==================== -->
         <section id="kategori"
-            class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative border-t border-[#93F514]/20">
+            class="reveal-on-scroll py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative border-t border-[#93F514]/20">
             <div class="mb-8">
                 {{-- <div class="inline-flex items-center gap-2 text-[#93F514] text-xs font-bold uppercase tracking-widest mb-2">
                 <span class="w-2 h-2 rounded-full bg-[#93F514]"></span> Bidang Karir
@@ -1069,7 +1073,8 @@
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                 @forelse($departments as $dept)
                     <a href="{{ route('jobs.index', ['department_id' => $dept->id]) }}"
-                        class="group p-5 rounded-2xl bg-gradient-to-b from-[#061506] to-[#040804] border border-[#93F514]/30 hover:border-[#93F514] hover:shadow-xl hover:shadow-[#93F514]/20 transition-all duration-300 flex flex-col justify-between">
+                        class="reveal-on-scroll group p-5 rounded-2xl bg-gradient-to-b from-[#061506] to-[#040804] border border-[#93F514]/30 hover:border-[#93F514] hover:shadow-xl hover:shadow-[#93F514]/20 transition-all duration-300 flex flex-col justify-between"
+                        data-delay="{{ ($loop->index % 4) * 100 }}">
                         <div
                             class="w-10 h-10 rounded-xl bg-[#93F514]/15 border border-[#93F514]/40 flex items-center justify-center text-[#93F514] group-hover:bg-[#93F514] group-hover:text-black transition-all">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1091,7 +1096,7 @@
         </section>
 
         <!-- ==================== CALL TO ACTION BANNER ==================== -->
-        <section class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <section class="reveal-on-scroll reveal-scale py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
             <div
                 class="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#041a04] via-[#062906] to-[#031203] border border-[#93F514]/50 p-8 sm:p-12 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-8 shadow-2xl shadow-[#93F514]/20">
                 <div class="max-w-xl z-10">

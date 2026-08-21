@@ -12,6 +12,7 @@ use App\Http\Controllers\TestController;
 use App\Http\Controllers\TestEvaluationController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\JobApplicationController;
+use App\Http\Controllers\InterviewScheduleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\CvController;
@@ -56,6 +57,13 @@ Route::middleware(['auth', 'verified', RoleMiddleware::class . ':recruiter'])
         Route::view('candidates', 'livewire.admin.candidates.index')->name('candidate');
         Route::view('test-evaluations', 'livewire.admin.test-evaluation.index')->name('test_evaluation');
         Route::put('test-evaluations/{id}/grade', [TestEvaluationController::class, 'updateGrade'])->name('test_evaluation.grade');
+        
+        // Interview Schedules
+        Route::view('interview-schedules', 'livewire.admin.interview-schedule.index')->name('interview_schedule');
+        Route::post('interview-schedules', [InterviewScheduleController::class, 'store'])->name('interview_schedule.store');
+        Route::put('interview-schedules/{id}', [InterviewScheduleController::class, 'update'])->name('interview_schedule.update');
+        Route::delete('interview-schedules/{id}', [InterviewScheduleController::class, 'destroy'])->name('interview_schedule.destroy');
+
         Route::view('profile', 'profile')->name('profile');
     });
 
@@ -71,6 +79,12 @@ Route::middleware(['auth', 'verified', RoleMiddleware::class . ':admin'])
         Route::view('applicants', 'livewire.admin.applicants.index')->name('application');
         Route::put('applicants/{id}', [JobApplicationController::class, 'update'])->name('application.update');
         Route::view('candidates', 'livewire.admin.candidates.index')->name('candidate');
+
+        // Interview Schedules
+        Route::view('interview-schedules', 'livewire.admin.interview-schedule.index')->name('interview_schedule');
+        Route::post('interview-schedules', [InterviewScheduleController::class, 'store'])->name('interview_schedule.store');
+        Route::put('interview-schedules/{id}', [InterviewScheduleController::class, 'update'])->name('interview_schedule.update');
+        Route::delete('interview-schedules/{id}', [InterviewScheduleController::class, 'destroy'])->name('interview_schedule.destroy');
 
         // Admin-Only Routes
         Route::middleware([RoleMiddleware::class . ':admin'])->group(function () {

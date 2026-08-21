@@ -111,7 +111,7 @@
 
             <!-- Job Header Card -->
             <div
-                class="rounded-3xl bg-gradient-to-b from-[#061506] to-[#040804] border border-[#93F514]/30 p-6 sm:p-8 shadow-2xl shadow-[#93F514]/15">
+                class="reveal-on-scroll rounded-3xl bg-gradient-to-b from-[#061506] to-[#040804] border border-[#93F514]/30 p-6 sm:p-8 shadow-2xl shadow-[#93F514]/15">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                     <div class="flex items-start gap-4">
                         @if ($job->company?->logo_url)
@@ -179,14 +179,14 @@
                                     <span>Sudah Dilamar</span>
                                 </div>
                                 <a href="{{ route('profile', ['tab' => 'riwayat']) }}" 
-                                   class="px-4 py-3 rounded-xl bg-[#051405] hover:bg-[#93F514]/20 border border-[#93F514]/30 text-gray-300 hover:text-[#93F514] text-xs font-semibold transition">
-                                    Pantau Status
+                                   class="px-4 py-3 rounded-xl bg-[#051405] hover:bg-[#93F514] border border-[#93F514]/30 text-white hover:text-black text-xs font-semibold shadow-md transition">
+                                    <span>Pantau Status</span>
                                 </a>
                             </div>
                         @else
                             <button type="button" 
                                     @click="handleApplyClick()"
-                                    class="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-[#93F514] to-[#5FE6B6] hover:brightness-110 text-black font-extrabold text-sm shadow-xl shadow-[#93F514]/30 text-center transition cursor-pointer flex items-center justify-center gap-2">
+                                    class="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#93F514] hover:bg-[#82dc0a] text-black font-extrabold text-sm shadow-lg shadow-[#93F514]/25 text-center transition cursor-pointer flex items-center justify-center gap-2">
                                 <svg class="w-4 h-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
                                 </svg>
@@ -195,7 +195,7 @@
                         @endif
                     @else
                         <a href="{{ route('login') }}"
-                            class="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-[#93F514] to-[#5FE6B6] hover:brightness-110 text-black font-extrabold text-sm shadow-xl shadow-[#93F514]/30 text-center transition flex items-center justify-center gap-2">
+                            class="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#93F514] hover:bg-[#82dc0a] text-black font-extrabold text-sm shadow-lg shadow-[#93F514]/25 text-center transition flex items-center justify-center gap-2">
                             <span>Masuk & Lamar</span>
                         </a>
                     @endauth
@@ -234,7 +234,7 @@
                 </div>
 
                 <!-- Job Description Content -->
-                <div class="rounded-3xl bg-[#050e05] border border-[#93F514]/25 p-6 sm:p-8 space-y-6">
+                <div class="reveal-on-scroll rounded-3xl bg-[#050e05] border border-[#93F514]/25 p-6 sm:p-8 space-y-6" data-delay="100">
                     @php
                         $rawDesc = $job->description ?? '';
                         $isHtml =
@@ -328,7 +328,7 @@
             </div>
 
             <!-- Sidebar / Company Info & Related Jobs (4 cols) -->
-            <div class="lg:col-span-4 space-y-6">
+            <div class="reveal-on-scroll reveal-slide-right lg:col-span-4 space-y-6" data-delay="150">
 
                 <!-- Company Card -->
                 <div class="rounded-3xl bg-[#050e05] border border-[#93F514]/25 p-6 space-y-4">
@@ -452,7 +452,7 @@
                      x-transition:leave="ease-in duration-200" 
                      x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" 
                      x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
-                     class="inline-block align-bottom bg-[#061506] rounded-3xl text-left overflow-hidden shadow-2xl border border-[#93F514]/40 transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+                     class="confirm-modal-card inline-block align-bottom bg-[#061506] rounded-3xl text-left overflow-hidden shadow-2xl border border-[#93F514]/40 transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
                     
                     <div class="p-6 sm:p-8 space-y-6">
                         <!-- Modal Header -->
@@ -477,28 +477,28 @@
                             </button>
                         </div>
 
-                        <!-- Job & Applicant Summary Box -->
-                        <div class="p-4 rounded-2xl bg-[#040a04] border border-[#93F514]/20 space-y-3 text-xs">
+                        <!-- Job & Applicant Summary Box (Putih Bersih di Light Mode) -->
+                        <div class="confirm-summary-box p-4 rounded-2xl bg-[#040a04] border border-[#93F514]/20 space-y-3 text-xs shadow-xs">
                             <div class="flex items-center justify-between pb-2 border-b border-[#93F514]/15">
                                 <span class="text-gray-400">Posisi yang Dilamar</span>
-                                <span class="font-bold text-[#EEEEEE]">{{ $job->title }}</span>
+                                <span class="job-title-val font-bold text-[#EEEEEE]">{{ $job->title }}</span>
                             </div>
                             <div class="flex items-center justify-between pb-2 border-b border-[#93F514]/15">
                                 <span class="text-gray-400">Perusahaan</span>
-                                <span class="font-semibold text-[#93F514]">{{ $job->company?->name ?? 'Perusahaan Mitra' }}</span>
+                                <span class="company-val font-semibold text-[#93F514]">{{ $job->company?->name ?? 'Perusahaan Mitra' }}</span>
                             </div>
                             <div class="flex items-center justify-between pb-2 border-b border-[#93F514]/15">
                                 <span class="text-gray-400">Penempatan & Tipe</span>
-                                <span class="text-gray-300">{{ $job->location ?? 'Indonesia' }} ({{ $job->employment_type }})</span>
+                                <span class="placement-val text-gray-300">{{ $job->location ?? 'Indonesia' }} ({{ $job->employment_type }})</span>
                             </div>
                             <div class="flex items-center justify-between">
                                 <span class="text-gray-400">Nama Pelamar</span>
-                                <span class="font-bold text-gray-200">{{ auth()->user()?->name ?? 'Pelamar' }}</span>
+                                <span class="applicant-val font-bold text-gray-200">{{ auth()->user()?->name ?? 'Pelamar' }}</span>
                             </div>
                         </div>
 
                         <!-- Statement Alert -->
-                        <div class="p-3.5 rounded-xl bg-[#93F514]/10 border border-[#93F514]/30 text-gray-300 text-xs flex items-start gap-2.5">
+                        <div class="confirm-statement-box p-3.5 rounded-xl bg-[#93F514]/10 border border-[#93F514]/30 text-gray-300 text-xs flex items-start gap-2.5">
                             <svg class="w-4 h-4 text-[#93F514] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
@@ -512,12 +512,12 @@
                             @csrf
                             <button type="button" 
                                     @click="showConfirmModal = false" 
-                                    class="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-gray-700 text-gray-300 hover:text-white font-semibold text-xs transition">
+                                    class="confirm-cancel-btn px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-gray-700 text-gray-300 hover:text-white font-semibold text-xs transition">
                                 Batal
                             </button>
                             <button type="submit" 
                                     :disabled="isSubmitting"
-                                    class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#93F514] to-[#5FE6B6] hover:brightness-110 text-black font-extrabold text-xs shadow-lg shadow-[#93F514]/30 transition flex items-center gap-2 cursor-pointer disabled:opacity-50">
+                                    class="confirm-submit-btn px-6 py-2.5 rounded-xl bg-[#93F514] hover:bg-[#82dc0a] text-black font-extrabold text-xs shadow-lg shadow-[#93F514]/30 transition flex items-center gap-2 cursor-pointer disabled:opacity-50">
                                 <svg x-show="isSubmitting" class="animate-spin w-4 h-4 text-black" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -559,7 +559,7 @@
                      x-transition:leave="ease-in duration-200" 
                      x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" 
                      x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
-                     class="inline-block align-bottom bg-[#0a0707] rounded-3xl text-left overflow-hidden shadow-2xl border border-amber-500/40 transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+                     class="incomplete-modal-card inline-block align-bottom bg-[#0a0707] rounded-3xl text-left overflow-hidden shadow-2xl border border-amber-500/40 transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
                     
                     <div class="p-6 sm:p-8 space-y-6">
                         <!-- Modal Header -->
@@ -590,7 +590,7 @@
                         </p>
 
                         <!-- Incomplete Section Pills List -->
-                        <div class="p-4 rounded-2xl bg-[#140c0c] border border-amber-500/20 space-y-2">
+                        <div class="incomplete-summary-box p-4 rounded-2xl bg-[#140c0c] border border-amber-500/20 space-y-2">
                             <span class="text-[11px] font-bold text-amber-400 uppercase tracking-wider block">Bagian yang Belum Dilengkapi:</span>
                             <div class="flex flex-wrap gap-2 pt-1">
                                 <template x-for="(section, idx) in missingSections" :key="idx">
@@ -608,7 +608,7 @@
                         <div class="flex flex-col sm:flex-row items-center justify-end gap-3 pt-2">
                             <button type="button" 
                                     @click="showIncompleteModal = false" 
-                                    class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-gray-700 text-gray-300 hover:text-white font-semibold text-xs transition">
+                                    class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-semibold text-xs transition">
                                 Tutup
                             </button>
                             <a href="{{ route('profile') }}" 

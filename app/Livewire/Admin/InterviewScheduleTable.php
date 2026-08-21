@@ -1,0 +1,232 @@
+<?php
+
+namespace App\Livewire\Admin;
+
+use Livewire\Component;
+use Livewire\WithPagination;
+use App\Models\InterviewSchedule;
+use App\Models\JobApplication;
+use App\Models\Job;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+
+class InterviewScheduleTable extends Component
+{
+    use WithPagination;
+
+    public $search = '';
+    public $statusFilter = '';
+    public $timeFilter = 'all'; // all, today, upcoming, past
+    public $typeFilter = 'all'; // all, online, offline
+    public $jobFilter = '';
+    public $interviewerFilter = '';
+
+    public $sortField = 'interview_date';
+    public $sortDirection = 'asc';
+
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingStatusFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingTimeFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingTypeFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingJobFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingInterviewerFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function resetFilters()
+    {
+        $this->search = '';
+        $this->statusFilter = '';
+        $this->timeFilter = 'all';
+        $this->typeFilter = 'all';
+        $this->jobFilter = '';
+        $this->interviewerFilter = '';
+        $this->sortField = 'interview_date';
+        $this->sortDirection = 'asc';
+        $this->resetPage();
+    }
+
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+        $this->resetPage();
+    }
+
+    public function render()
+    {
+        $now = Carbon::now();
+        $todayStart = Carbon::today()->startOfDay();
+        $todayEnd = Carbon::today()->endOfDay();
+
+        // Calculate Stats
+        $stats = [
+            'total'     => InterviewSchedule::count(),
+            'today'     => InterviewSchedule::whereBetween('interview_date', [$todayStart, $todayEnd])->count(),
+            'upcoming'  => InterviewSchedule::where('interview_date', '>', $now)->where('status', 'Scheduled')->count(),
+            'completed' => InterviewSchedule::where('status', 'Completed')->count(),
+            'accepted'  => InterviewSchedule::whereHas('jobApplication', function($q) {
+                $q->whereRaw('LOWER(status) = ?', ['accepted']);
+            })->count(),
+            'rejected'  => InterviewSchedule::whereHas('jobApplication', function($q) {
+                $q->whereRaw('LOWER(status) = ?', ['rejected']);
+            })->count(),
+            'online'    => InterviewSchedule::where(function ($q) {
+                $q->whereNotNull('meeting_link')
+                  ->where('meeting_link', '!=', '')
+                  ->orWhereRaw('LOWER(location) LIKE ?', ['%online%']);
+            })->count(),
+            'offline'   => InterviewSchedule::where(function ($q) {
+                $q->whereNull('meeting_link')
+                  ->orWhere('meeting_link', '=', '');
+            })->whereRaw('LOWER(location) NOT LIKE ?', ['%online%'])->count(),
+        ];
+
+        // Base Query
+        $query = InterviewSchedule::with([
+            'jobApplication.applicantProfile.user',
+            'jobApplication.job.company',
+            'jobApplication.job.department',
+            'user', // interviewer
+        ]);
+
+        // Search Filter
+        if (!empty($this->search)) {
+            $search = strtolower(trim($this->search));
+            $query->where(function ($q) use ($search) {
+                $q->whereRaw('LOWER(location) LIKE ?', ['%' . $search . '%'])
+                  ->orWhereRaw('LOWER(meeting_link) LIKE ?', ['%' . $search . '%'])
+                  ->orWhereRaw('LOWER(status) LIKE ?', ['%' . $search . '%'])
+                  ->orWhereHas('jobApplication', function ($jq) use ($search) {
+                      $jq->whereRaw('LOWER(status) LIKE ?', ['%' . $search . '%']);
+                  })
+                  ->orWhereHas('jobApplication.applicantProfile', function ($apq) use ($search) {
+                      $apq->whereRaw('LOWER(full_name) LIKE ?', ['%' . $search . '%'])
+                          ->orWhereRaw('LOWER(city) LIKE ?', ['%' . $search . '%'])
+                          ->orWhereHas('user', function ($uq) use ($search) {
+                              $uq->whereRaw('LOWER(email) LIKE ?', ['%' . $search . '%']);
+                          });
+                  })
+                  ->orWhereHas('jobApplication.job', function ($jq) use ($search) {
+                      $jq->whereRaw('LOWER(title) LIKE ?', ['%' . $search . '%'])
+                        ->orWhereHas('company', function ($cq) use ($search) {
+                            $cq->whereRaw('LOWER(name) LIKE ?', ['%' . $search . '%']);
+                        });
+                  })
+                  ->orWhereHas('user', function ($uq) use ($search) {
+                      $uq->whereRaw('LOWER(name) LIKE ?', ['%' . $search . '%'])
+                        ->orWhereRaw('LOWER(email) LIKE ?', ['%' . $search . '%']);
+                  });
+            });
+        }
+
+        // Status Filter (Support both schedule status and application decision status)
+        if (!empty($this->statusFilter)) {
+            if (in_array(strtolower($this->statusFilter), ['accepted', 'rejected'])) {
+                $query->whereHas('jobApplication', function ($q) {
+                    $q->whereRaw('LOWER(status) = ?', [strtolower($this->statusFilter)]);
+                });
+            } else {
+                $query->where('status', $this->statusFilter);
+            }
+        }
+
+        // Time Filter
+        if ($this->timeFilter === 'today') {
+            $query->whereBetween('interview_date', [$todayStart, $todayEnd]);
+        } elseif ($this->timeFilter === 'upcoming') {
+            $query->where('interview_date', '>=', $now);
+        } elseif ($this->timeFilter === 'past') {
+            $query->where('interview_date', '<', $now);
+        }
+
+        // Type Filter (Online / Offline)
+        if ($this->typeFilter === 'online') {
+            $query->where(function ($q) {
+                $q->whereNotNull('meeting_link')
+                  ->where('meeting_link', '!=', '')
+                  ->orWhereRaw('LOWER(location) LIKE ?', ['%online%']);
+            });
+        } elseif ($this->typeFilter === 'offline') {
+            $query->where(function ($q) {
+                $q->where(function ($sub) {
+                    $sub->whereNull('meeting_link')
+                        ->orWhere('meeting_link', '=', '');
+                })->whereRaw('LOWER(location) NOT LIKE ?', ['%online%']);
+            });
+        }
+
+        // Job Filter
+        if (!empty($this->jobFilter)) {
+            $query->whereHas('jobApplication', function ($jaq) {
+                $jaq->where('job_id', $this->jobFilter);
+            });
+        }
+
+        // Interviewer Filter
+        if (!empty($this->interviewerFilter)) {
+            $query->where('users_id', $this->interviewerFilter);
+        }
+
+        // Sorting
+        $schedules = $query->orderBy($this->sortField, $this->sortDirection)->paginate(10);
+
+        // Data for Modal Form Selection (Hanya status Interview & Shortlisted)
+        $activeApplications = JobApplication::with(['applicantProfile.user', 'job.company'])
+            ->whereIn(DB::raw('LOWER(status)'), ['interview', 'shortlisted'])
+            ->orderBy('id', 'desc')
+            ->get()
+            ->map(function ($app) {
+                return [
+                    'id'        => $app->id,
+                    'name'      => $app->applicantProfile->full_name ?? ('Pelamar #' . $app->id),
+                    'email'     => $app->applicantProfile->user->email ?? '',
+                    'job_title' => $app->job->title ?? 'Posisi',
+                    'company'   => $app->job->company->name ?? '',
+                    'status'    => $app->status,
+                ];
+            });
+
+        $interviewers = User::whereHas('role', function ($rq) {
+            $rq->whereIn(DB::raw('LOWER(name)'), ['admin', 'recruiter', 'superadmin']);
+        })->orWhereIn('role_id', [1, 2])
+        ->orderBy('name', 'asc')
+        ->get();
+
+        $jobs = Job::with('company')->orderBy('title', 'asc')->get();
+
+        return view('livewire.admin.interview-schedule.table', [
+            'schedules'          => $schedules,
+            'stats'              => $stats,
+            'activeApplications' => $activeApplications,
+            'interviewers'       => $interviewers,
+            'jobs'               => $jobs,
+        ]);
+    }
+}

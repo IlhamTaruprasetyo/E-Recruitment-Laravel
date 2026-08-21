@@ -43,7 +43,8 @@
             this.createQuill.on('text-change', () => {
                 let html = this.createQuill.root.innerHTML;
                 let isEmpty = this.createQuill.getText().trim().length === 0;
-                document.getElementById('create_final_description').value = isEmpty ? '' : html;
+                let input = document.getElementById('create_final_description');
+                if (input) input.value = isEmpty ? '' : html;
             });
         });
     },
@@ -69,6 +70,8 @@
                     let html = this.editQuill.root.innerHTML;
                     let isEmpty = this.editQuill.getText().trim().length === 0;
                     this.editData.description = isEmpty ? '' : html;
+                    let input = document.getElementById('edit_final_description');
+                    if (input) input.value = isEmpty ? '' : html;
                 });
             }
             
@@ -91,6 +94,13 @@
     openCreateModal() {
         this.showCreateModal = true;
         this.initQuillCreate();
+        this.$nextTick(() => {
+            if (this.createQuill) {
+                this.createQuill.root.innerHTML = '';
+            }
+            let input = document.getElementById('create_final_description');
+            if (input) input.value = '';
+        });
     },
     openEditModal(job) {
         this.editData = {
@@ -103,7 +113,7 @@
             location: job.location || '',
             salary_min: job.salary_min || '',
             salary_max: job.salary_max || '',
-            quota: job.quota || '1',
+            quota: job.quota !== undefined && job.quota !== null && job.quota !== '' ? Number(job.quota) : 1,
             deadline: job.deadline ? job.deadline.split('T')[0] : '',
             status: job.status || 'Open'
         };
@@ -124,24 +134,12 @@
     <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 
     <style>
+        /* Quill Snow Editor Base (Light Mode) */
         .ql-toolbar.ql-snow {
             border-top-left-radius: 0.75rem;
             border-top-right-radius: 0.75rem;
             border-color: #e2e8f0;
             background-color: #f8fafc;
-        }
-        .dark .ql-toolbar.ql-snow {
-            border-color: #334155;
-            background-color: #1e293b;
-        }
-        .dark .ql-snow .ql-stroke {
-            stroke: #cbd5e1;
-        }
-        .dark .ql-snow .ql-fill {
-            fill: #cbd5e1;
-        }
-        .dark .ql-snow .ql-picker {
-            color: #cbd5e1;
         }
         .ql-container.ql-snow {
             border-bottom-left-radius: 0.75rem;
@@ -151,17 +149,18 @@
             font-size: 0.85rem;
             min-height: 180px;
             background-color: #ffffff;
-        }
-        .dark .ql-container.ql-snow {
-            border-color: #334155;
-            background-color: #0f172a;
-            color: #e2e8f0;
+            color: #1e293b;
         }
         .ql-editor {
             min-height: 180px;
             max-height: 280px;
             overflow-y: auto;
             line-height: 1.6;
+            color: #1e293b;
+        }
+        .ql-editor.ql-blank::before {
+            color: #94a3b8;
+            font-style: italic;
         }
         .ql-editor ul {
             list-style-type: disc;
@@ -175,6 +174,132 @@
             font-weight: bold;
             margin-top: 0.75rem;
             margin-bottom: 0.25rem;
+        }
+
+        /* Dark Mode Support (via media query, .dark class, and parent dark classes) */
+        @media (prefers-color-scheme: dark) {
+            .ql-toolbar.ql-snow {
+                border-color: #334155 !important;
+                background-color: #1e293b !important;
+            }
+            .ql-snow .ql-stroke {
+                stroke: #cbd5e1 !important;
+            }
+            .ql-snow .ql-fill {
+                fill: #cbd5e1 !important;
+            }
+            .ql-snow .ql-picker {
+                color: #cbd5e1 !important;
+            }
+            .ql-snow .ql-picker-options {
+                background-color: #1e293b !important;
+                border-color: #334155 !important;
+            }
+            .ql-snow .ql-picker-item {
+                color: #cbd5e1 !important;
+            }
+            .ql-snow .ql-picker-label:hover,
+            .ql-snow .ql-picker-label.ql-active,
+            .ql-snow .ql-picker-item:hover,
+            .ql-snow .ql-picker-item.ql-selected {
+                color: #93F514 !important;
+            }
+            .ql-snow button:hover .ql-stroke,
+            .ql-snow button.ql-active .ql-stroke {
+                stroke: #93F514 !important;
+            }
+            .ql-snow button:hover .ql-fill,
+            .ql-snow button.ql-active .ql-fill {
+                fill: #93F514 !important;
+            }
+            .ql-container.ql-snow {
+                border-color: #334155 !important;
+                background-color: #0f172a !important;
+                color: #f1f5f9 !important;
+            }
+            .ql-editor {
+                background-color: #0f172a !important;
+                color: #f1f5f9 !important;
+            }
+            .ql-editor p,
+            .ql-editor span,
+            .ql-editor li,
+            .ql-editor strong,
+            .ql-editor em,
+            .ql-editor h1,
+            .ql-editor h2,
+            .ql-editor h3 {
+                color: #f1f5f9 !important;
+            }
+            .ql-editor.ql-blank::before {
+                color: #64748b !important;
+            }
+        }
+
+        .dark .ql-toolbar.ql-snow,
+        .dark .quill-dark-wrapper .ql-toolbar.ql-snow {
+            border-color: #334155 !important;
+            background-color: #1e293b !important;
+        }
+        .dark .ql-snow .ql-stroke,
+        .dark .quill-dark-wrapper .ql-snow .ql-stroke {
+            stroke: #cbd5e1 !important;
+        }
+        .dark .ql-snow .ql-fill,
+        .dark .quill-dark-wrapper .ql-snow .ql-fill {
+            fill: #cbd5e1 !important;
+        }
+        .dark .ql-snow .ql-picker,
+        .dark .quill-dark-wrapper .ql-snow .ql-picker {
+            color: #cbd5e1 !important;
+        }
+        .dark .ql-snow .ql-picker-options,
+        .dark .quill-dark-wrapper .ql-snow .ql-picker-options {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+        }
+        .dark .ql-snow .ql-picker-item,
+        .dark .quill-dark-wrapper .ql-snow .ql-picker-item {
+            color: #cbd5e1 !important;
+        }
+        .dark .ql-snow .ql-picker-label:hover,
+        .dark .ql-snow .ql-picker-label.ql-active,
+        .dark .ql-snow .ql-picker-item:hover,
+        .dark .ql-snow .ql-picker-item.ql-selected {
+            color: #93F514 !important;
+        }
+        .dark .ql-snow button:hover .ql-stroke,
+        .dark .ql-snow button.ql-active .ql-stroke {
+            stroke: #93F514 !important;
+        }
+        .dark .ql-snow button:hover .ql-fill,
+        .dark .ql-snow button.ql-active .ql-fill {
+            fill: #93F514 !important;
+        }
+        .dark .ql-container.ql-snow,
+        .dark .quill-dark-wrapper .ql-container.ql-snow {
+            border-color: #334155 !important;
+            background-color: #0f172a !important;
+            color: #f1f5f9 !important;
+        }
+        .dark .ql-editor,
+        .dark .quill-dark-wrapper .ql-editor {
+            background-color: #0f172a !important;
+            color: #f1f5f9 !important;
+        }
+        .dark .ql-editor p,
+        .dark .ql-editor span,
+        .dark .ql-editor li,
+        .dark .ql-editor strong,
+        .dark .ql-editor em,
+        .dark .ql-editor h1,
+        .dark .ql-editor h2,
+        .dark .ql-editor h3 {
+            color: #f1f5f9 !important;
+        }
+        .dark .ql-editor.ql-blank::before,
+        .dark .quill-dark-wrapper .ql-editor.ql-blank::before {
+            color: #64748b !important;
         }
     </style>
     <!-- Session Notifications -->
@@ -404,7 +529,7 @@
     </div>
 
     <!-- Create Job Modal -->
-    <div x-show="showCreateModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div wire:ignore.self x-show="showCreateModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             <div x-show="showCreateModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" @click="showCreateModal = false" class="fixed inset-0 transition-opacity bg-gray-900/60 dark:bg-black/70 backdrop-blur-sm"></div>
 
@@ -424,7 +549,7 @@
                         </button>
                     </div>
 
-                    <form action="{{ route('admin.job.store') }}" method="POST" class="mt-4 space-y-4">
+                    <form action="{{ route('admin.job.store') }}" method="POST" @submit="if(createQuill) { let html = createQuill.root.innerHTML; let isEmpty = createQuill.getText().trim().length === 0; document.getElementById('create_final_description').value = isEmpty ? '' : html; }" class="mt-4 space-y-4">
                         @csrf
 
                         <div class="grid grid-cols-2 gap-3">
@@ -540,7 +665,7 @@
                         </div>
 
                         <!-- Quill Rich Text Visual Editor for Description & Requirements -->
-                        <input type="hidden" name="description" id="create_final_description" :value="editData.description">
+                        <input type="hidden" name="description" id="create_final_description">
 
                         <div class="space-y-1.5 pt-1">
                             <div class="flex items-center justify-between">
@@ -552,7 +677,7 @@
                                 </span>
                             </div>
                             
-                            <div class="rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700">
+                            <div class="rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700 quill-dark-wrapper">
                                 <div id="create_quill_editor"></div>
                             </div>
                         </div>
@@ -574,7 +699,7 @@
     </div>
 
     <!-- Edit Job Modal -->
-    <div x-show="showEditModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title-edit" role="dialog" aria-modal="true">
+    <div wire:ignore.self x-show="showEditModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title-edit" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             <div x-show="showEditModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" @click="showEditModal = false" class="fixed inset-0 transition-opacity bg-gray-900/60 dark:bg-black/70 backdrop-blur-sm"></div>
 
@@ -594,7 +719,7 @@
                         </button>
                     </div>
 
-                    <form :action="'/admin/jobs/' + editData.id" method="POST" class="mt-4 space-y-4">
+                    <form :action="'/admin/jobs/' + editData.id" method="POST" @submit="if(editQuill) { let html = editQuill.root.innerHTML; let isEmpty = editQuill.getText().trim().length === 0; editData.description = isEmpty ? '' : html; document.getElementById('edit_final_description').value = isEmpty ? '' : html; }" class="mt-4 space-y-4">
                         @csrf
                         @method('PUT')
                         <input type="hidden" name="is_edit" value="1">
@@ -686,9 +811,9 @@
                             <!-- Quota -->
                             <div>
                                 <label for="edit_quota" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                    Kuota (Orang)
+                                    Kuota (Orang) <span class="text-rose-500">*</span>
                                 </label>
-                                <input type="number" name="quota" id="edit_quota" min="1" x-model="editData.quota" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                <input type="number" name="quota" id="edit_quota" min="1" x-model.number="editData.quota" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
                             </div>
 
                             <!-- Deadline -->
@@ -713,7 +838,7 @@
                         </div>
 
                         <!-- Quill Rich Text Visual Editor for Description & Requirements -->
-                        <input type="hidden" name="description" x-model="editData.description">
+                        <input type="hidden" name="description" id="edit_final_description" x-model="editData.description">
 
                         <div class="space-y-1.5 pt-1">
                             <div class="flex items-center justify-between">
@@ -725,7 +850,7 @@
                                 </span>
                             </div>
                             
-                            <div class="rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700">
+                            <div class="rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700 quill-dark-wrapper">
                                 <div id="edit_quill_editor"></div>
                             </div>
                         </div>
@@ -747,7 +872,7 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div x-show="showDeleteModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title-delete" role="dialog" aria-modal="true">
+    <div wire:ignore.self x-show="showDeleteModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title-delete" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             <div x-show="showDeleteModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" @click="showDeleteModal = false" class="fixed inset-0 transition-opacity bg-gray-900/60 dark:bg-black/70 backdrop-blur-sm"></div>
 

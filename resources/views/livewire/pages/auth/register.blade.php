@@ -35,7 +35,7 @@ new #[Layout('layouts.guest')] class extends Component {
         event(new Registered($user));
 
         session()->flash('status', 'Registrasi berhasil! Silakan masuk menggunakan akun Anda.');
-        $this->redirect(route('login', absolute: false), navigate: true);
+        $this->redirect(route('login', absolute: false));
     }
 }; ?>
 
@@ -64,7 +64,7 @@ new #[Layout('layouts.guest')] class extends Component {
 
                 <!-- Top Area: Brand Logo & Heading -->
                 <div class="relative z-10">
-                    <a href="{{ url('/') }}" wire:navigate class="inline-flex items-center gap-3 group">
+                    <a href="{{ url('/') }}" class="inline-flex items-center gap-3 group">
                         <div class="p-2 rounded-xl bg-black/40 border border-[#93F514]/30 shadow-md group-hover:scale-105 transition-transform duration-200">
                             <img src="{{ asset('storage/logo/mikaaaa.png') }}" 
                                  alt="Logo MIKA" 
@@ -171,13 +171,12 @@ new #[Layout('layouts.guest')] class extends Component {
                             </span>
                             <span class="text-xs font-semibold text-white tracking-wide">Calon Karyawan MIKA</span>
                         </div> --}}
-
                     </div>
                 </div>
 
                 <!-- Bottom Back Link -->
                 <div class="relative z-10 pt-2">
-                    <a href="{{ url('/') }}" wire:navigate 
+                    <a href="{{ url('/') }}" 
                        class="inline-flex items-center gap-2 text-xs font-medium text-gray-300 hover:text-[#93F514] transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
@@ -196,9 +195,6 @@ new #[Layout('layouts.guest')] class extends Component {
                         <h1 class="heading-font text-2xl sm:text-3xl font-bold text-white tracking-tight">
                             Buat Akun Baru
                         </h1>
-                        {{-- <span class="text-xs font-medium px-3 py-1 rounded-full bg-[#93F514]/10 text-[#93F514] border border-[#93F514]/30">
-                            Daftar
-                        </span> --}}
                     </div>
                     <p class="text-sm text-gray-400 font-normal">
                         Lengkapi data di bawah ini untuk mendaftar di <span class="text-white font-medium">MIKA CAREER</span>.
@@ -254,7 +250,7 @@ new #[Layout('layouts.guest')] class extends Component {
                                    name="name" 
                                    required 
                                    autocomplete="name" 
-                                   placeholder="Nama sesuai KTP"
+                                   placeholder="Nama lengkap sesuai KTP"
                                    class="w-full pl-10 pr-4 py-2.5 bg-black/40 border border-white/15 focus:border-[#93F514] focus:ring-1 focus:ring-[#93F514] rounded-xl text-sm text-white placeholder-gray-500 transition outline-none" />
                         </div>
                         @if ($errors->has('name'))
@@ -293,8 +289,8 @@ new #[Layout('layouts.guest')] class extends Component {
                         @endif
                     </div>
 
-                    <!-- Password & Confirm Password Grid -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <!-- Password and Confirmation Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-3">
                         <!-- Password -->
                         <div x-data="{ showPassword: false }">
                             <label for="password" class="block text-xs font-semibold text-gray-300 mb-1">
@@ -369,9 +365,17 @@ new #[Layout('layouts.guest')] class extends Component {
                     <!-- Submit Button -->
                     <div class="pt-2">
                         <button type="submit" 
-                                class="w-full py-3 px-4 bg-[#93F514] hover:bg-[#82dc0e] active:scale-[0.99] text-black font-semibold text-sm rounded-xl shadow-lg shadow-[#93F514]/20 hover:shadow-[#93F514]/30 transition flex items-center justify-center gap-2 group cursor-pointer">
-                            <span>Daftar Sekarang</span>
-                            <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                wire:loading.attr="disabled"
+                                class="w-full py-3 px-4 bg-[#93F514] hover:bg-[#82dc0e] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed text-black font-semibold text-sm rounded-xl shadow-lg shadow-[#93F514]/20 hover:shadow-[#93F514]/30 transition flex items-center justify-center gap-2 group cursor-pointer">
+                            <span wire:loading.remove wire:target="register">Daftar Sekarang</span>
+                            <span wire:loading wire:target="register" class="inline-flex items-center gap-2">
+                                <svg class="animate-spin h-4 w-4 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                                </svg>
+                                <span>Mendaftarkan...</span>
+                            </span>
+                            <svg wire:loading.remove wire:target="register" class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                             </svg>
                         </button>
@@ -382,7 +386,7 @@ new #[Layout('layouts.guest')] class extends Component {
                 <div class="mt-6 pt-5 border-t border-white/10 text-center">
                     <p class="text-xs text-gray-400">
                         Sudah punya akun?
-                        <a href="{{ route('login') }}" wire:navigate 
+                        <a href="{{ route('login') }}" 
                            class="font-semibold text-[#93F514] hover:underline ml-1">
                             Masuk
                         </a>

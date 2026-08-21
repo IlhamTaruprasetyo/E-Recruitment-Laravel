@@ -7,6 +7,7 @@ use Livewire\WithPagination;
 use App\Models\TestAttempt;
 use App\Models\Job;
 use App\Models\Test;
+use Illuminate\Support\Facades\DB;
 
 class TestEvaluationTable extends Component
 {
@@ -16,6 +17,9 @@ class TestEvaluationTable extends Component
     public $jobId = '';
     public $testId = '';
     public $status = '';
+
+    public $sortField = 'id';
+    public $sortDirection = 'desc';
 
     public function updatingSearch()
     {
@@ -37,12 +41,25 @@ class TestEvaluationTable extends Component
         $this->resetPage();
     }
 
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+        $this->resetPage();
+    }
+
     public function resetFilters()
     {
         $this->search = '';
         $this->jobId = '';
         $this->testId = '';
         $this->status = '';
+        $this->sortField = 'id';
+        $this->sortDirection = 'desc';
         $this->resetPage();
     }
 
@@ -51,7 +68,7 @@ class TestEvaluationTable extends Component
         $jobs = Job::orderBy('title', 'asc')->get();
         $tests = Test::orderBy('title', 'asc')->get();
 
-        $attempts = TestAttempt::with([
+        $query = TestAttempt::with([
             'jobApplication.applicantProfile.user',
             'jobApplication.job',
             'test.category',
@@ -59,44 +76,103 @@ class TestEvaluationTable extends Component
             'answers.option',
             'answers.reviewer',
             'discTestResult.discProfile',
-        ])
-        ->when($this->search, function ($query) {
+        ]);
+
+        // Search Filter
+        if (!empty($this->search)) {
             $search = strtolower(trim($this->search));
             $query->where(function ($q) use ($search) {
                 $q->whereHas('jobApplication.applicantProfile', function ($p) use ($search) {
-                    $p->whereRaw('LOWER(full_name) LIKE ?', ['%' . $search . '%']);
+                    $p->whereRaw('LOWER(full_name) LIKE ?', ['%' . $search . '%'])
+                      ->orWhereRaw('LOWER(nik) LIKE ?', ['%' . $search . '%'])
+                      ->orWhereHas('user', function ($uq) use ($search) {
+                          $uq->whereRaw('LOWER(email) LIKE ?', ['%' . $search . '%']);
+                      });
                 })
                 ->orWhereHas('test', function ($t) use ($search) {
                     $t->whereRaw('LOWER(title) LIKE ?', ['%' . $search . '%']);
+                })
+                ->orWhereHas('jobApplication.job', function ($j) use ($search) {
+                    $j->whereRaw('LOWER(title) LIKE ?', ['%' . $search . '%']);
                 });
             });
-        })
-        ->when($this->jobId, function ($query) {
+        }
+
+        // Filter Lowongan
+        if (!empty($this->jobId)) {
             $query->whereHas('jobApplication', function ($j) {
                 $j->where('job_id', $this->jobId);
             });
-        })
-        ->when($this->testId, function ($query) {
+        }
+
+        // Filter Paket Ujian
+        if (!empty($this->testId)) {
             $query->where('test_id', $this->testId);
-        })
-        ->when($this->status, function ($query) {
+        }
+
+        // Filter Status Ujian / Hasil Evaluasi
+        if (!empty($this->status)) {
             if ($this->status === 'needs_grading') {
                 $query->whereHas('answers.question', function ($q) {
                     $q->where('question_type', 'essay');
                 })->whereHas('answers', function ($a) {
                     $a->whereNull('reviewed_by');
                 });
+            } elseif ($this->status === 'passed') {
+                $query->where('status', 'passed');
+            } elseif ($this->status === 'failed') {
+                // Gagal Tes / Ditolak (tanpa mencampurkan yang Shortlisted/Interview/Accepted)
+                $query->where(function ($q) {
+                    $q->where('status', 'failed')
+                      ->orWhereHas('jobApplication', function ($jq) {
+                          $jq->where('status', 'Rejected');
+                      });
+                })
+                ->whereDoesntHave('discTestResult')
+                ->where(function ($q) {
+                    $q->whereDoesntHave('jobApplication')
+                      ->orWhereHas('jobApplication', function ($jq) {
+                          $jq->whereNotIn(DB::raw('LOWER(status)'), ['shortlisted', 'interview', 'accepted']);
+                      });
+                });
+            } elseif ($this->status === 'disc') {
+                // Khusus Tes Kepribadian DISC
+                $query->where(function ($q) {
+                    $q->whereHas('discTestResult')
+                      ->orWhereHas('test', function ($t) {
+                          $t->whereRaw('LOWER(title) LIKE ?', ['%disc%'])
+                            ->orWhereRaw('LOWER(title) LIKE ?', ['%personality%']);
+                      });
+                });
+            } elseif ($this->status === 'in_progress') {
+                $query->where('status', 'in_progress');
             } else {
                 $query->where('status', $this->status);
             }
-        })
-        ->orderBy('id', 'desc')
-        ->paginate(10);
+        }
+
+        // Sorting
+        if ($this->sortField === 'applicant') {
+            $query->join('job_applications', 'test_attempts.application_id', '=', 'job_applications.id')
+                  ->join('applicant_profile', 'job_applications.profile_id', '=', 'applicant_profile.id')
+                  ->orderBy('applicant_profile.full_name', $this->sortDirection)
+                  ->select('test_attempts.*');
+        } elseif ($this->sortField === 'score') {
+            $query->orderBy('total_score', $this->sortDirection);
+        } elseif ($this->sortField === 'started_at') {
+            $query->orderBy('started_at', $this->sortDirection);
+        } elseif ($this->sortField === 'status') {
+            $query->orderBy('status', $this->sortDirection);
+        } else {
+            $query->orderBy('id', $this->sortDirection);
+        }
+
+        $attempts = $query->paginate(10);
 
         return view('livewire.admin.test-evaluation.table', [
             'attempts' => $attempts,
-            'jobs' => $jobs,
-            'tests' => $tests,
+            'jobs'     => $jobs,
+            'tests'    => $tests,
         ]);
     }
 }

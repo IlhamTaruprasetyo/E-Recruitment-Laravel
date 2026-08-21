@@ -400,7 +400,71 @@ class ApplicantOnlineTest extends Component
         session()->flash('message', 'Lampiran file berhasil dihapus.');
     }
 
-    public function finishTest()
+    /**
+     * Dapatkan daftar butir soal yang belum dijawab atau belum lengkap
+     */
+    public function getUnansweredQuestions(): array
+    {
+        $unanswered = [];
+        foreach ($this->questions as $index => $q) {
+            $qId = $q['id'];
+            $qType = $q['question_type'] ?? 'multiple_choice';
+            $qNum = $index + 1;
+
+            if ($qType === 'disc') {
+                $hasMost = !empty($this->answers[$qId]['most']);
+                $hasLeast = !empty($this->answers[$qId]['least']);
+
+                if (!$hasMost && !$hasLeast) {
+                    $unanswered[] = [
+                        'index' => $index,
+                        'number' => $qNum,
+                        'reason' => 'P & K belum dipilih',
+                        'status' => 'empty',
+                    ];
+                } elseif (!$hasMost) {
+                    $unanswered[] = [
+                        'index' => $index,
+                        'number' => $qNum,
+                        'reason' => 'P (Paling) belum dipilih',
+                        'status' => 'partial',
+                    ];
+                } elseif (!$hasLeast) {
+                    $unanswered[] = [
+                        'index' => $index,
+                        'number' => $qNum,
+                        'reason' => 'K (Kurang) belum dipilih',
+                        'status' => 'partial',
+                    ];
+                }
+            } elseif ($qType === 'multiple_choice') {
+                $hasAnswer = isset($this->answers[$qId]) && $this->answers[$qId] !== null && $this->answers[$qId] !== '';
+                if (!$hasAnswer) {
+                    $unanswered[] = [
+                        'index' => $index,
+                        'number' => $qNum,
+                        'reason' => 'Pilihan jawaban belum dipilih',
+                        'status' => 'empty',
+                    ];
+                }
+            } elseif ($qType === 'essay') {
+                $hasText = !empty($this->answers[$qId]) && trim($this->answers[$qId]) !== '';
+                $hasAttachment = !empty($this->essayAttachments[$qId]);
+                if (!$hasText && !$hasAttachment) {
+                    $unanswered[] = [
+                        'index' => $index,
+                        'number' => $qNum,
+                        'reason' => 'Jawaban essay belum diisi',
+                        'status' => 'empty',
+                    ];
+                }
+            }
+        }
+
+        return $unanswered;
+    }
+
+    public function finishTest($isAuto = false)
     {
         if (!$this->attemptId) return;
 
@@ -408,6 +472,33 @@ class ApplicantOnlineTest extends Component
         foreach ($this->questions as $q) {
             if ($q['question_type'] === 'essay' && isset($this->answers[$q['id']])) {
                 $this->saveAnswer($q['id'], null, $this->answers[$q['id']]);
+            }
+        }
+
+        // Jika diselesaikan manual oleh pelamar, pastikan seluruh jawaban terisi lengkap
+        if (!$isAuto) {
+            $unanswered = $this->getUnansweredQuestions();
+            if (!empty($unanswered)) {
+                // Arahkan kursor/tampilan soal ke butir pertama yang belum lengkap
+                $this->currentQuestionIndex = $unanswered[0]['index'];
+
+                $count = count($unanswered);
+                $details = array_map(function ($item) {
+                    return "No. {$item['number']} ({$item['reason']})";
+                }, array_slice($unanswered, 0, 5));
+
+                $detailStr = implode(', ', $details);
+                if ($count > 5) {
+                    $detailStr .= ' ...dan ' . ($count - 5) . ' butir lainnya';
+                }
+
+                $isDisc = collect($this->questions)->contains('question_type', 'disc');
+                $errorMessage = $isDisc
+                    ? "Tes DISC belum dapat diselesaikan karena masih ada {$count} butir soal yang belum lengkap. Setiap nomor wajib memiliki 1 pilihan P (Paling) dan 1 pilihan K (Kurang). Rincian: [{$detailStr}]."
+                    : "Ujian belum dapat diselesaikan karena masih ada {$count} butir soal yang belum dijawab. Rincian: [{$detailStr}].";
+
+                session()->flash('test_error', $errorMessage);
+                return;
             }
         }
 
@@ -488,7 +579,7 @@ class ApplicantOnlineTest extends Component
 
     public function finishTestAuto()
     {
-        $this->finishTest();
+        $this->finishTest(true);
     }
 
     public function render()
@@ -498,6 +589,12 @@ class ApplicantOnlineTest extends Component
             $discResult = DiscTestResult::with('discProfile')->where('test_attempt_id', $this->attemptId)->first();
         }
 
+        $unansweredQuestions = ($this->testState === 'taking') ? $this->getUnansweredQuestions() : [];
+        $totalQuestions = count($this->questions);
+        $unansweredCount = count($unansweredQuestions);
+        $completedCount = max(0, $totalQuestions - $unansweredCount);
+        $progressPercent = $totalQuestions > 0 ? round(($completedCount / $totalQuestions) * 100) : 0;
+
         return view('livewire.applicant.online-test', [
             'application' => $this->application,
             'test' => $this->test,
@@ -505,6 +602,10 @@ class ApplicantOnlineTest extends Component
             'currentQuestion' => $this->questions[$this->currentQuestionIndex] ?? null,
             'attempt' => $this->attempt,
             'discResult' => $discResult,
+            'unansweredQuestions' => $unansweredQuestions,
+            'completedCount' => $completedCount,
+            'totalQuestions' => $totalQuestions,
+            'progressPercent' => $progressPercent,
         ])->layout('layouts.app');
     }
 }

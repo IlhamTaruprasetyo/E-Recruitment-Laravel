@@ -85,7 +85,8 @@ class ApplicantTable extends Component
             'applicantProfile.skills',
             'applicantProfile.socialMedias',
             'applicantProfile.languages',
-            'statusHistories.changedBy'
+            'statusHistories.changedBy',
+            'interviewSchedules.user'
         ])
         ->when($isRecruiterOnly, function ($query) {
             $query->whereHas('job', function ($jq) {

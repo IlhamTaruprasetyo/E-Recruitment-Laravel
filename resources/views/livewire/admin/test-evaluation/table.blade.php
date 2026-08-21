@@ -114,16 +114,16 @@
                 </select>
 
                 <!-- Filter Status -->
-                <select wire:model.live="status" class="px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition max-w-[160px]">
+                <select wire:model.live="status" class="px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition max-w-[180px]">
                     <option value="">Semua Status</option>
-                    <option value="needs_grading">Perlu Penilaian Essay</option>
-                    <option value="completed">Selesai Dikoreksi</option>
+                    <option value="needs_grading">Perlu Koreksi Essay</option>
                     <option value="passed">Lulus (Passed)</option>
-                    <option value="failed">Gagal (Failed)</option>
+                    <option value="failed">Gagal / Ditolak</option>
+                    <option value="disc">Tes Kepribadian (DISC)</option>
                     <option value="in_progress">Sedang Dikerjakan</option>
                 </select>
 
-                @if ($search || $jobId || $status)
+                @if ($search || $jobId || $status || $sortField !== 'id')
                     <button wire:click="resetFilters" class="px-3 py-2 text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition">
                         Reset
                     </button>
@@ -136,7 +136,7 @@
     <div class="relative bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
         
         <!-- Livewire Loading Overlay -->
-        <div wire:loading wire:target="search, jobId, status, previousPage, nextPage, gotoPage, resetFilters" class="absolute inset-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-[1px] flex items-center justify-center z-10 transition">
+        <div wire:loading wire:target="search, jobId, status, sortField, sortDirection, sortBy, previousPage, nextPage, gotoPage, resetFilters" class="absolute inset-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-[1px] flex items-center justify-center z-10 transition">
             <div class="flex items-center gap-2.5 px-4 py-2.5 bg-slate-900/90 dark:bg-slate-800/90 text-white rounded-xl shadow-xl text-xs font-semibold">
                 <svg class="animate-spin w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -151,12 +151,48 @@
                 <thead>
                     <tr class="border-b border-gray-200 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/50 text-gray-500 dark:text-slate-400 uppercase tracking-wider font-semibold">
                         <th class="px-6 py-4 w-12">No</th>
-                        <th class="px-6 py-4">Pelamar & Lowongan</th>
+                        <th class="px-6 py-4 cursor-pointer hover:text-indigo-600 transition" wire:click="sortBy('applicant')">
+                            <div class="flex items-center gap-1">
+                                <span>Pelamar & Lowongan</span>
+                                @if ($sortField === 'applicant')
+                                    <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $sortDirection === 'asc' ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7' }}" />
+                                    </svg>
+                                @endif
+                            </div>
+                        </th>
                         <th class="px-6 py-4">Paket Ujian</th>
-                        <th class="px-6 py-4">Waktu Pengerjaan</th>
+                        <th class="px-6 py-4 cursor-pointer hover:text-indigo-600 transition" wire:click="sortBy('started_at')">
+                            <div class="flex items-center gap-1">
+                                <span>Waktu Pengerjaan</span>
+                                @if ($sortField === 'started_at')
+                                    <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $sortDirection === 'asc' ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7' }}" />
+                                    </svg>
+                                @endif
+                            </div>
+                        </th>
                         <th class="px-6 py-4">Nilai P. Ganda / Essay</th>
-                        <th class="px-6 py-4">Total & KKM</th>
-                        <th class="px-6 py-4">Status</th>
+                        <th class="px-6 py-4 cursor-pointer hover:text-indigo-600 transition" wire:click="sortBy('score')">
+                            <div class="flex items-center gap-1">
+                                <span>Total & KKM</span>
+                                @if ($sortField === 'score')
+                                    <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $sortDirection === 'asc' ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7' }}" />
+                                    </svg>
+                                @endif
+                            </div>
+                        </th>
+                        <th class="px-6 py-4 cursor-pointer hover:text-indigo-600 transition" wire:click="sortBy('status')">
+                            <div class="flex items-center gap-1">
+                                <span>Status</span>
+                                @if ($sortField === 'status')
+                                    <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $sortDirection === 'asc' ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7' }}" />
+                                    </svg>
+                                @endif
+                            </div>
+                        </th>
                         <th class="px-6 py-4 text-right">Aksi</th>
                     </tr>
                 </thead>

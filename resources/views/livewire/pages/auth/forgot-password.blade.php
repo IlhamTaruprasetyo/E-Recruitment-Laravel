@@ -36,7 +36,7 @@ new #[Layout('layouts.guest')] class extends Component
 <div class="w-full max-w-md mx-auto">
     <!-- Back to Login Link -->
     <div class="mb-6 flex justify-between items-center">
-        <a href="{{ route('login') }}" wire:navigate 
+        <a href="{{ route('login') }}" 
            class="inline-flex items-center gap-2 text-xs font-semibold text-gray-400 hover:text-[#93F514] px-3.5 py-1.5 rounded-full bg-white/[0.03] hover:bg-[#93F514]/10 border border-white/10 hover:border-[#93F514]/40 transition-all duration-300 backdrop-blur-md group">
             <svg class="w-4 h-4 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>

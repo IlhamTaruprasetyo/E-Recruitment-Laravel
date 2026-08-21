@@ -61,7 +61,13 @@ class TestEvaluationController extends Controller
             $totalScore = $objectiveScoreSum + $essayScoreSum;
 
             $passingScore = $attempt->test ? (float) $attempt->test->passing_score : 0;
-            $status = ($passingScore > 0 && $totalScore >= $passingScore) ? 'passed' : 'failed';
+            $hasDisc = $attempt->discTestResult || ($attempt->test && (str_contains(strtolower($attempt->test->title ?? ''), 'disc') || str_contains(strtolower($attempt->test->title ?? ''), 'personality')));
+
+            if ($hasDisc || $passingScore <= 0) {
+                $status = 'completed';
+            } else {
+                $status = ($totalScore >= $passingScore) ? 'passed' : 'failed';
+            }
 
             $attempt->update([
                 'objective_score' => $objectiveScoreSum,

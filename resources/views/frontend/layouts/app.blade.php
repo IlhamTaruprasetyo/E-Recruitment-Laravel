@@ -73,7 +73,7 @@
         @keyframes pageFadeIn {
             from {
                 opacity: 0;
-                transform: translateY(6px);
+                transform: translateY(10px);
             }
 
             to {
@@ -83,7 +83,7 @@
         }
 
         .animate-page-fade {
-            animation: pageFadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: pageFadeIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         @keyframes pulseGlow {
@@ -103,6 +103,73 @@
 
         .animate-brand-pulse {
             animation: pulseGlow 1.2s ease-in-out infinite;
+        }
+
+        /* Scroll Reveal Animation Engine (Hardware-Accelerated & 60fps Smooth) */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+            backface-visibility: hidden;
+        }
+
+        .reveal-on-scroll.is-revealed {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* Directional and Scale Variants */
+        .reveal-slide-left {
+            transform: translateX(-32px);
+        }
+        .reveal-slide-left.is-revealed {
+            transform: translateX(0);
+        }
+
+        .reveal-slide-right {
+            transform: translateX(32px);
+        }
+        .reveal-slide-right.is-revealed {
+            transform: translateX(0);
+        }
+
+        .reveal-scale {
+            transform: scale(0.94);
+        }
+        .reveal-scale.is-revealed {
+            transform: scale(1);
+        }
+
+        .reveal-fade {
+            transform: none;
+        }
+        .reveal-fade.is-revealed {
+            transform: none;
+        }
+
+        /* Stagger Delays for Cards & Grids */
+        .reveal-on-scroll[data-delay="50"], [data-delay="50"] { transition-delay: 50ms; }
+        .reveal-on-scroll[data-delay="100"], [data-delay="100"] { transition-delay: 100ms; }
+        .reveal-on-scroll[data-delay="150"], [data-delay="150"] { transition-delay: 150ms; }
+        .reveal-on-scroll[data-delay="200"], [data-delay="200"] { transition-delay: 200ms; }
+        .reveal-on-scroll[data-delay="250"], [data-delay="250"] { transition-delay: 250ms; }
+        .reveal-on-scroll[data-delay="300"], [data-delay="300"] { transition-delay: 300ms; }
+        .reveal-on-scroll[data-delay="350"], [data-delay="350"] { transition-delay: 350ms; }
+        .reveal-on-scroll[data-delay="400"], [data-delay="400"] { transition-delay: 400ms; }
+        .reveal-on-scroll[data-delay="500"], [data-delay="500"] { transition-delay: 500ms; }
+
+        /* Accessibility: respect users who prefer reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            .reveal-on-scroll {
+                opacity: 1 !important;
+                transform: none !important;
+                transition: none !important;
+            }
+            .animate-page-fade {
+                animation: none !important;
+            }
         }
 
         /* ============================================================
@@ -212,13 +279,147 @@
             background-color: #E4F5C8 !important;
         }
 
+        /* =====================================================
+           MODAL KONFIRMASI LAMARAN (LIGHT MODE)
+        ===================================================== */
+        html.light-mode .confirm-modal-card {
+            background-color: #FFFFFF !important;
+            border-color: rgba(0, 0, 0, 0.10) !important;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.20) !important;
+        }
+
+        html.light-mode .confirm-modal-card h3 {
+            color: #111827 !important;
+        }
+
+        html.light-mode .confirm-modal-card p {
+            color: #4B5563 !important;
+        }
+
+        /* Summary Info Box: Putih Bersih di Light Mode */
+        html.light-mode .confirm-summary-box,
+        html.light-mode .bg-\[\#040a04\] {
+            background-color: #FFFFFF !important;
+            background: #FFFFFF !important;
+            border: 1px solid #E5E7EB !important;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        html.light-mode .confirm-summary-box .border-b {
+            border-color: #F3F4F6 !important;
+        }
+
+        html.light-mode .confirm-summary-box span.text-gray-400,
+        html.light-mode .confirm-summary-box span.text-gray-500 {
+            color: #6B7280 !important;
+        }
+
+        html.light-mode .confirm-summary-box .job-title-val {
+            color: #111827 !important;
+        }
+
+        html.light-mode .confirm-summary-box .company-val {
+            color: #2D6B00 !important;
+        }
+
+        html.light-mode .confirm-summary-box .placement-val {
+            color: #374151 !important;
+        }
+
+        html.light-mode .confirm-summary-box .applicant-val {
+            color: #111827 !important;
+        }
+
+        /* Statement Alert Box */
+        html.light-mode .confirm-statement-box {
+            background-color: #F4FDE8 !important;
+            border-color: rgba(147, 245, 20, 0.5) !important;
+            color: #374151 !important;
+        }
+
+        html.light-mode .confirm-statement-box svg {
+            color: #2D6B00 !important;
+        }
+
+        html.light-mode .confirm-statement-box p {
+            color: #374151 !important;
+        }
+
+        /* Batal Button */
+        html.light-mode .confirm-cancel-btn {
+            background-color: #F3F4F6 !important;
+            border-color: #D1D5DB !important;
+            color: #374151 !important;
+        }
+
+        html.light-mode .confirm-cancel-btn:hover {
+            background-color: #E5E7EB !important;
+            color: #111827 !important;
+        }
+
+        /* Ya, Kirim Lamaran Button */
+        html.light-mode .confirm-submit-btn {
+            background-color: #93F514 !important;
+            color: #000000 !important;
+            box-shadow: 0 4px 14px rgba(147, 245, 20, 0.40) !important;
+        }
+
+        html.light-mode .confirm-submit-btn:hover {
+            background-color: #82DC0A !important;
+            color: #000000 !important;
+        }
+
+        html.light-mode .confirm-submit-btn svg {
+            color: #000000 !important;
+            stroke: #000000 !important;
+        }
+
+        /* Incomplete Modal Card */
+        html.light-mode .incomplete-modal-card,
+        html.light-mode .bg-\[\#0a0707\] {
+            background-color: #FFFFFF !important;
+            border-color: rgba(245, 158, 11, 0.4) !important;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.20) !important;
+        }
+
+        html.light-mode .incomplete-modal-card h3 {
+            color: #111827 !important;
+        }
+
+        html.light-mode .incomplete-modal-card p {
+            color: #4B5563 !important;
+        }
+
+        html.light-mode .incomplete-summary-box,
+        html.light-mode .bg-\[\#140c0c\] {
+            background-color: #FFFDF5 !important;
+            border: 1px solid rgba(245, 158, 11, 0.3) !important;
+        }
+
         /* Active/selected company card */
         html.light-mode .bg-\[\#0a2e0a\] {
             background-color: #CCEFAA !important;
         }
 
-        /* "Cari Lowongan" submit button: normal hitam pekat + teks putih & icon neon, hover warna neon #93F514 + teks & icon hitam */
-        html.light-mode .bg-\[\#051405\] {
+        /* CTA button #93F514 di light mode: tetap warna neon #93F514 solid + teks hitam pekat */
+        html.light-mode .bg-\[\#93F514\],
+        html.light-mode button.bg-\[\#93F514\],
+        html.light-mode a.bg-\[\#93F514\] {
+            background-color: #93F514 !important;
+            color: #000000 !important;
+        }
+
+        html.light-mode .bg-\[\#93F514\]:hover,
+        html.light-mode button.bg-\[\#93F514\]:hover,
+        html.light-mode a.bg-\[\#93F514\]:hover {
+            background-color: #82dc0a !important;
+            color: #000000 !important;
+        }
+
+        /* "Cari Lowongan" & "Pantau Status" submit button: normal hitam pekat + teks putih & icon neon, hover warna neon #93F514 + teks & icon hitam */
+        html.light-mode .bg-\[\#051405\],
+        html.light-mode a.bg-\[\#051405\],
+        html.light-mode button.bg-\[\#051405\] {
             background-color: #051405 !important;
             color: #FFFFFF !important;
             border-color: rgba(147, 245, 20, 0.45) !important;
@@ -226,7 +427,11 @@
         }
 
         html.light-mode .bg-\[\#051405\] span,
-        html.light-mode .bg-\[\#051405\].text-\[\#EEEEEE\] {
+        html.light-mode a.bg-\[\#051405\] span,
+        html.light-mode button.bg-\[\#051405\] span,
+        html.light-mode .bg-\[\#051405\].text-\[\#EEEEEE\],
+        html.light-mode .bg-\[\#051405\].text-white,
+        html.light-mode .bg-\[\#051405\].text-gray-300 {
             color: #FFFFFF !important;
         }
 
@@ -234,7 +439,9 @@
             color: #93F514 !important;
         }
 
-        html.light-mode .bg-\[\#051405\]:hover {
+        html.light-mode .bg-\[\#051405\]:hover,
+        html.light-mode a.bg-\[\#051405\]:hover,
+        html.light-mode button.bg-\[\#051405\]:hover {
             background-color: #93F514 !important;
             border-color: #93F514 !important;
             color: #000000 !important;
@@ -242,8 +449,12 @@
         }
 
         html.light-mode .bg-\[\#051405\]:hover span,
+        html.light-mode a.bg-\[\#051405\]:hover span,
+        html.light-mode button.bg-\[\#051405\]:hover span,
         html.light-mode .bg-\[\#051405\]:hover svg,
-        html.light-mode .bg-\[\#051405\]:hover.text-\[\#EEEEEE\] {
+        html.light-mode .bg-\[\#051405\]:hover.text-\[\#EEEEEE\],
+        html.light-mode .bg-\[\#051405\]:hover.text-white,
+        html.light-mode .bg-\[\#051405\]:hover.text-gray-300 {
             color: #000000 !important;
             stroke: #000000;
         }
@@ -912,6 +1123,129 @@
         }
 
         /* =====================================================
+           JOB CARDS (GRID & LIST VIEW) - LIGHT MODE (PUTIH BERSIH)
+        ===================================================== */
+        html.light-mode .job-card-item,
+        html.light-mode .bg-gradient-to-r.from-\[\#061506\].via-\[\#051205\].to-\[\#030803\],
+        html.light-mode .bg-gradient-to-b.from-\[\#061506\].to-\[\#030803\] {
+            background: #FFFFFF !important;
+            background-image: none !important;
+            border-color: rgba(45, 107, 0, 0.18) !important;
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 1px 4px rgba(0, 0, 0, 0.03) !important;
+        }
+
+        html.light-mode .job-card-item:hover,
+        html.light-mode .bg-gradient-to-r.from-\[\#061506\].via-\[\#051205\].to-\[\#030803\]:hover,
+        html.light-mode .bg-gradient-to-b.from-\[\#061506\].to-\[\#030803\]:hover {
+            border-color: rgba(45, 107, 0, 0.45) !important;
+            box-shadow: 0 12px 30px -4px rgba(45, 107, 0, 0.12), 0 4px 10px -2px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        /* Card Text & Headings in Light Mode */
+        html.light-mode .job-card-item h3,
+        html.light-mode .job-card-item h3.text-\[\#EEEEEE\] {
+            color: #111827 !important;
+        }
+
+        html.light-mode .job-card-item h3:hover,
+        html.light-mode .job-card-item a:hover h3 {
+            color: #2D6B00 !important;
+        }
+
+        html.light-mode .job-card-item h4.text-gray-400,
+        html.light-mode .job-card-item .text-gray-400 {
+            color: #6B7280 !important;
+        }
+
+        html.light-mode .job-card-item p.text-gray-400 {
+            color: #4B5563 !important;
+        }
+
+        html.light-mode .job-card-item .text-gray-300 {
+            color: #374151 !important;
+        }
+
+        html.light-mode .job-card-item strong.text-\[\#EEEEEE\] {
+            color: #111827 !important;
+        }
+
+        html.light-mode .job-card-item span.text-\[\#93F514\] {
+            color: #2D6B00 !important;
+            filter: none !important;
+        }
+
+        html.light-mode .job-card-item svg.text-\[\#93F514\] {
+            color: #3D7A00 !important;
+        }
+
+        /* Card Logo Container in Light Mode */
+        html.light-mode .job-card-item .bg-\[\#051205\] {
+            background-color: #F3F9EE !important;
+            border-color: rgba(45, 107, 0, 0.20) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        html.light-mode .job-card-item .bg-\[\#93F514\]\/15 {
+            background-color: #E8F7D6 !important;
+            border-color: rgba(45, 107, 0, 0.30) !important;
+            color: #2D6B00 !important;
+        }
+
+        /* Card Badges in Light Mode */
+        html.light-mode .job-card-item span.bg-\[\#93F514\]\/15 {
+            background-color: #EAF8DA !important;
+            color: #2D6B00 !important;
+            border-color: rgba(45, 107, 0, 0.25) !important;
+        }
+
+        /* Card Inner Dividers in Light Mode */
+        html.light-mode .job-card-item .border-\[\#93F514\]\/15 {
+            border-color: rgba(0, 0, 0, 0.08) !important;
+        }
+
+        /* Card Action Button in Light Mode */
+        html.light-mode .job-card-item a.bg-\[\#93F514\] {
+            background-color: #93F514 !important;
+            color: #000000 !important;
+            box-shadow: 0 3px 12px rgba(147, 245, 20, 0.35) !important;
+        }
+
+        html.light-mode .job-card-item a.bg-\[\#93F514\]:hover {
+            background-color: #82e408 !important;
+            box-shadow: 0 4px 16px rgba(147, 245, 20, 0.50) !important;
+        }
+
+        /* View Mode Switcher Pill in Light Mode */
+        html.light-mode .view-mode-toggle-pill {
+            background-color: #FFFFFF !important;
+            border-color: rgba(0, 0, 0, 0.12) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        html.light-mode .view-mode-toggle-pill button.text-gray-400 {
+            color: #9CA3AF !important;
+        }
+
+        html.light-mode .view-mode-toggle-pill button.text-gray-400:hover {
+            color: #2D6B00 !important;
+        }
+
+        html.light-mode .view-mode-toggle-pill button.bg-\[\#93F514\] {
+            background-color: #93F514 !important;
+            color: #000000 !important;
+        }
+
+        /* Section Heading in Light Mode */
+        html.light-mode h2.text-\[\#EEEEEE\],
+        html.light-mode h2 .text-\[\#EEEEEE\] {
+            color: #111827 !important;
+        }
+
+        html.light-mode h2 span.text-\[\#93F514\] {
+            color: #2D6B00 !important;
+        }
+
+        /* =====================================================
            MISC
         ===================================================== */
         html.light-mode .placeholder-gray-400::placeholder {
@@ -960,23 +1294,7 @@
 </head>
 
 <body
-    class="antialiased bg-[#040804] text-[#EEEEEE] selection:bg-[#93F514] selection:text-black min-h-screen flex flex-col justify-between"
-    x-data="{ pageLoaded: false }" x-init="window.addEventListener('load', () => setTimeout(() => pageLoaded = true, 200));
-    setTimeout(() => pageLoaded = true, 500);">
-
-    <!-- Lightweight Initial Page Loader Overlay (Smooth Rotating Neon Spinner) -->
-    <div x-show="!pageLoaded" x-transition:leave="transition ease-out duration-300"
-        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0 pointer-events-none"
-        class="fixed inset-0 z-[100] bg-[#040804] flex flex-col items-center justify-center select-none">
-
-        <div class="relative flex items-center justify-center">
-            <!-- Subtle Glow behind spinner -->
-            <div class="w-20 h-20 rounded-full bg-[#93F514]/30 blur-xl absolute"></div>
-
-            <!-- Sleek Rotating Neon Green Spinner -->
-            <div class="w-14 h-14 border-4 border-[#93F514]/20 border-t-[#93F514] rounded-full animate-spin"></div>
-        </div>
-    </div>
+    class="antialiased bg-[#040804] text-[#EEEEEE] selection:bg-[#93F514] selection:text-black min-h-screen flex flex-col justify-between">
 
     <!-- Top Navigation Header -->
     @include('frontend.components.navbar')
@@ -1010,6 +1328,46 @@
                 }
             });
         });
+
+        // =========================================================================
+        // High-Performance Hardware-Accelerated Scroll Reveal Engine (Zero Dependencies)
+        // =========================================================================
+        (function() {
+            function initScrollReveal() {
+                const reveals = document.querySelectorAll('.reveal-on-scroll:not(.is-revealed)');
+                if (!reveals.length) return;
+
+                if ('IntersectionObserver' in window) {
+                    const observer = new IntersectionObserver((entries, obs) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                entry.target.classList.add('is-revealed');
+                                obs.unobserve(entry.target); // Stop observing once revealed for 0% memory overhead
+                            }
+                        });
+                    }, {
+                        root: null,
+                        threshold: 0.05,
+                        rootMargin: '0px 0px -25px 0px' // Triggers slightly before element enters view for butter smoothness
+                    });
+
+                    reveals.forEach(el => observer.observe(el));
+                } else {
+                    reveals.forEach(el => el.classList.add('is-revealed'));
+                }
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initScrollReveal);
+            } else {
+                initScrollReveal();
+            }
+
+            // Re-bind on Livewire navigations or dynamic DOM changes if present
+            if (window.Livewire) {
+                document.addEventListener('livewire:navigated', initScrollReveal);
+            }
+        })();
     </script>
 </body>
 

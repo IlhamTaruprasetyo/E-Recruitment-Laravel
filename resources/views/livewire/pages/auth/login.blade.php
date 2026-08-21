@@ -20,7 +20,7 @@ new #[Layout('layouts.guest')] class extends Component
 
         Session::regenerate();
 
-        $this->redirectIntended(default: $this->form->redirectAfterLogin(), navigate: true);
+        $this->redirectIntended(default: $this->form->redirectAfterLogin());
     }
 }; ?>
 
@@ -49,7 +49,7 @@ new #[Layout('layouts.guest')] class extends Component
 
                 <!-- Top Area: Brand Logo & Tagline -->
                 <div class="relative z-10">
-                    <a href="{{ url('/') }}" wire:navigate class="inline-flex items-center gap-3 group">
+                    <a href="{{ url('/') }}" class="inline-flex items-center gap-3 group">
                         <div class="p-2 rounded-xl bg-black/40 border border-[#93F514]/30 shadow-md group-hover:scale-105 transition-transform duration-200">
                             <img src="{{ asset('storage/logo/mikaaaa.png') }}" 
                                  alt="Logo MIKA" 
@@ -127,7 +127,7 @@ new #[Layout('layouts.guest')] class extends Component
 
                 <!-- Bottom Back Link in Left Side -->
                 <div class="relative z-10 pt-2">
-                    <a href="{{ url('/') }}" wire:navigate 
+                    <a href="{{ url('/') }}" 
                        class="inline-flex items-center gap-2 text-xs font-medium text-gray-300 hover:text-[#93F514] transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
@@ -202,7 +202,7 @@ new #[Layout('layouts.guest')] class extends Component
                                 Kata Sandi
                             </label>
                             @if (Route::has('password.request'))
-                                <a href="{{ route('password.request') }}" wire:navigate 
+                                <a href="{{ route('password.request') }}" 
                                    class="text-xs text-gray-400 hover:text-[#93F514] transition">
                                     Lupa kata sandi?
                                 </a>
@@ -261,9 +261,17 @@ new #[Layout('layouts.guest')] class extends Component
                     <!-- Submit Button -->
                     <div class="pt-2">
                         <button type="submit" 
-                                class="w-full py-3 px-4 bg-[#93F514] hover:bg-[#82dc0e] active:scale-[0.99] text-black font-semibold text-sm rounded-xl shadow-lg shadow-[#93F514]/20 hover:shadow-[#93F514]/30 transition flex items-center justify-center gap-2 group cursor-pointer">
-                            <span>Masuk</span>
-                            <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                wire:loading.attr="disabled"
+                                class="w-full py-3 px-4 bg-[#93F514] hover:bg-[#82dc0e] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed text-black font-semibold text-sm rounded-xl shadow-lg shadow-[#93F514]/20 hover:shadow-[#93F514]/30 transition flex items-center justify-center gap-2 group cursor-pointer">
+                            <span wire:loading.remove wire:target="login">Masuk</span>
+                            <span wire:loading wire:target="login" class="inline-flex items-center gap-2">
+                                <svg class="animate-spin h-4 w-4 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                                </svg>
+                                <span>Memproses...</span>
+                            </span>
+                            <svg wire:loading.remove wire:target="login" class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                             </svg>
                         </button>
@@ -274,7 +282,7 @@ new #[Layout('layouts.guest')] class extends Component
                 <div class="mt-6 pt-5 border-t border-white/10 text-center">
                     <p class="text-xs text-gray-400">
                         Belum punya akun?
-                        <a href="{{ route('register') }}" wire:navigate 
+                        <a href="{{ route('register') }}" 
                            class="font-semibold text-[#93F514] hover:underline ml-1">
                             Daftar Sekarang
                         </a>

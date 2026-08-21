@@ -1,6 +1,7 @@
 <div class="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto" x-data="{
     timeRemaining: {{ $timeRemainingSeconds }},
     timerInterval: null,
+    showConfirmModal: false,
     formatTime(sec) {
         if (sec <= 0) return '00:00:00';
         let h = Math.floor(sec / 3600);
@@ -55,73 +56,111 @@
 
         @if ($testState === 'taking')
             <!-- Countdown Timer Badge -->
-            <div class="flex items-center gap-3 bg-gradient-to-r from-amber-500/10 via-rose-500/10 to-indigo-500/10 p-3 rounded-2xl border border-amber-300/40 dark:border-amber-700/40 shadow-sm shrink-0">
-                <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-md shadow-amber-500/30">
-                    <svg class="w-5 h-5 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="flex items-center gap-3 bg-white dark:bg-gray-800 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-xs shrink-0">
+                <div class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
                 <div>
-                    <span class="block text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Sisa Waktu Pengerjaan</span>
-                    <span class="text-lg font-black text-rose-600 dark:text-rose-400 font-mono" x-text="formatTime(timeRemaining)">--:--</span>
+                    <span class="block text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Sisa Waktu</span>
+                    <span class="text-base font-bold text-rose-600 dark:text-rose-400 font-mono" x-text="formatTime(timeRemaining)">--:--</span>
                 </div>
             </div>
         @endif
     </div>
 
+    <!-- Flash Messages (Errors / Warnings / Success) -->
+    @if (session()->has('test_error') || session()->has('error'))
+        <div x-data="{ show: true }" x-show="show" x-transition class="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/80 flex items-start gap-3 text-red-800 dark:text-red-300">
+            <svg class="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div class="flex-1 text-xs">
+                <p class="font-semibold text-red-900 dark:text-red-200 mb-0.5">Ujian Belum Dapat Dikirim</p>
+                <p class="text-red-700 dark:text-red-300 leading-relaxed font-normal">
+                    {{ session('test_error') ?: session('error') }}
+                </p>
+            </div>
+            <button type="button" @click="show = false" class="text-red-400 hover:text-red-600 dark:hover:text-red-200 transition p-1">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+    @endif
+
+    @if (session()->has('message'))
+        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)" x-transition class="mb-6 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 flex items-center justify-between gap-3 text-xs text-emerald-800 dark:text-emerald-200">
+            <div class="flex items-center gap-2.5">
+                <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="font-medium">{{ session('message') }}</span>
+            </div>
+            <button type="button" @click="show = false" class="text-emerald-500 hover:text-emerald-700">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+    @endif
+
     <!-- STATE 1: INTRO / PETUNJUK PENGERJAAN -->
     @if ($testState === 'intro')
-        <div class="bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm p-6 sm:p-8 space-y-6">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 sm:p-8 space-y-6">
             <div class="flex items-center gap-4 pb-6 border-b border-gray-100 dark:border-gray-700">
-                <div class="w-14 h-14 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-2xl shadow-lg shadow-indigo-600/30 shrink-0">
-                    📝
+                <div class="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
                 </div>
                 <div>
-                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                    <span class="px-2.5 py-0.5 rounded-md text-xs font-semibold bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
                         {{ $test->category->name ?? 'Kategori Ujian' }}
                     </span>
-                    <h2 class="text-xl font-bold text-gray-900 dark:text-white mt-1">Petunjuk Pelaksanaan Ujian</h2>
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white mt-1">Petunjuk Pelaksanaan Ujian</h2>
                 </div>
             </div>
 
             <!-- Ringkasan Info Ujian -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div class="p-4 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 text-center">
-                    <span class="block text-xs text-gray-400 mb-1">Durasi Waktu</span>
-                    <span class="text-lg font-extrabold text-gray-900 dark:text-white">{{ $test->duration_minutes }} Menit</span>
+                <div class="p-4 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-200/60 dark:border-gray-800 text-center">
+                    <span class="block text-xs text-gray-500 mb-1">Durasi Waktu</span>
+                    <span class="text-base font-bold text-gray-900 dark:text-white">{{ $test->duration_minutes }} Menit</span>
                 </div>
-                <div class="p-4 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 text-center">
-                    <span class="block text-xs text-gray-400 mb-1">Nilai KKM Kelulusan</span>
-                    <span class="text-lg font-extrabold text-emerald-600 dark:text-emerald-400">{{ number_format($test->passing_score, 0) }}%</span>
+                <div class="p-4 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-200/60 dark:border-gray-800 text-center">
+                    <span class="block text-xs text-gray-500 mb-1">Nilai KKM Kelulusan</span>
+                    <span class="text-base font-bold text-emerald-600 dark:text-emerald-400">{{ number_format($test->passing_score, 0) }}%</span>
                 </div>
-                <div class="p-4 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 text-center">
-                    <span class="block text-xs text-gray-400 mb-1">Jumlah Pertanyaan</span>
-                    <span class="text-lg font-extrabold text-indigo-600 dark:text-indigo-400">{{ count($questions) > 0 ? count($questions) : ($test->total_questions ?: 'Sesuai Soal') }} Soal</span>
+                <div class="p-4 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-200/60 dark:border-gray-800 text-center">
+                    <span class="block text-xs text-gray-500 mb-1">Jumlah Pertanyaan</span>
+                    <span class="text-base font-bold text-indigo-600 dark:text-indigo-400">{{ count($questions) > 0 ? count($questions) : ($test->total_questions ?: 'Sesuai Soal') }} Soal</span>
                 </div>
-                <div class="p-4 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 text-center">
-                    <span class="block text-xs text-gray-400 mb-1">Metode Urutan</span>
-                    <span class="text-lg font-extrabold text-purple-600 dark:text-purple-400">{{ $test->is_random ? 'Acak' : 'Urut' }}</span>
+                <div class="p-4 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-200/60 dark:border-gray-800 text-center">
+                    <span class="block text-xs text-gray-500 mb-1">Metode Urutan</span>
+                    <span class="text-base font-bold text-gray-800 dark:text-gray-200">{{ $test->is_random ? 'Acak' : 'Urut' }}</span>
                 </div>
             </div>
 
             <!-- Ketentuan Ujian -->
-            <div class="p-5 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 text-xs text-gray-700 dark:text-gray-300 space-y-2.5">
-                <h3 class="font-bold text-sm text-indigo-900 dark:text-indigo-200">Peraturan & Hal yang Perlu Diperhatikan:</h3>
-                <ul class="list-disc list-inside space-y-1.5 leading-relaxed text-indigo-800/90 dark:text-indigo-300/90">
-                    <li>Pastikan koneksi internet Anda stabil sebelum menekan tombol <strong>Mulai Ujian Sekarang</strong>.</li>
+            <div class="p-4 rounded-xl bg-gray-50 dark:bg-gray-900/40 border border-gray-200 dark:border-gray-800 text-xs text-gray-700 dark:text-gray-300 space-y-2">
+                <h3 class="font-semibold text-xs text-gray-900 dark:text-white">Peraturan & Hal yang Perlu Diperhatikan:</h3>
+                <ul class="list-disc list-inside space-y-1 text-gray-600 dark:text-gray-400 leading-relaxed">
+                    <li>Pastikan koneksi internet Anda stabil sebelum menekan tombol <strong>Mulai Ujian</strong>.</li>
                     <li>Waktu akan langsung berjalan otomatis dan tidak dapat dijeda (pause).</li>
                     <li>Jawaban Anda otomatis tersimpan setiap kali Anda memilih opsi atau mengetik jawaban.</li>
-                    <li>Jika butir soal memiliki <strong>file lampiran / studi kasus</strong> (PDF, Word, Excel, Gambar), tombol untuk mengunduh/melihat berkas akan muncul di atas pertanyaan.</li>
+                    <li>Jika butir soal memiliki <strong>file lampiran / studi kasus</strong>, tautan unduhan akan muncul di atas pertanyaan.</li>
                     <li>Ujian akan otomatis disubmit jika batas waktu pengerjaan telah habis.</li>
                 </ul>
             </div>
 
             <div class="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
-                <a href="{{ route('profile', ['tab' => 'riwayat']) }}" class="px-5 py-2.5 text-xs font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition">
+                <a href="{{ route('profile', ['tab' => 'riwayat']) }}" class="px-4 py-2 text-xs font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition">
                     Kembali ke Riwayat
                 </a>
-                <button type="button" wire:click="startTest" class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-500/25 transition transform active:scale-95 flex items-center gap-2">
-                    <span>Mulai Ujian Sekarang</span>
+                <button type="button" wire:click="startTest" class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium rounded-lg transition">
+                    <span>Mulai Ujian</span>
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
@@ -434,8 +473,8 @@
                         <!-- Navigation Buttons -->
                         <div class="flex items-center justify-between pt-6 border-t border-gray-100 dark:border-gray-700 gap-3">
                             <button type="button" wire:click="prevQuestion" {{ $currentQuestionIndex === 0 ? 'disabled' : '' }}
-                                class="px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition">
+                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                                 </svg>
                                 <span>Sebelumnya</span>
@@ -443,16 +482,15 @@
 
                             @if ($currentQuestionIndex < count($questions) - 1)
                                 <button type="button" wire:click="nextQuestion"
-                                    class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition flex items-center gap-1.5 shadow-md shadow-indigo-500/20">
+                                    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition">
                                     <span>Selanjutnya</span>
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                                     </svg>
                                 </button>
                             @else
-                                <button type="button" wire:click="finishTest"
-                                    onclick="return confirm('Apakah Anda yakin ingin menyelesaikan dan mengirim ujian ini?')"
-                                    class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-emerald-500/20">
+                                <button type="button" @click="showConfirmModal = true"
+                                    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium transition">
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                     </svg>
@@ -466,54 +504,181 @@
 
             <!-- Right Side: Nomor Soal Grid & Submit Button (1 Col) -->
             <div class="lg:col-span-1 space-y-4">
-                <div class="bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm p-5 space-y-4 sticky top-24">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5 space-y-4 sticky top-24">
                     <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-700">
-                        <h3 class="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider">
-                            Navigasi Nomor Soal
+                        <h3 class="text-xs font-semibold text-gray-900 dark:text-white uppercase tracking-wider">
+                            Navigasi Soal
                         </h3>
-                        <span class="text-[11px] text-gray-400 font-medium">
-                            {{ count($questions) }} Butir
+                        <span class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                            {{ $completedCount }} / {{ $totalQuestions }} Terisi
                         </span>
                     </div>
 
+                    <!-- Progress Bar -->
+                    <div class="space-y-1.5">
+                        <div class="flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400">
+                            <span>Kelengkapan</span>
+                            <span class="font-medium text-gray-700 dark:text-gray-300">{{ $progressPercent }}%</span>
+                        </div>
+                        <div class="w-full h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                            <div class="h-full bg-indigo-600 transition-all duration-300" style="width: {{ $progressPercent }}%"></div>
+                        </div>
+                    </div>
+
                     <!-- Number Grid -->
-                    <div class="grid grid-cols-5 gap-2">
+                    <div class="grid grid-cols-5 gap-1.5">
                         @foreach ($questions as $idx => $q)
                             @php
-                                $isAnswered = false;
+                                $status = 'unanswered';
                                 if ($q['question_type'] === 'disc') {
-                                    $isAnswered = isset($answers[$q['id']]['most']) && isset($answers[$q['id']]['least']);
-                                } else {
-                                    $isAnswered = isset($answers[$q['id']]) && $answers[$q['id']] !== '';
+                                    $hasMost = !empty($answers[$q['id']]['most']);
+                                    $hasLeast = !empty($answers[$q['id']]['least']);
+                                    if ($hasMost && $hasLeast) {
+                                        $status = 'completed';
+                                    } elseif ($hasMost || $hasLeast) {
+                                        $status = 'partial';
+                                    }
+                                } elseif ($q['question_type'] === 'multiple_choice') {
+                                    $status = (!empty($answers[$q['id']])) ? 'completed' : 'unanswered';
+                                } elseif ($q['question_type'] === 'essay') {
+                                    $hasText = !empty($answers[$q['id']]) && trim($answers[$q['id']]) !== '';
+                                    $hasAttachment = !empty($essayAttachments[$q['id']]);
+                                    $status = ($hasText || $hasAttachment) ? 'completed' : 'unanswered';
                                 }
                                 $isCurrent = ($currentQuestionIndex === $idx);
                             @endphp
                             <button type="button" wire:click="selectQuestion({{ $idx }})"
-                                class="h-9 rounded-xl font-bold text-xs flex items-center justify-center transition border {{ $isCurrent ? 'ring-2 ring-indigo-500 border-indigo-500' : '' }} {{ $isAnswered ? 'bg-emerald-500 text-white border-emerald-600' : 'bg-gray-100 dark:bg-gray-700/60 text-gray-700 dark:text-gray-300 border-transparent hover:bg-gray-200' }}">
+                                class="h-8 rounded-lg text-xs font-medium flex items-center justify-center transition border {{ $isCurrent ? 'ring-2 ring-indigo-500 ring-offset-1 border-indigo-500' : '' }} {{ $status === 'completed' ? 'bg-emerald-600 text-white border-emerald-600' : ($status === 'partial' ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-700 font-semibold' : 'bg-gray-50 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700') }}"
+                                title="Soal No. {{ $idx + 1 }}">
                                 {{ $idx + 1 }}
                             </button>
                         @endforeach
                     </div>
 
-                    <div class="pt-3 border-t border-gray-100 dark:border-gray-700 space-y-2 text-[11px] text-gray-500 dark:text-gray-400">
+                    <!-- Status Legend -->
+                    <div class="pt-3 border-t border-gray-100 dark:border-gray-700 space-y-1.5 text-[11px] text-gray-500 dark:text-gray-400">
                         <div class="flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
-                            <span>Sudah Dijawab</span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 shrink-0"></span>
+                            <span>Sudah Lengkap {{ collect($questions)->contains('question_type', 'disc') ? '(P & K)' : '' }}</span>
                         </div>
+                        @if (collect($questions)->contains('question_type', 'disc'))
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0"></span>
+                                <span>Kurang P atau K</span>
+                            </div>
+                        @endif
                         <div class="flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-gray-200 dark:bg-gray-700"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-gray-300 dark:bg-gray-600 shrink-0"></span>
                             <span>Belum Dijawab</span>
                         </div>
                     </div>
 
-                    <button type="button" wire:click="finishTest"
-                        onclick="return confirm('Apakah Anda yakin ingin menyelesaikan ujian sekarang?')"
-                        class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs shadow-md shadow-emerald-600/20 transition flex items-center justify-center gap-1.5 mt-4">
+                    @if ($completedCount < $totalQuestions)
+                        <div class="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 text-[11px] text-amber-800 dark:text-amber-300">
+                            Masih ada {{ $totalQuestions - $completedCount }} butir soal yang belum lengkap.
+                        </div>
+                    @endif
+
+                    <button type="button" @click="showConfirmModal = true"
+                        class="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-medium transition flex items-center justify-center gap-2 mt-2">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                         </svg>
                         <span>Selesaikan Ujian</span>
                     </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Confirmation Modal (Replacing Browser Native Confirm) -->
+        <div x-show="showConfirmModal" 
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 z-50 overflow-y-auto" 
+             x-cloak>
+            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                <!-- Background Backdrop -->
+                <div class="fixed inset-0 transition-opacity bg-gray-900/60 dark:bg-black/75 backdrop-blur-xs" 
+                     @click="showConfirmModal = false"></div>
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+                <!-- Modal Dialog Panel -->
+                <div x-show="showConfirmModal"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                     x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                     x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                     class="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white dark:bg-gray-800 rounded-2xl shadow-xl sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-gray-200 dark:border-gray-700 p-6 space-y-4">
+                    
+                    @if ($completedCount === $totalQuestions)
+                        <!-- State 1: Semua Soal Sudah Terisi Lengkap -->
+                        <div class="flex items-start gap-3.5">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0 border border-emerald-200 dark:border-emerald-800/80">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-base font-semibold text-gray-900 dark:text-white">
+                                    Selesaikan Ujian?
+                                </h3>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+                                    Seluruh <strong>{{ $totalQuestions }} butir soal</strong> telah terisi. Setelah dikirim, jawaban tidak dapat diubah kembali.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-end gap-2.5 pt-4 border-t border-gray-100 dark:border-gray-700">
+                            <button type="button" 
+                                    @click="showConfirmModal = false" 
+                                    class="px-4 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition">
+                                Batal
+                            </button>
+                            <button type="button" 
+                                    wire:click="finishTest" 
+                                    @click="showConfirmModal = false" 
+                                    wire:loading.attr="disabled"
+                                    class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition shadow-xs">
+                                <span wire:loading.remove wire:target="finishTest">Ya, Selesaikan</span>
+                                <span wire:loading wire:target="finishTest">Menyimpan...</span>
+                            </button>
+                        </div>
+                    @else
+                        <!-- State 2: Ada Soal Belum Lengkap -->
+                        <div class="flex items-start gap-3.5">
+                            <div class="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0 border border-amber-200 dark:border-amber-800/80">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-base font-semibold text-gray-900 dark:text-white">
+                                    Jawaban Belum Lengkap
+                                </h3>
+                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1 leading-relaxed">
+                                    Masih terdapat <strong>{{ $totalQuestions - $completedCount }} butir soal</strong> yang belum lengkap / belum dijawab. Seluruh butir soal wajib terisi sebelum menyelesaikan ujian ini.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-end gap-2.5 pt-4 border-t border-gray-100 dark:border-gray-700">
+                            <button type="button" 
+                                    @click="showConfirmModal = false; $wire.finishTest()" 
+                                    class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition shadow-xs">
+                                <span>Lengkapi Jawaban Sekarang</span>
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </button>
+                        </div>
+                    @endif
+
                 </div>
             </div>
         </div>

@@ -819,9 +819,45 @@
                                     </template>
                                 </div>
                             </template>
-                            <template x-if="!detailData.status_histories || detailData.status_histories.length === 0">
+                        <!-- Jadwal Wawancara Pelamar -->
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="font-bold text-gray-900 dark:text-white flex items-center gap-2 text-sm">
+                                    <svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    Jadwal Wawancara (Interview)
+                                </h4>
+                                <a :href="'{{ $isRecruiter ? route('recruiter.interview_schedule') : route('admin.interview_schedule') }}'" class="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1">
+                                    <span>Kelola Jadwal</span>
+                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </a>
+                            </div>
+
+                            <template x-if="(detailData.interview_schedules && detailData.interview_schedules.length > 0) || (detailData.interviewSchedules && detailData.interviewSchedules.length > 0)">
+                                <div class="space-y-2">
+                                    <template x-for="item in (detailData.interview_schedules || detailData.interviewSchedules || [])" :key="item.id">
+                                        <div class="p-3 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-900/40 space-y-1">
+                                            <div class="flex items-center justify-between">
+                                                <span class="font-bold text-emerald-900 dark:text-emerald-300 text-xs" x-text="new Date(item.interview_date).toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' }) + ' WIB'"></span>
+                                                <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300" x-text="item.status"></span>
+                                            </div>
+                                            <div class="text-[11px] text-gray-700 dark:text-gray-300">
+                                                <p><strong class="font-semibold">Lokasi/Metode:</strong> <span x-text="item.location"></span></p>
+                                                <p x-show="item.meeting_link">
+                                                    <strong class="font-semibold">Link:</strong> 
+                                                    <a :href="item.meeting_link" target="_blank" class="text-indigo-600 dark:text-indigo-400 underline font-semibold break-all" x-text="item.meeting_link"></a>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                            <template x-if="(!detailData.interview_schedules || detailData.interview_schedules.length === 0) && (!detailData.interviewSchedules || detailData.interviewSchedules.length === 0)">
                                 <div class="p-3 bg-gray-50 dark:bg-slate-800/40 rounded-xl text-gray-400 italic text-[11px]">
-                                    Belum ada catatan riwayat perubahan status.
+                                    Belum ada jadwal wawancara untuk pelamar ini.
                                 </div>
                             </template>
                         </div>

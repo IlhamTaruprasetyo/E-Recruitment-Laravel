@@ -102,12 +102,26 @@ class Riwayat extends Component
 
             $applications = $query->orderBy('applied_at', 'desc')->get();
 
+            // Ambil jadwal wawancara aktif / mendatang untuk notifikasi pelamar
+            $upcomingInterviews = \App\Models\InterviewSchedule::with([
+                'jobApplication.job.company',
+                'jobApplication.job.department',
+                'user'
+            ])
+            ->whereHas('jobApplication', function ($q) use ($applicantProfile) {
+                $q->where('profile_id', $applicantProfile->id);
+            })
+            ->whereIn('status', ['Scheduled', 'Rescheduled'])
+            ->where('interview_date', '>=', now()->subHours(4))
+            ->orderBy('interview_date', 'asc')
+            ->get();
+
             if ($this->selectedApplicationId) {
                 $selectedApplication = JobApplication::with([
                     'job.company',
                     'job.department',
                     'statusHistories.changedBy',
-                    'interviewSchedules',
+                    'interviewSchedules.user',
                     'testAttempts.test'
                 ])
                 ->where('profile_id', $applicantProfile->id)
@@ -118,6 +132,7 @@ class Riwayat extends Component
         return view('livewire.applicant.riwayat', [
             'applications' => $applications,
             'selectedApplication' => $selectedApplication,
+            'upcomingInterviews' => $upcomingInterviews ?? collect(),
             'stats' => $stats,
         ]);
     }

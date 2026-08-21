@@ -55,6 +55,12 @@
                 $isMandatoryComplete = $applicantProfile ? $applicantProfile->is_mandatory_complete : false;
                 $missingMandatorySections = $applicantProfile ? $applicantProfile->missing_mandatory_sections : [];
                 $sectionStatuses = $applicantProfile ? $applicantProfile->section_statuses : [];
+                $hasUpcomingInterview = false;
+                if ($applicantProfile) {
+                    $hasUpcomingInterview = \App\Models\InterviewSchedule::whereHas('jobApplication', function ($q) use ($applicantProfile) {
+                        $q->where('profile_id', $applicantProfile->id);
+                    })->whereIn('status', ['Scheduled', 'Rescheduled'])->where('interview_date', '>=', now()->subHours(4))->exists();
+                }
             @endphp
 
             <!-- Navigation Sections -->
@@ -310,19 +316,29 @@
                         <x-sidebar.single-nav-link :href="route('profile', ['tab' => 'riwayat'])" tab="riwayat"
                             x-on:click.prevent="activeTab = 'riwayat'; $dispatch('switch-tab', 'riwayat')">
                             <x-slot:icon>
-                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
+                                <div class="relative">
+                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    @if ($hasUpcomingInterview)
+                                        <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-500 ring-2 ring-white dark:ring-gray-800 animate-ping"></span>
+                                        <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-500 ring-2 ring-white dark:ring-gray-800"></span>
+                                    @endif
+                                </div>
                             </x-slot:icon>
                             Riwayat Lamaran
-                            @if (!empty($applicationCount) && $applicationCount > 0)
-                                <x-slot:append>
+                            <x-slot:append>
+                                @if ($hasUpcomingInterview)
+                                    <span class="px-2 py-0.5 text-[9px] font-black rounded-full bg-amber-400 text-gray-950 shadow-xs flex items-center gap-1 animate-pulse">
+                                        <span>Wawancara</span>
+                                    </span>
+                                @elseif (!empty($applicationCount) && $applicationCount > 0)
                                     <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
                                         {{ $applicationCount }}
                                     </span>
-                                </x-slot:append>
-                            @endif
+                                @endif
+                            </x-slot:append>
                         </x-sidebar.single-nav-link>
 
                         <x-sidebar.single-nav-link :href="route('profile', ['tab' => 'pengaturan'])" tab="pengaturan"

@@ -32,12 +32,12 @@ class JobController extends Controller
             'company_id' => $request->company_id,
             'department_id' => $request->department_id,
             'title' => $request->title,
-            'description' => $request->description,
+            'description' => !empty($request->description) ? $request->description : '-',
             'employment_type' => $request->employment_type,
-            'location' => $request->location,
+            'location' => !empty($request->location) ? $request->location : 'Indonesia',
             'salary_min' => $request->salary_min,
             'salary_max' => $request->salary_max,
-            'quota' => $request->quota,
+            'quota' => (int) $request->quota,
             'deadline' => $request->deadline,
             'status' => $request->status,
         ]);
@@ -73,16 +73,19 @@ class JobController extends Controller
             'status' => 'sometimes|required|in:Open,Closed,Draft',
         ]);
 
+        $newDesc = $request->input('description', $data->description);
+        $newLoc = $request->input('location', $data->location);
+
         $data->update([
             'company_id' => $request->input('company_id', $data->company_id),
             'department_id' => $request->input('department_id', $data->department_id),
             'title' => $request->input('title', $data->title),
-            'description' => $request->input('description', $data->description),
+            'description' => !empty($newDesc) ? $newDesc : ($data->description ?? '-'),
             'employment_type' => $request->input('employment_type', $data->employment_type),
-            'location' => $request->input('location', $data->location),
+            'location' => !empty($newLoc) ? $newLoc : ($data->location ?? 'Indonesia'),
             'salary_min' => $request->input('salary_min', $data->salary_min),
             'salary_max' => $request->input('salary_max', $data->salary_max),
-            'quota' => $request->input('quota', $data->quota),
+            'quota' => $request->filled('quota') ? (int) $request->quota : ($data->quota ?? 1),
             'deadline' => $request->input('deadline', $data->deadline),
             'status' => $request->input('status', $data->status),
         ]);

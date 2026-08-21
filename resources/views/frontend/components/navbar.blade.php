@@ -154,12 +154,12 @@
                     {{ $shortName }}
                 </a>
             @else
-                <a href="{{ route('login') }}"
+                <a @click="mobileMenuOpen = false" href="{{ route('login') }}"
                     class="w-full text-center px-4 py-2.5 rounded-2xl bg-[#93F514]/10 border border-[#93F514]/40 text-[#EEEEEE] font-semibold text-sm">
                     Masuk
                 </a>
                 @if (Route::has('register'))
-                    <a href="{{ route('register') }}"
+                    <a @click="mobileMenuOpen = false" href="{{ route('register') }}"
                         class="w-full text-center px-4 py-2.5 rounded-2xl bg-[#061806] hover:bg-[#93F514] text-[#EEEEEE] hover:text-black border border-[#93F514]/50 font-bold text-sm shadow-md shadow-[#93F514]/20 transition">
                         Daftar Akun Baru
                     </a>
