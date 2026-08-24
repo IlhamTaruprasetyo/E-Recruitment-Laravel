@@ -1,3 +1,8 @@
+@php
+    $isRecruiter = $isRecruiter ?? (auth()->check() && (auth()->user()->role_id == 2 || strtolower(auth()->user()->role?->name ?? '') === 'recruiter'));
+    $formActionPrefix = $isRecruiter ? url('/recruiter/applicants') . '/' : url('/admin/applicants') . '/';
+@endphp
+
 <div class="space-y-6" x-data="{ 
     showDetailModal: false,
     showStatusModal: false,
@@ -14,13 +19,13 @@
         this.detailData = application;
         this.showDetailModal = true;
     },
-    openStatusModal(application) {
+    openStatusModal(data) {
         this.statusData = {
-            id: application.id,
-            applicant_name: application.applicant_profile ? application.applicant_profile.full_name : 'Pelamar',
-            job_title: application.job ? application.job.title : 'Lowongan',
-            status: application.status || 'Submitted',
-            notes: application.notes || ''
+            id: data.id,
+            applicant_name: data.applicant_name || (data.applicant_profile ? data.applicant_profile.full_name : 'Pelamar'),
+            job_title: data.job_title || (data.job ? data.job.title : 'Lowongan'),
+            status: data.status || 'Submitted',
+            notes: data.notes || ''
         };
         this.showStatusModal = true;
     },
@@ -29,7 +34,15 @@
         const d = new Date(dateStr);
         if (isNaN(d.getTime())) return dateStr;
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-        return months[d.getMonth()] + ' ' + d.getFullYear();
+        return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+    },
+    formatDateTime(dateStr) {
+        if (!dateStr) return '-';
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return dateStr;
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        const pad = (n) => n < 10 ? '0' + n : n;
+        return pad(d.getDate()) + ' ' + months[d.getMonth()] + ' ' + d.getFullYear() + ', ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ' WIB';
     }
 }">
     <!-- Session Notifications -->
@@ -94,7 +107,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                         </svg>
                         <span>Checklist Status</span>
-                        @if(count($selectedStatuses) > 0)
+                        @if(!empty($selectedStatuses))
                             <span class="px-1.5 py-0.5 text-[10px] font-bold bg-indigo-600 text-white rounded-full">
                                 {{ count($selectedStatuses) }}
                             </span>
@@ -117,7 +130,7 @@
                         
                         <div class="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-slate-800">
                             <span class="text-xs font-bold text-gray-900 dark:text-white">Filter Multi-Status</span>
-                            @if(count($selectedStatuses) > 0)
+                            @if(!empty($selectedStatuses))
                                 <button wire:click="$set('selectedStatuses', [])" class="text-[10px] text-indigo-600 dark:text-indigo-400 hover:underline">
                                     Reset Filter
                                 </button>
@@ -388,9 +401,9 @@
                             @endif
 
                             @if(in_array('applied_at', $selectedColumns))
-                                <td class="px-6 py-4">
-                                    <span class="text-gray-600 dark:text-slate-300 font-medium">
-                                        {{ \Carbon\Carbon::parse($app->applied_at)->format('d M Y, H:i') }}
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="text-gray-600 dark:text-slate-300 font-medium text-xs">
+                                        {{ \Carbon\Carbon::parse($app->applied_at)->timezone('Asia/Jakarta')->translatedFormat('d M Y, H:i') }} WIB
                                     </span>
                                 </td>
                             @endif
@@ -437,7 +450,7 @@
                                 <td class="px-6 py-4 text-right">
                                     <div class="flex items-center justify-end gap-2">
                                         <!-- View Detail Button -->
-                                        <button @click="openDetailModal({{ json_encode($app) }})" class="p-1.5 rounded-lg text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors" title="Lihat Detail Profil">
+                                        <button @click="openDetailModal({{ \Illuminate\Support\Js::from($app) }})" class="p-1.5 rounded-lg text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors" title="Lihat Detail Profil">
                                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -445,7 +458,13 @@
                                         </button>
 
                                         <!-- Edit Status Button -->
-                                        <button @click="openStatusModal({{ json_encode($app) }})" class="p-1.5 rounded-lg text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors" title="Update Status Lamaran">
+                                        <button @click="openStatusModal({{ \Illuminate\Support\Js::from([
+                                            'id' => $app->id,
+                                            'applicant_name' => $app->applicantProfile->full_name ?? 'Pelamar',
+                                            'job_title' => $app->job->title ?? 'Lowongan',
+                                            'status' => $app->status ?? 'Submitted',
+                                            'notes' => $app->notes ?? '',
+                                        ]) }})" class="p-1.5 rounded-lg text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors" title="Update Status Lamaran">
                                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
@@ -496,6 +515,7 @@
                             <div>
                                 <h3 class="text-lg font-bold text-gray-900 dark:text-white" x-text="detailData.applicant_profile ? detailData.applicant_profile.full_name : 'Detail Pelamar'"></h3>
                                 <p class="text-xs text-indigo-600 dark:text-indigo-400 font-semibold" x-text="detailData.job ? (detailData.job.title + ' • ' + (detailData.job.company ? detailData.job.company.name : '')) : ''"></p>
+                                <p class="text-[11px] text-gray-400 mt-0.5" x-show="detailData.applied_at" x-text="'Dilamar: ' + formatDateTime(detailData.applied_at)"></p>
                             </div>
                         </div>
                         <button @click="showDetailModal = false" class="p-2 rounded-xl text-gray-400 hover:text-gray-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 transition">
@@ -811,7 +831,7 @@
                                             <div class="absolute -left-[21px] top-1.5 w-2.5 h-2.5 rounded-full bg-indigo-600 dark:bg-indigo-400"></div>
                                             <div class="flex items-center justify-between">
                                                 <span class="font-bold text-gray-900 dark:text-white text-xs" x-text="history.status"></span>
-                                                <span class="text-[10px] text-gray-400" x-text="history.changed_at"></span>
+                                                <span class="text-[10px] text-gray-400 font-mono" x-text="formatDateTime(history.changed_at)"></span>
                                             </div>
                                             <p x-show="history.notes" class="text-gray-600 dark:text-slate-300 text-[11px] mt-0.5" x-text="'Catatan: ' + history.notes"></p>
                                             <div x-show="history.changed_by" class="text-[10px] text-gray-400 italic" x-text="'Diubah oleh: ' + (history.changed_by ? (history.changed_by.name || 'Admin') : 'Admin')"></div>
@@ -819,6 +839,8 @@
                                     </template>
                                 </div>
                             </template>
+                        </div>
+
                         <!-- Jadwal Wawancara Pelamar -->
                         <div>
                             <div class="flex items-center justify-between mb-3">
@@ -885,7 +907,19 @@
                     </div>
 
                     <!-- Modal Actions -->
-                    <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 dark:border-slate-800 mt-4">
+                    <div class="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-slate-800 mt-4">
+                        <button type="button" @click="showDetailModal = false; openStatusModal({
+                            id: detailData.id,
+                            applicant_name: detailData.applicant_profile ? detailData.applicant_profile.full_name : 'Pelamar',
+                            job_title: detailData.job ? detailData.job.title : 'Lowongan',
+                            status: detailData.status || 'Submitted',
+                            notes: detailData.notes || ''
+                        })" class="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-sm transition flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                            <span>Update Status Lamaran</span>
+                        </button>
                         <button type="button" @click="showDetailModal = false" class="px-4 py-2 text-xs font-semibold text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition">
                             Tutup
                         </button>
@@ -917,10 +951,6 @@
                         </button>
                     </div>
 
-                    @php
-                        $isRecruiter = auth()->check() && (auth()->user()->role_id == 2 || strtolower(auth()->user()->role?->name ?? '') === 'recruiter');
-                        $formActionPrefix = $isRecruiter ? '/recruiter/applicants/' : '/admin/applicants/';
-                    @endphp
                     <form :action="'{{ $formActionPrefix }}' + statusData.id" method="POST" @submit="isSubmittingStatus = true" class="mt-4 space-y-4">
                         @csrf
                         @method('PUT')

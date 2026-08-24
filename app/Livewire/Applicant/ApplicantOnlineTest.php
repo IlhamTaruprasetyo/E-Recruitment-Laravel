@@ -109,11 +109,12 @@ class ApplicantOnlineTest extends Component
                 $elapsedSec = Carbon::parse($existingAttempt->started_at)->diffInSeconds(now());
                 $remaining = $durationSec - $elapsedSec;
 
+                $this->loadQuestionsAndAnswers();
+
                 if ($remaining <= 0) {
                     $this->finishTestAuto();
                 } else {
                     $this->timeRemainingSeconds = (int) $remaining;
-                    $this->loadQuestionsAndAnswers();
                     $this->testState = 'taking';
                 }
             }
@@ -127,6 +128,49 @@ class ApplicantOnlineTest extends Component
 
         try {
             DB::beginTransaction();
+
+            // Cek apakah sudah ada attempt yang tersimpan untuk pelamar & ujian ini
+            $existingAttempt = TestAttempt::where('job_application_id', $this->application->id)
+                ->where('test_id', $this->test->id)
+                ->latest('id')
+                ->lockForUpdate()
+                ->first();
+
+            if ($existingAttempt) {
+                $this->attempt = $existingAttempt;
+                $this->attemptId = $existingAttempt->id;
+
+                if (in_array($existingAttempt->status, ['completed', 'passed', 'failed'])) {
+                    $this->testState = 'completed';
+                    DB::commit();
+                    return;
+                }
+
+                if ($existingAttempt->status === 'in_progress') {
+                    $durationSec = ($this->test->duration_minutes ?: 60) * 60;
+                    $elapsedSec = Carbon::parse($existingAttempt->started_at)->diffInSeconds(now());
+                    $remaining = $durationSec - $elapsedSec;
+
+                    $this->loadQuestionsAndAnswers();
+
+                    if ($remaining <= 0) {
+                        $this->finishTestAuto();
+                    } else {
+                        $this->timeRemainingSeconds = (int) $remaining;
+                        $this->testState = 'taking';
+                    }
+
+                    DB::commit();
+                    return;
+                }
+            }
+
+            // Bersihkan attempt kosong (in_progress tanpa jawaban) jika ada sebelum membuat attempt baru
+            TestAttempt::where('job_application_id', $this->application->id)
+                ->where('test_id', $this->test->id)
+                ->where('status', 'in_progress')
+                ->whereDoesntHave('answers')
+                ->delete();
 
             $attempt = TestAttempt::create([
                 'job_application_id' => $this->application->id,
@@ -596,16 +640,18 @@ class ApplicantOnlineTest extends Component
         $progressPercent = $totalQuestions > 0 ? round(($completedCount / $totalQuestions) * 100) : 0;
 
         return view('livewire.applicant.online-test', [
-            'application' => $this->application,
-            'test' => $this->test,
-            'questions' => $this->questions,
-            'currentQuestion' => $this->questions[$this->currentQuestionIndex] ?? null,
-            'attempt' => $this->attempt,
-            'discResult' => $discResult,
-            'unansweredQuestions' => $unansweredQuestions,
-            'completedCount' => $completedCount,
-            'totalQuestions' => $totalQuestions,
-            'progressPercent' => $progressPercent,
+            'application'          => $this->application,
+            'test'                 => $this->test,
+            'questions'            => $this->questions,
+            'currentQuestion'      => $this->questions[$this->currentQuestionIndex] ?? null,
+            'attempt'              => $this->attempt,
+            'discResult'           => $discResult,
+            'unansweredQuestions'  => $unansweredQuestions,
+            'completedCount'       => $completedCount,
+            'totalQuestions'       => $totalQuestions,
+            'progressPercent'      => $progressPercent,
+            'timeRemainingSeconds' => $this->timeRemainingSeconds,
+            'testState'            => $this->testState,
         ])->layout('layouts.app');
     }
 }

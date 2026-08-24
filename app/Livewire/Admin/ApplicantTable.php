@@ -150,7 +150,14 @@ class ApplicantTable extends Component
         ->paginate(10);
 
         return view('livewire.admin.applicants.table', [
-            'applications' => $applications,
+            'applications'     => $applications,
+            'isRecruiter'      => $isRecruiterOnly,
+            'search'           => $this->search,
+            'statusFilter'     => $this->statusFilter,
+            'selectedStatuses' => $this->selectedStatuses,
+            'selectedColumns'  => $this->selectedColumns,
+            'sortField'        => $this->sortField,
+            'sortDirection'    => $this->sortDirection,
         ]);
     }
 }

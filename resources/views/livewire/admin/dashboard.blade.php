@@ -186,7 +186,7 @@
                                         {{ $app->job->title ?? '-' }}
                                     </td>
                                     <td class="py-3 text-xs text-slate-500">
-                                        {{ $app->applied_at ? \Carbon\Carbon::parse($app->applied_at)->format('d M Y') : '-' }}
+                                        {{ $app->applied_at ? \Carbon\Carbon::parse($app->applied_at)->timezone('Asia/Jakarta')->translatedFormat('d M Y, H:i') . ' WIB' : '-' }}
                                     </td>
                                     <td class="py-3 text-center">
                                         @php

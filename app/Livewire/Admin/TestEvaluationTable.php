@@ -151,9 +151,22 @@ class TestEvaluationTable extends Component
             }
         }
 
+        // Filter out orphaned in-progress attempts with no answers when another attempt exists for the same application and test
+        $query->where(function ($q) {
+            $q->where('test_attempts.status', '!=', 'in_progress')
+              ->orWhereHas('answers')
+              ->orWhereNotExists(function ($sub) {
+                  $sub->select(DB::raw(1))
+                      ->from('test_attempts as ta2')
+                      ->whereColumn('ta2.job_application_id', 'test_attempts.job_application_id')
+                      ->whereColumn('ta2.test_id', 'test_attempts.test_id')
+                      ->where('ta2.id', '!=', DB::raw('test_attempts.id'));
+              });
+        });
+
         // Sorting
         if ($this->sortField === 'applicant') {
-            $query->join('job_applications', 'test_attempts.application_id', '=', 'job_applications.id')
+            $query->join('job_applications', 'test_attempts.job_application_id', '=', 'job_applications.id')
                   ->join('applicant_profile', 'job_applications.profile_id', '=', 'applicant_profile.id')
                   ->orderBy('applicant_profile.full_name', $this->sortDirection)
                   ->select('test_attempts.*');
@@ -170,9 +183,15 @@ class TestEvaluationTable extends Component
         $attempts = $query->paginate(10);
 
         return view('livewire.admin.test-evaluation.table', [
-            'attempts' => $attempts,
-            'jobs'     => $jobs,
-            'tests'    => $tests,
+            'attempts'      => $attempts,
+            'jobs'          => $jobs,
+            'tests'         => $tests,
+            'search'        => $this->search,
+            'jobId'         => $this->jobId,
+            'testId'        => $this->testId,
+            'status'        => $this->status,
+            'sortField'     => $this->sortField,
+            'sortDirection' => $this->sortDirection,
         ]);
     }
 }

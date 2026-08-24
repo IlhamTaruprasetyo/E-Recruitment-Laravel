@@ -24,6 +24,11 @@ class TestAttempt extends Model
         'status',
     ];
 
+    protected $casts = [
+        'started_at' => 'datetime',
+        'finished_at' => 'datetime',
+    ];
+
     public function jobApplication(): BelongsTo
     {
         return $this->belongsTo(JobApplication::class, 'job_application_id');

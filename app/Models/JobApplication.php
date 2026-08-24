@@ -10,6 +10,10 @@ class JobApplication extends Model
 
     protected $fillable = ['job_id', 'profile_id', 'status', 'applied_at', 'notes'];
 
+    protected $casts = [
+        'applied_at' => 'datetime',
+    ];
+
     public function job()
     {
         return $this->belongsTo(Job::class);

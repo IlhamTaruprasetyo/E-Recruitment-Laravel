@@ -14,6 +14,7 @@ class DiscProfile extends Model
         'pattern_code',
         'title',
         'general_description',
+        'suitable_jobs',
     ];
 
     public function testResults(): HasMany

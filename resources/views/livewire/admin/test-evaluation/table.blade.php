@@ -1,3 +1,8 @@
+@php
+    $isRecruiter = auth()->check() && (auth()->user()->role_id == 2 || strtolower(auth()->user()->role?->name ?? '') === 'recruiter');
+    $gradeActionPrefix = $isRecruiter ? '/recruiter/test-evaluations/' : '/admin/test-evaluations/';
+@endphp
+
 <div class="space-y-6" x-data="{ 
     showGradingModal: false,
     isSubmittingGrading: false,
@@ -224,7 +229,7 @@
                             <td class="px-6 py-4">
                                 <div class="space-y-0.5 text-[11px]">
                                     <span class="block text-gray-700 dark:text-slate-300">
-                                        {{ $att->started_at ? \Carbon\Carbon::parse($att->started_at)->format('d M Y H:i') : '-' }}
+                                        {{ $att->started_at ? \Carbon\Carbon::parse($att->started_at)->timezone('Asia/Jakarta')->translatedFormat('d M Y, H:i') . ' WIB' : '-' }}
                                     </span>
                                     @if ($att->duration)
                                         <span class="text-gray-400">Durasi: {{ round($att->duration / 60) }} menit</span>
@@ -309,7 +314,7 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <button @click="openGradingModal({{ json_encode($att) }})" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center justify-center gap-1.5 ml-auto">
+                                <button @click="openGradingModal({{ \Illuminate\Support\Js::from($att) }})" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center justify-center gap-1.5 ml-auto">
                                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -556,6 +561,21 @@
                                     <p class="text-indigo-100/90 leading-relaxed font-normal pt-0.5" x-text="gradingData.disc_result.disc_profile.general_description || 'Analisis kepribadian pelamar berhasil dibentuk.'"></p>
                                 </div>
                             </template>
+
+                            <!-- Suitable Jobs Recommendation (Standar Internasional) -->
+                            <template x-if="gradingData.disc_result.disc_profile && gradingData.disc_result.disc_profile.suitable_jobs">
+                                <div class="rounded-xl overflow-hidden border border-amber-400/70 dark:border-amber-500/50 shadow-sm text-xs">
+                                    <div class="bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 dark:from-amber-500 dark:via-amber-400 dark:to-yellow-500 py-1.5 px-3 text-center">
+                                        <h5 class="text-xs font-black text-gray-950 uppercase tracking-wide flex items-center justify-center gap-1.5">
+                                            <svg class="w-3.5 h-3.5 text-gray-950" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                            </svg>
+                                            <span>Profesi yang cocok :</span>
+                                        </h5>
+                                    </div>
+                                    <div class="p-3 bg-white dark:bg-slate-900 text-gray-800 dark:text-slate-100 font-medium leading-relaxed text-center" x-text="gradingData.disc_result.disc_profile.suitable_jobs"></div>
+                                </div>
+                            </template>
                         </div>
                     </template>
 
@@ -581,10 +601,6 @@
                         </div>
                     </template>
 
-                    @php
-                        $isRecruiter = auth()->check() && (auth()->user()->role_id == 2 || strtolower(auth()->user()->role?->name ?? '') === 'recruiter');
-                        $gradeActionPrefix = $isRecruiter ? '/recruiter/test-evaluations/' : '/admin/test-evaluations/';
-                    @endphp
                     <!-- Form Penilaian Essay -->
                     <form :action="'{{ $gradeActionPrefix }}' + gradingData.id + '/grade'" method="POST" @submit="isSubmittingGrading = true" class="space-y-4">
                         @csrf

@@ -325,7 +325,7 @@
                             <span>{{ $statusLabel }}</span>
                         </span>
                         <span class="text-[11px] text-gray-400 dark:text-gray-500">
-                            Dilamar: {{ \Carbon\Carbon::parse($app->applied_at)->translatedFormat('d M Y, H:i') }}
+                            Dilamar: {{ \Carbon\Carbon::parse($app->applied_at)->timezone('Asia/Jakarta')->translatedFormat('d M Y, H:i') }} WIB
                         </span>
                     </div>
                 </div>
@@ -581,7 +581,7 @@
                             <div class="p-3 bg-gray-50 dark:bg-gray-900/40 rounded-xl border border-gray-100 dark:border-gray-800">
                                 <span class="block text-[10px] font-bold text-gray-400 uppercase">Tanggal Melamar</span>
                                 <span class="block text-xs font-bold text-gray-800 dark:text-gray-200 mt-0.5">
-                                    {{ \Carbon\Carbon::parse($selectedApplication->applied_at)->translatedFormat('d M Y, H:i') }}
+                                    {{ \Carbon\Carbon::parse($selectedApplication->applied_at)->timezone('Asia/Jakarta')->translatedFormat('d M Y, H:i') }} WIB
                                 </span>
                             </div>
                             <div class="p-3 bg-gray-50 dark:bg-gray-900/40 rounded-xl border border-gray-100 dark:border-gray-800 col-span-2 sm:col-span-1">
@@ -612,7 +612,7 @@
                                                             {{ $hist->status }}
                                                         </span>
                                                         <span class="text-[10px] text-gray-400 font-mono">
-                                                            {{ \Carbon\Carbon::parse($hist->changed_at)->translatedFormat('d M Y, H:i') }}
+                                                            {{ \Carbon\Carbon::parse($hist->changed_at)->timezone('Asia/Jakarta')->translatedFormat('d M Y, H:i') }} WIB
                                                         </span>
                                                     </div>
                                                     @if ($hist->notes)

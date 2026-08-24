@@ -10,6 +10,8 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!-- Tailwind CSS CDN Fallback -->
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="font-sans text-gray-900 antialiased bg-gray-200 flex items-center justify-center min-h-screen">
     {{ $slot }}

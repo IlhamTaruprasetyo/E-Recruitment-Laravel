@@ -10,6 +10,10 @@ class ApplicationStatusHistory extends Model
     protected $fillable = ['job_applications_id', 'status', 'notes', 'changed_by', 'changed_at'];
     public $timestamps = false; // Menggunakan changed_at sesuai skema
 
+    protected $casts = [
+        'changed_at' => 'datetime',
+    ];
+
     public function jobApplication()
     {
         return $this->belongsTo(JobApplication::class, 'job_applications_id');
