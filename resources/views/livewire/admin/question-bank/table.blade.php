@@ -752,10 +752,20 @@
                                 <template x-for="(opt, idx) in detailData.options" :key="opt.id || idx">
                                     <div class="flex items-center justify-between p-3 rounded-xl border bg-purple-50/50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-800/50 text-gray-800 dark:text-slate-200">
                                         <div class="flex items-center gap-3">
-                                            <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold bg-purple-600 text-white" x-text="opt.attribute_tag || (idx + 1)"></span>
-                                            <span class="text-xs" x-text="opt.option_text"></span>
+                                            <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold bg-purple-600 text-white" x-text="(idx + 1)"></span>
+                                            <span class="text-xs font-medium" x-text="opt.option_text"></span>
                                         </div>
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-700" x-text="'Dimensi ' + (opt.attribute_tag || '-')"></span>
+                                        <div class="flex items-center gap-1.5 shrink-0">
+                                            <template x-if="opt.most_tag || opt.least_tag">
+                                                <div class="flex items-center gap-1.5">
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800" x-text="'P: ' + (opt.most_tag || opt.attribute_tag || '*')"></span>
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-sky-100 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800" x-text="'K: ' + (opt.least_tag || opt.attribute_tag || '*')"></span>
+                                                </div>
+                                            </template>
+                                            <template x-if="!opt.most_tag && !opt.least_tag">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-700" x-text="'Dimensi ' + (opt.attribute_tag || '-')"></span>
+                                            </template>
+                                        </div>
                                     </div>
                                 </template>
                             </div>

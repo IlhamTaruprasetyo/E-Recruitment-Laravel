@@ -12,7 +12,9 @@ class QuestionOption extends Model
     protected $fillable = [
         'question_id',
         'option_text',
-        'attribute_tag',// e.g. D, I, S, C
+        'attribute_tag', // e.g. D, I, S, C, *
+        'most_tag',      // Tag for Most / P (D, I, S, C, *)
+        'least_tag',     // Tag for Least / K (D, I, S, C, *)
         'is_correct',
     ];
 

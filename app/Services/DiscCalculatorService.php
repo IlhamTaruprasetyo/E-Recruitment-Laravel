@@ -22,15 +22,18 @@ class DiscCalculatorService
         $line2Raw = ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0, '*' => 0];
 
         foreach ($answers as $ans) {
-            $tag = strtoupper($ans->option?->attribute_tag ?? '');
-            if (!in_array($tag, ['D', 'I', 'S', 'C'])) {
-                $tag = '*';
-            }
-
             $ansType = strtolower($ans->answer_type ?? '');
             if ($ansType === 'most' || $ansType === 'p' || $ansType === '1') {
+                $tag = strtoupper($ans->option?->most_tag ?? $ans->option?->attribute_tag ?? '');
+                if (!in_array($tag, ['D', 'I', 'S', 'C'])) {
+                    $tag = '*';
+                }
                 $line1Raw[$tag] = ($line1Raw[$tag] ?? 0) + 1;
             } elseif ($ansType === 'least' || $ansType === 'k' || $ansType === '2') {
+                $tag = strtoupper($ans->option?->least_tag ?? $ans->option?->attribute_tag ?? '');
+                if (!in_array($tag, ['D', 'I', 'S', 'C'])) {
+                    $tag = '*';
+                }
                 $line2Raw[$tag] = ($line2Raw[$tag] ?? 0) + 1;
             }
         }
