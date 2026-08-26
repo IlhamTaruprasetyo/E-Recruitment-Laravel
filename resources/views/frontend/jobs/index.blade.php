@@ -1,6 +1,6 @@
 @extends('frontend.layouts.app')
 
-@section('title', 'Daftar Lowongan Pekerjaan | MAKNA E-Recruitment')
+@section('title', 'Lowongan | Mika Career')
 
 @section('content')
     <div class="relative py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
@@ -11,10 +11,6 @@
             <div class="absolute -right-20 -top-20 w-80 h-80 bg-[#93F514]/15 rounded-full blur-3xl pointer-events-none">
             </div>
             <div class="relative z-10 max-w-2xl">
-                {{-- <div class="inline-flex items-center gap-2 text-[#93F514] text-xs font-bold uppercase tracking-widest mb-3">
-                <span class="w-2 h-2 rounded-full bg-[#93F514] animate-pulse"></span>
-                <span>Peluang Karir Terbuka</span>
-            </div> --}}
                 <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#EEEEEE] leading-tight">
                     Jelajahi <span
                         class="text-transparent bg-clip-text bg-gradient-to-r from-[#93F514] via-[#75f06a] to-[#5FE6B6]">Lowongan

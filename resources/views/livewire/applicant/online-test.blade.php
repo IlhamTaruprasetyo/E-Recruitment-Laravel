@@ -46,7 +46,7 @@
                 <span>/</span>
                 <span class="text-indigo-600 dark:text-indigo-400 font-semibold">{{ $test->title ?? 'Tes Rekrutmen' }}</span>
             </div>
-            <h1 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">
+            <h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
                 {{ $test->title }}
             </h1>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">

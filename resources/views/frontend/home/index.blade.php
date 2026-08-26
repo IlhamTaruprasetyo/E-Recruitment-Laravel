@@ -1,6 +1,6 @@
 @extends('frontend.layouts.app')
 
-@section('title', 'Beranda | Portal E-Rekrutmen')
+@section('title', 'Beranda | Mika Career')
 
 @section('content')
     <div class="relative overflow-hidden">
