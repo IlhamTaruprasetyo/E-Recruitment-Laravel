@@ -133,7 +133,19 @@ class JobApplicationController extends Controller
         ]);
 
         $newStatus = $request->input('status', $application->status);
-        $notes = $request->input('notes', $application->notes);
+        $notes = $request->input('notes');
+
+        if (empty(trim($notes ?? ''))) {
+            $defaultTemplates = [
+                'Reviewed'    => 'Selamat! Anda lolos seleksi berkas administrasi. Silakan lanjut kerjakan ujian online yang tersedia pada menu Riwayat Lamaran.',
+                'Shortlisted' => 'Selamat! Anda dinyatakan lolos tahap seleksi dan masuk ke dalam daftar kandidat terpilih (Shortlisted). Kami akan segera menginformasikan jadwal wawancara.',
+                'Interview'   => 'Anda diundang untuk mengikuti tahap wawancara. Silakan periksa jadwal dan informasi meeting yang tertera.',
+                'Accepted'    => 'Selamat! Anda dinyatakan DITERIMA untuk bergabung bersama kami. Tim HR akan segera menghubungi Anda terkait proses offering dan onboarding.',
+                'Rejected'    => 'Terima kasih atas partisipasi Anda. Saat ini kualifikasi Anda belum sesuai dengan kriteria yang kami butuhkan. Tetap semangat dan sukses untuk kesempatan berikutnya.',
+                'Submitted'   => 'Lamaran Anda telah kami terima dan sedang dalam proses seleksi berkas oleh tim rekruter.',
+            ];
+            $notes = $defaultTemplates[$newStatus] ?? $application->notes;
+        }
 
         $application->update([
             'status' => $newStatus,

@@ -22,8 +22,7 @@ class FrontendJobController extends Controller
         $companyId = $request->query('company_id');
         $employmentType = $request->query('employment_type');
 
-        $jobsQuery = Job::with(['company', 'department', 'degrees', 'majors'])
-            ->where('status', 'Open');
+        $jobsQuery = Job::active()->with(['company', 'department', 'degrees', 'majors']);
 
         if ($search) {
             $searchLower = mb_strtolower($search);
@@ -69,8 +68,8 @@ class FrontendJobController extends Controller
         }
 
         $jobs = $jobsQuery->latest('id')->paginate(9)->withQueryString();
-        $departments = Department::withCount(['jobs' => fn($q) => $q->where('status', 'Open')])->get();
-        $companies = Company::withCount(['jobs' => fn($q) => $q->where('status', 'Open')])->get();
+        $departments = Department::withCount(['jobs' => fn($q) => $q->active()])->get();
+        $companies = Company::withCount(['jobs' => fn($q) => $q->active()])->get();
         $employmentTypes = [
             'Magang' => 'Magang / Internship',
             'Full Time' => 'Full Time',
@@ -99,11 +98,10 @@ class FrontendJobController extends Controller
     public function show(string $id)
     {
         $job = Job::with(['company', 'department', 'degrees', 'majors'])
-            ->where('status', 'Open')
             ->findOrFail($id);
 
-        $relatedJobs = Job::with(['company', 'department'])
-            ->where('status', 'Open')
+        $relatedJobs = Job::active()
+            ->with(['company', 'department'])
             ->where('id', '!=', $id)
             ->where(function ($q) use ($job) {
                 $q->where('department_id', $job->department_id)

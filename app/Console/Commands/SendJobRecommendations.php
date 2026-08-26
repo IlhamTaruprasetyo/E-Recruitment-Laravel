@@ -49,12 +49,12 @@ class SendJobRecommendations extends Command
             return 0;
         }
 
-        $activeJobs = Job::with(['company', 'department'])
-            ->where('status', 'open')
+        $activeJobs = Job::active()
+            ->with(['company', 'department'])
             ->get();
 
         if ($activeJobs->isEmpty()) {
-            $this->info("Tidak ada lowongan pekerjaan aktif (open).");
+            $this->info("Tidak ada lowongan pekerjaan aktif (open & belum lewat deadline).");
             return 0;
         }
 

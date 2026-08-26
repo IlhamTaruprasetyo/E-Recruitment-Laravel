@@ -8,6 +8,14 @@
     showStatusModal: false,
     isSubmittingStatus: false,
     detailData: {},
+    statusTemplates: {
+        'Reviewed': 'Selamat! Anda lolos seleksi berkas administrasi. Silakan lanjut kerjakan ujian online yang tersedia pada menu Riwayat Lamaran.',
+        'Shortlisted': 'Selamat! Anda dinyatakan lolos tahap seleksi dan masuk ke dalam daftar kandidat terpilih (Shortlisted). Kami akan segera menginformasikan jadwal wawancara.',
+        'Interview': 'Anda diundang untuk mengikuti tahap wawancara. Silakan periksa jadwal dan informasi meeting yang tertera.',
+        'Accepted': 'Selamat! Anda dinyatakan DITERIMA untuk bergabung bersama kami. Tim HR akan segera menghubungi Anda terkait proses offering dan onboarding.',
+        'Rejected': 'Terima kasih atas partisipasi Anda. Saat ini kualifikasi Anda belum sesuai dengan kriteria yang kami butuhkan. Tetap semangat dan sukses untuk kesempatan berikutnya.',
+        'Submitted': 'Lamaran Anda telah kami terima dan sedang dalam proses seleksi berkas oleh tim rekruter.'
+    },
     statusData: {
         id: '',
         applicant_name: '',
@@ -20,14 +28,42 @@
         this.showDetailModal = true;
     },
     openStatusModal(data) {
+        const initialStatus = data.status || 'Submitted';
+        let initialNotes = data.notes || '';
+
+        // Jika catatan masih kosong, otomatis berikan template sesuai status awal
+        if (!initialNotes && this.statusTemplates[initialStatus]) {
+            initialNotes = this.statusTemplates[initialStatus];
+        }
+
         this.statusData = {
             id: data.id,
             applicant_name: data.applicant_name || (data.applicant_profile ? data.applicant_profile.full_name : 'Pelamar'),
             job_title: data.job_title || (data.job ? data.job.title : 'Lowongan'),
-            status: data.status || 'Submitted',
-            notes: data.notes || ''
+            status: initialStatus,
+            notes: initialNotes
         };
         this.showStatusModal = true;
+    },
+    applyTemplate(statusKey) {
+        if (statusKey) {
+            this.statusData.status = statusKey;
+        }
+        const targetStatus = statusKey || this.statusData.status;
+        if (this.statusTemplates[targetStatus]) {
+            this.statusData.notes = this.statusTemplates[targetStatus];
+        }
+    },
+    onStatusChange(newStatus) {
+        const currentNotes = (this.statusData.notes || '').trim();
+        const isExistingTemplate = Object.values(this.statusTemplates).some(t => t.trim() === currentNotes);
+
+        // Jika catatan kosong atau masih berupa template bawaan sebelumnya, gantikan otomatis dengan template status baru
+        if (!currentNotes || isExistingTemplate) {
+            if (this.statusTemplates[newStatus]) {
+                this.statusData.notes = this.statusTemplates[newStatus];
+            }
+        }
     },
     formatDate(dateStr) {
         if (!dateStr) return '-';
@@ -966,7 +1002,7 @@
                             <label for="status_select" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
                                 Status Lamaran <span class="text-rose-500">*</span>
                             </label>
-                            <select name="status" id="status_select" x-model="statusData.status" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                            <select name="status" id="status_select" x-model="statusData.status" @change="onStatusChange($event.target.value)" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
                                 <option value="Submitted">Submitted (Diajukan)</option>
                                 <option value="Reviewed">Reviewed (Lolos Berkas / Tahap Tes)</option>
                                 <option value="Shortlisted">Shortlisted (Lolos Ujian / Siap Wawancara)</option>
@@ -976,12 +1012,58 @@
                             </select>
                         </div>
 
+                        <!-- Quick Template Chips -->
+                        <div class="space-y-1.5">
+                            <div class="flex items-center justify-between text-[11px]">
+                                <span class="font-semibold text-gray-600 dark:text-slate-400 flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
+                                    <span>Pilihan Cepat / Template Pesan:</span>
+                                </span>
+                                <button type="button" @click="statusData.notes = ''" class="text-gray-400 hover:text-rose-500 transition text-[10px]">
+                                    Kosongkan
+                                </button>
+                            </div>
+                            <div class="flex flex-wrap gap-1.5">
+                                <button type="button" @click="applyTemplate('Reviewed')" class="px-2 py-1 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-200 dark:border-amber-800/80 rounded-lg text-[10px] font-semibold text-amber-800 dark:text-amber-300 transition flex items-center gap-1">
+                                    <span>Lolos Berkas & Lanjut Tes</span>
+                                </button>
+                                <button type="button" @click="applyTemplate('Shortlisted')" class="px-2 py-1 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 border border-indigo-200 dark:border-indigo-800/80 rounded-lg text-[10px] font-semibold text-indigo-700 dark:text-indigo-300 transition flex items-center gap-1">
+                                    <span>Lolos Ujian / Shortlisted</span>
+                                </button>
+                                <button type="button" @click="applyTemplate('Interview')" class="px-2 py-1 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800/80 rounded-lg text-[10px] font-semibold text-blue-700 dark:text-blue-300 transition flex items-center gap-1">
+                                    <span>Wawancara</span>
+                                </button>
+                                <button type="button" @click="applyTemplate('Accepted')" class="px-2 py-1 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-800/80 rounded-lg text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 transition flex items-center gap-1">
+                                    <span>Diterima</span>
+                                </button>
+                                <button type="button" @click="applyTemplate('Rejected')" class="px-2 py-1 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800/80 rounded-lg text-[10px] font-semibold text-rose-700 dark:text-rose-300 transition flex items-center gap-1">
+                                    <span>Ditolak</span>
+                                </button>
+                            </div>
+                        </div>
+
                         <!-- Notes -->
                         <div>
-                            <label for="notes_text" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                Catatan / Feedback Internal
-                            </label>
-                            <textarea name="notes" id="notes_text" rows="3" x-model="statusData.notes" placeholder="Tambahkan catatan untuk proses seleksi pelamar ini..." class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"></textarea>
+                            <div class="flex items-center justify-between mb-1">
+                                <label for="notes_text" class="block text-xs font-semibold text-gray-700 dark:text-slate-300">
+                                    Catatan / Pesan untuk Pelamar
+                                </label>
+                                <button type="button" @click="applyTemplate()" class="text-[10px] text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-0.5">
+                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                    </svg>
+                                    <span>Terapkan Pesan Status</span>
+                                </button>
+                            </div>
+                            <textarea name="notes" id="notes_text" rows="3" x-model="statusData.notes" placeholder="Tambahkan catatan untuk proses seleksi pelamar ini..." class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition leading-relaxed"></textarea>
+                            <p class="text-[10.5px] text-gray-400 dark:text-slate-500 mt-1 flex items-center gap-1">
+                                <svg class="w-3 h-3 text-indigo-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span>Pesan ini akan langsung dibaca pelamar pada menu <strong>Riwayat Lamaran</strong>.</span>
+                            </p>
                         </div>
 
                         <!-- Modal Actions -->

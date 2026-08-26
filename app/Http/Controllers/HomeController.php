@@ -17,8 +17,7 @@ class HomeController extends Controller
         $search = $request->query('search');
         $location = $request->query('location');
 
-        $jobsQuery = Job::with(['company', 'department', 'degrees', 'majors'])
-            ->where('status', 'Open');
+        $jobsQuery = Job::active()->with(['company', 'department', 'degrees', 'majors']);
 
         if ($search) {
             $jobsQuery->where(function ($q) use ($search) {
@@ -36,13 +35,13 @@ class HomeController extends Controller
 
         // 6 Featured Jobs for Home
         $featuredJobs = (clone $jobsQuery)->latest('id')->take(6)->get();
-        $totalJobsCount = Job::where('status', 'Open')->count();
+        $totalJobsCount = Job::active()->count();
         $companiesCount = Company::count();
         $departmentsCount = Department::count();
-        $totalQuotaCount = Job::where('status', 'Open')->sum('quota');
+        $totalQuotaCount = Job::active()->sum('quota');
         
         $departments = Department::withCount(['jobs' => function ($q) {
-            $q->where('status', 'Open');
+            $q->active();
         }])->get();
         $companies = Company::all();
 

@@ -12,3 +12,7 @@ Artisan::command('inspire', function () {
 Schedule::command('app:send-job-recommendations Harian')->dailyAt('08:00');
 Schedule::command('app:send-job-recommendations Mingguan')->weeklyOn(1, '08:00'); // Setiap Senin jam 08:00
 Schedule::command('app:send-job-recommendations Bulanan')->monthlyOn(1, '08:00');  // Tanggal 1 setiap bulan jam 08:00
+
+// Jadwal Otomatis Penutupan Lowongan yang Melewati Batas Tanggal (Deadline)
+Schedule::command('app:close-expired-jobs')->hourly();
+

@@ -591,13 +591,21 @@
                                 @endif
 
                                 @if ($job->deadline)
-                                    <div class="flex items-center gap-2 text-xs text-gray-400">
-                                        <svg class="w-4 h-4 text-[#93F514] shrink-0" fill="none" viewBox="0 0 24 24"
+                                    <div class="flex items-center gap-2 text-xs {{ $job->days_remaining === 0 ? 'text-rose-400 font-bold' : ($job->days_remaining !== null && $job->days_remaining <= 3 ? 'text-amber-400 font-semibold' : 'text-gray-400') }}">
+                                        <svg class="w-4 h-4 {{ $job->days_remaining === 0 ? 'text-rose-400' : ($job->days_remaining !== null && $job->days_remaining <= 3 ? 'text-amber-400' : 'text-[#93F514]') }} shrink-0" fill="none" viewBox="0 0 24 24"
                                             stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                         </svg>
-                                        <span>Batas: {{ \Carbon\Carbon::parse($job->deadline)->format('d M Y') }}</span>
+                                        <span>
+                                            @if ($job->days_remaining === 0)
+                                                🔥 Berakhir Hari Ini!
+                                            @elseif ($job->days_remaining !== null && $job->days_remaining <= 3)
+                                                ⚡ Sisa {{ $job->days_remaining }} Hari ({{ \Carbon\Carbon::parse($job->deadline)->format('d M') }})
+                                            @else
+                                                Batas: {{ \Carbon\Carbon::parse($job->deadline)->format('d M Y') }}
+                                            @endif
+                                        </span>
                                     </div>
                                 @endif
                             </div>
@@ -697,11 +705,19 @@
                                     @endif
 
                                     @if ($job->deadline)
-                                        <div class="flex items-center gap-1.5 text-gray-400">
-                                            <svg class="w-4 h-4 text-[#93F514] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <div class="flex items-center gap-1.5 text-xs {{ $job->days_remaining === 0 ? 'text-rose-400 font-bold' : ($job->days_remaining !== null && $job->days_remaining <= 3 ? 'text-amber-400 font-semibold' : 'text-gray-400') }}">
+                                            <svg class="w-4 h-4 {{ $job->days_remaining === 0 ? 'text-rose-400' : ($job->days_remaining !== null && $job->days_remaining <= 3 ? 'text-amber-400' : 'text-[#93F514]') }} shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                             </svg>
-                                            <span>Batas: {{ \Carbon\Carbon::parse($job->deadline)->format('d M Y') }}</span>
+                                            <span>
+                                                @if ($job->days_remaining === 0)
+                                                    🔥 Berakhir Hari Ini!
+                                                @elseif ($job->days_remaining !== null && $job->days_remaining <= 3)
+                                                    ⚡ Sisa {{ $job->days_remaining }} Hari ({{ \Carbon\Carbon::parse($job->deadline)->format('d M') }})
+                                                @else
+                                                    Batas: {{ \Carbon\Carbon::parse($job->deadline)->format('d M Y') }}
+                                                @endif
+                                            </span>
                                         </div>
                                     @endif
                                     

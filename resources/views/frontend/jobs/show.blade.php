@@ -109,9 +109,32 @@
         <!-- Main Job Details (8 cols) -->
         <div class="lg:col-span-8 space-y-8">
 
+            @if ($job->is_expired || $job->status !== 'Open')
+                <!-- Banner Pemberitahuan Lowongan Ditutup / Kadaluwarsa -->
+                <div class="reveal-on-scroll rounded-3xl bg-gradient-to-r from-rose-950/70 via-rose-900/40 to-black border border-rose-500/40 p-5 sm:p-6 flex items-start gap-4 shadow-xl shadow-rose-950/30" data-delay="50">
+                    <div class="w-11 h-11 rounded-2xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 shrink-0 shadow-lg shadow-rose-500/20">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="text-base font-extrabold text-rose-200">Pendaftaran Lowongan Ini Telah Ditutup</h4>
+                        <p class="text-xs sm:text-sm text-gray-300 mt-1 leading-relaxed">
+                            @if ($job->is_expired)
+                                Lowongan ini telah melewati batas akhir pendaftaran pada tanggal <strong class="text-rose-300">{{ \Carbon\Carbon::parse($job->deadline)->format('d F Y') }}</strong> dan saat ini tidak lagi menerima pengajuan lamaran baru.
+                            @elseif ($job->status === 'Closed')
+                                Lowongan ini telah resmi ditutup oleh perusahaan/perekrut sehingga proses penerimaan berkas baru telah berakhir.
+                            @else
+                                Lowongan ini saat ini tidak berstatus aktif sehingga tidak menerima pengajuan lamaran baru.
+                            @endif
+                        </p>
+                    </div>
+                </div>
+            @endif
+
             <!-- Job Header Card -->
             <div
-                class="reveal-on-scroll rounded-3xl bg-gradient-to-b from-[#061506] to-[#040804] border border-[#93F514]/30 p-6 sm:p-8 shadow-2xl shadow-[#93F514]/15">
+                class="reveal-on-scroll rounded-3xl bg-gradient-to-b from-[#061506] to-[#040804] border {{ $job->is_expired || $job->status !== 'Open' ? 'border-rose-500/30' : 'border-[#93F514]/30' }} p-6 sm:p-8 shadow-2xl {{ $job->is_expired || $job->status !== 'Open' ? 'shadow-rose-950/20' : 'shadow-[#93F514]/15' }}">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                     <div class="flex items-start gap-4">
                         @if ($job->company?->logo_url)
@@ -127,10 +150,25 @@
                             </div>
                         @endif
                         <div>
-                            <span
-                                class="px-3 py-1 rounded-full text-xs font-semibold bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514]">
-                                {{ $job->employment_type }}
-                            </span>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span
+                                    class="px-3 py-1 rounded-full text-xs font-semibold bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514]">
+                                    {{ $job->employment_type }}
+                                </span>
+                                @if ($job->is_expired || $job->status === 'Closed')
+                                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-500/20 border border-rose-500/40 text-rose-400">
+                                        Ditutup
+                                    </span>
+                                @elseif ($job->days_remaining === 0)
+                                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-500/20 border border-rose-500/40 text-rose-400 animate-pulse">
+                                        Berakhir Hari Ini!
+                                    </span>
+                                @elseif ($job->days_remaining !== null && $job->days_remaining <= 3)
+                                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/20 border border-amber-500/40 text-amber-400">
+                                        Sisa {{ $job->days_remaining }} Hari
+                                    </span>
+                                @endif
+                            </div>
                             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#EEEEEE] mt-2">
                                 {{ $job->title }}
                             </h1>
@@ -141,64 +179,76 @@
                         </div>
                     </div>
 
-                    @auth
-                        @php
-                            $isAdminOrRecruiter =
-                                auth()->user()->role_id == 1 ||
-                                auth()->user()->role_id == 2 ||
-                                in_array(strtolower(auth()->user()->role?->name ?? ''), [
-                                    'admin',
-                                    'superadmin',
-                                    'recruiter',
-                                ]);
-                        @endphp
-
-                        @if ($isAdminOrRecruiter)
-                            <div class="flex flex-col sm:flex-row items-center gap-3">
-                                <div
-                                    class="px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold text-center flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                    </svg>
-                                    <span>Akun {{ auth()->user()->role?->name ?? 'Admin/Staff' }} tidak dapat
-                                        melamar</span>
-                                </div>
-                                <a href="{{ auth()->user()->role_id == 2 || strtolower(auth()->user()->role?->name ?? '') === 'recruiter' ? route('recruiter.dashboard') : route('admin.dashboard') }}"
-                                    class="w-full sm:w-auto px-5 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white font-bold text-xs shadow-lg text-center transition">
-                                    Buka Dashboard
-                                </a>
-                            </div>
-                        @elseif($hasApplied)
-                            <div class="flex items-center gap-2.5">
-                                <div class="px-5 py-3 rounded-xl bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] font-bold text-xs flex items-center gap-2 shadow-lg shadow-[#93F514]/15">
-                                    <svg class="w-4 h-4 text-[#93F514]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-                                    </svg>
-                                    <span>Sudah Dilamar</span>
-                                </div>
-                                <a href="{{ route('profile', ['tab' => 'riwayat']) }}" 
-                                   class="px-4 py-3 rounded-xl bg-[#051405] hover:bg-[#93F514] border border-[#93F514]/30 text-white hover:text-black text-xs font-semibold shadow-md transition">
-                                    <span>Pantau Status</span>
-                                </a>
-                            </div>
-                        @else
-                            <button type="button" 
-                                    @click="handleApplyClick()"
-                                    class="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#93F514] hover:bg-[#82dc0a] text-black font-extrabold text-sm shadow-lg shadow-[#93F514]/25 text-center transition cursor-pointer flex items-center justify-center gap-2">
-                                <svg class="w-4 h-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                    @if ($job->is_expired || $job->status !== 'Open')
+                        <!-- Status Tombol Ditutup -->
+                        <div class="flex items-center gap-2.5">
+                            <div class="px-5 py-3 rounded-xl bg-gray-900/90 border border-gray-700 text-gray-400 font-bold text-xs flex items-center gap-2 cursor-not-allowed shadow-inner select-none">
+                                <svg class="w-4 h-4 text-rose-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                                 </svg>
-                                <span>Lamar Posisi Ini</span>
-                            </button>
-                        @endif
+                                <span>Pendaftaran Ditutup</span>
+                            </div>
+                        </div>
                     @else
-                        <a href="{{ route('login') }}"
-                            class="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#93F514] hover:bg-[#82dc0a] text-black font-extrabold text-sm shadow-lg shadow-[#93F514]/25 text-center transition flex items-center justify-center gap-2">
-                            <span>Masuk & Lamar</span>
-                        </a>
-                    @endauth
+                        @auth
+                            @php
+                                $isAdminOrRecruiter =
+                                    auth()->user()->role_id == 1 ||
+                                    auth()->user()->role_id == 2 ||
+                                    in_array(strtolower(auth()->user()->role?->name ?? ''), [
+                                        'admin',
+                                        'superadmin',
+                                        'recruiter',
+                                    ]);
+                            @endphp
+
+                            @if ($isAdminOrRecruiter)
+                                <div class="flex flex-col sm:flex-row items-center gap-3">
+                                    <div
+                                        class="px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold text-center flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" viewBox="0 0 24 24"
+                                            stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                        </svg>
+                                        <span>Akun {{ auth()->user()->role?->name ?? 'Admin/Staff' }} tidak dapat
+                                            melamar</span>
+                                    </div>
+                                    <a href="{{ auth()->user()->role_id == 2 || strtolower(auth()->user()->role?->name ?? '') === 'recruiter' ? route('recruiter.dashboard') : route('admin.dashboard') }}"
+                                        class="w-full sm:w-auto px-5 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white font-bold text-xs shadow-lg text-center transition">
+                                        Buka Dashboard
+                                    </a>
+                                </div>
+                            @elseif($hasApplied)
+                                <div class="flex items-center gap-2.5">
+                                    <div class="px-5 py-3 rounded-xl bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] font-bold text-xs flex items-center gap-2 shadow-lg shadow-[#93F514]/15">
+                                        <svg class="w-4 h-4 text-[#93F514]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        <span>Sudah Dilamar</span>
+                                    </div>
+                                    <a href="{{ route('profile', ['tab' => 'riwayat']) }}" 
+                                       class="px-4 py-3 rounded-xl bg-[#051405] hover:bg-[#93F514] border border-[#93F514]/30 text-white hover:text-black text-xs font-semibold shadow-md transition">
+                                        <span>Pantau Status</span>
+                                    </a>
+                                </div>
+                            @else
+                                <button type="button" 
+                                        @click="handleApplyClick()"
+                                        class="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#93F514] hover:bg-[#82dc0a] text-black font-extrabold text-sm shadow-lg shadow-[#93F514]/25 text-center transition cursor-pointer flex items-center justify-center gap-2">
+                                    <svg class="w-4 h-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                                    </svg>
+                                    <span>Lamar Posisi Ini</span>
+                                </button>
+                            @endif
+                        @else
+                            <a href="{{ route('login') }}"
+                                class="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#93F514] hover:bg-[#82dc0a] text-black font-extrabold text-sm shadow-lg shadow-[#93F514]/25 text-center transition flex items-center justify-center gap-2">
+                                <span>Masuk & Lamar</span>
+                            </a>
+                        @endauth
+                    @endif
                 </div>
 
                     <!-- Info Highlights Grid -->
@@ -224,11 +274,18 @@
                             <span class="text-xs sm:text-sm font-bold text-[#EEEEEE] mt-0.5 block">{{ $job->quota }}
                                 Orang</span>
                         </div>
-                        <div class="p-3 rounded-xl bg-[#050c05] border border-[#93F514]/20">
+                        <div class="p-3 rounded-xl bg-[#050c05] border {{ $job->is_expired || $job->status === 'Closed' ? 'border-rose-500/30' : ($job->days_remaining !== null && $job->days_remaining <= 3 ? 'border-amber-500/40' : 'border-[#93F514]/20') }}">
                             <span class="text-[11px] text-gray-400 block">Batas Lamaran</span>
-                            <span class="text-xs sm:text-sm font-bold text-[#EEEEEE] mt-0.5 block">
+                            <span class="text-xs sm:text-sm font-bold {{ $job->is_expired || $job->status === 'Closed' ? 'text-rose-400' : 'text-[#EEEEEE]' }} mt-0.5 block">
                                 {{ $job->deadline ? \Carbon\Carbon::parse($job->deadline)->format('d M Y') : 'Hingga Terpenuhi' }}
                             </span>
+                            @if ($job->is_expired || $job->status === 'Closed')
+                                <span class="text-[10px] font-semibold text-rose-400 block mt-0.5">Sudah Ditutup</span>
+                            @elseif ($job->days_remaining === 0)
+                                <span class="text-[10px] font-bold text-rose-400 animate-pulse block mt-0.5">Berakhir Hari Ini!</span>
+                            @elseif ($job->days_remaining !== null && $job->days_remaining <= 3)
+                                <span class="text-[10px] font-semibold text-amber-400 block mt-0.5">Sisa {{ $job->days_remaining }} Hari</span>
+                            @endif
                         </div>
                     </div>
                 </div>

@@ -471,10 +471,17 @@
                             <td class="px-6 py-4">
                                 <div class="space-y-1">
                                     @if ($job->status === 'Open')
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                            Open
-                                        </span>
+                                        @if ($job->is_expired)
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800" title="Lowongan Open tetapi tanggal deadline sudah terlewat">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                                Open (Expired)
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                                Open
+                                            </span>
+                                        @endif
                                     @elseif ($job->status === 'Closed')
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800">
                                             Closed
@@ -484,8 +491,11 @@
                                             Draft
                                         </span>
                                     @endif
-                                    <div class="text-[11px] text-gray-400">
-                                        Deadline: {{ \Carbon\Carbon::parse($job->deadline)->format('d M Y') }}
+                                    <div class="text-[11px] {{ $job->is_expired ? 'text-rose-500 font-medium' : 'text-gray-400' }}">
+                                        Deadline: {{ $job->deadline ? \Carbon\Carbon::parse($job->deadline)->format('d M Y') : 'Hingga Terpenuhi' }}
+                                        @if ($job->is_expired)
+                                            <span class="block text-[10px] text-rose-400 font-semibold">(Melewati batas)</span>
+                                        @endif
                                     </div>
                                 </div>
                             </td>
