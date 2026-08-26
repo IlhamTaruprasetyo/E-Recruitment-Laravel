@@ -599,9 +599,9 @@
                                         </svg>
                                         <span>
                                             @if ($job->days_remaining === 0)
-                                                🔥 Berakhir Hari Ini!
+                                                Berakhir Hari Ini!
                                             @elseif ($job->days_remaining !== null && $job->days_remaining <= 3)
-                                                ⚡ Sisa {{ $job->days_remaining }} Hari ({{ \Carbon\Carbon::parse($job->deadline)->format('d M') }})
+                                                Sisa {{ $job->days_remaining }} Hari ({{ \Carbon\Carbon::parse($job->deadline)->format('d M') }})
                                             @else
                                                 Batas: {{ \Carbon\Carbon::parse($job->deadline)->format('d M Y') }}
                                             @endif
@@ -711,9 +711,9 @@
                                             </svg>
                                             <span>
                                                 @if ($job->days_remaining === 0)
-                                                    🔥 Berakhir Hari Ini!
+                                                    Berakhir Hari Ini!
                                                 @elseif ($job->days_remaining !== null && $job->days_remaining <= 3)
-                                                    ⚡ Sisa {{ $job->days_remaining }} Hari ({{ \Carbon\Carbon::parse($job->deadline)->format('d M') }})
+                                                    Sisa {{ $job->days_remaining }} Hari ({{ \Carbon\Carbon::parse($job->deadline)->format('d M') }})
                                                 @else
                                                     Batas: {{ \Carbon\Carbon::parse($job->deadline)->format('d M Y') }}
                                                 @endif

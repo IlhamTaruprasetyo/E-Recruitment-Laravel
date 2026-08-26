@@ -250,19 +250,23 @@
 
                         <!-- OPSI PILIHAN GANDA -->
                         @if ($currentQuestion['question_type'] === 'multiple_choice')
-                            <div class="space-y-3 pt-2">
-                                @php
-                                    $labels = ['A', 'B', 'C', 'D', 'E'];
-                                    $selectedOpt = $answers[$currentQuestion['id']] ?? null;
-                                @endphp
+                            @php
+                                $labels = ['A', 'B', 'C', 'D', 'E'];
+                                $selectedOpt = $answers[$currentQuestion['id']] ?? null;
+                            @endphp
+                            <div class="space-y-3 pt-2"
+                                 wire:key="mc-box-{{ $currentQuestion['id'] }}"
+                                 wire:ignore
+                                 x-data="{ selected: {{ $selectedOpt ?? 'null' }} }">
                                 @foreach ($currentQuestion['options'] as $idx => $opt)
-                                    @php
-                                        $isSelected = ($selectedOpt == $opt['id']);
-                                    @endphp
-                                    <label wire:click="saveAnswer({{ $currentQuestion['id'] }}, {{ $opt['id'] }})"
-                                        class="flex items-center gap-3.5 p-4 rounded-2xl border cursor-pointer transition-all duration-200 {{ $isSelected ? 'bg-indigo-50/80 dark:bg-indigo-950/50 border-indigo-500 ring-2 ring-indigo-500/20 text-indigo-900 dark:text-indigo-100 font-semibold' : 'bg-gray-50/50 dark:bg-gray-900/40 border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-gray-700/50' }}">
-                                        <input type="radio" name="opt_{{ $currentQuestion['id'] }}" value="{{ $opt['id'] }}" {{ $isSelected ? 'checked' : '' }} class="sr-only">
-                                        <span class="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 {{ $isSelected ? 'bg-indigo-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300' }}">
+                                    <label @click="selected = {{ $opt['id'] }}; $wire.saveAnswer({{ $currentQuestion['id'] }}, {{ $opt['id'] }})"
+                                        class="flex items-center gap-3.5 p-4 rounded-2xl border cursor-pointer transition-all duration-200"
+                                        :class="selected == {{ $opt['id'] }}
+                                            ? 'bg-indigo-50/80 dark:bg-indigo-950/50 border-indigo-500 ring-2 ring-indigo-500/20 text-indigo-900 dark:text-indigo-100 font-semibold'
+                                            : 'bg-gray-50/50 dark:bg-gray-900/40 border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-gray-700/50'">
+                                        <input type="radio" name="opt_{{ $currentQuestion['id'] }}" value="{{ $opt['id'] }}" :checked="selected == {{ $opt['id'] }}" class="sr-only">
+                                        <span class="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs shrink-0"
+                                              :class="selected == {{ $opt['id'] }} ? 'bg-indigo-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'">
                                             {{ $labels[$idx] ?? ($idx + 1) }}
                                         </span>
                                         <span class="text-xs sm:text-sm flex-1 leading-snug">
@@ -389,16 +393,31 @@
                                 $mostOpt = $answers[$currentQuestion['id']]['most'] ?? null;
                                 $leastOpt = $answers[$currentQuestion['id']]['least'] ?? null;
                             @endphp
-                            <div class="space-y-4 pt-2" wire:key="disc-box-{{ $currentQuestion['id'] }}">
+                            <div class="space-y-4 pt-2" 
+                                 wire:key="disc-box-{{ $currentQuestion['id'] }}"
+                                 wire:ignore
+                                 x-data="{
+                                     discMost: {{ $mostOpt ?? 'null' }},
+                                     discLeast: {{ $leastOpt ?? 'null' }},
+                                     selectDisc(optId, type) {
+                                         if (type === 'most' && this.discLeast == optId) return;
+                                         if (type === 'least' && this.discMost == optId) return;
+                                         if (type === 'most') this.discMost = optId;
+                                         else this.discLeast = optId;
+                                         $wire.saveAnswer({{ $currentQuestion['id'] }}, optId, null, type);
+                                     }
+                                 }">
                                 <!-- Instruction Header -->
                                 <div class="flex items-center justify-between text-xs font-semibold px-1 text-gray-600 dark:text-gray-300">
                                     <span>Pilihlah <strong>1 pernyataan P</strong> (Paling Menggambarkan) dan <strong>1 pernyataan K</strong> (Kurang Menggambarkan).</span>
                                     <div class="flex items-center gap-1.5 font-mono text-[11px]">
-                                        <span class="px-2.5 py-0.5 rounded font-bold {{ $mostOpt ? 'bg-amber-400 text-amber-950' : 'bg-gray-100 dark:bg-gray-700 text-gray-400' }}">
-                                            P: {{ $mostOpt ? '✓' : '-' }}
+                                        <span class="px-2.5 py-0.5 rounded font-bold"
+                                              :class="discMost ? 'bg-amber-400 text-amber-950' : 'bg-gray-100 dark:bg-gray-700 text-gray-400'">
+                                            P: <span x-text="discMost ? '✓' : '-'"></span>
                                         </span>
-                                        <span class="px-2.5 py-0.5 rounded font-bold {{ $leastOpt ? 'bg-sky-400 text-sky-950' : 'bg-gray-100 dark:bg-gray-700 text-gray-400' }}">
-                                            K: {{ $leastOpt ? '✓' : '-' }}
+                                        <span class="px-2.5 py-0.5 rounded font-bold"
+                                              :class="discLeast ? 'bg-sky-400 text-sky-950' : 'bg-gray-100 dark:bg-gray-700 text-gray-400'">
+                                            K: <span x-text="discLeast ? '✓' : '-'"></span>
                                         </span>
                                     </div>
                                 </div>
@@ -408,62 +427,55 @@
                                     <table class="w-full text-xs border-collapse text-left">
                                         <thead>
                                             <tr class="font-extrabold text-sm border-b-2 border-gray-900 dark:border-gray-600 text-center">
-                                                <!-- Kolom No (Abu-abu) -->
-                                                <th class="w-14 py-2.5 px-3 bg-gray-400 text-gray-900 border-r-2 border-gray-900 dark:border-gray-600">
-                                                    No.
-                                                </th>
-                                                <!-- Kolom P (Kuning / Oranye) -->
-                                                <th class="w-14 py-2.5 px-3 bg-amber-400 text-gray-900 border-r-2 border-gray-900 dark:border-gray-600">
-                                                    P
-                                                </th>
-                                                <!-- Kolom K (Biru Langit) -->
-                                                <th class="w-14 py-2.5 px-3 bg-sky-400 text-gray-900 border-r-2 border-gray-900 dark:border-gray-600">
-                                                    K
-                                                </th>
-                                                <!-- Kolom Gambaran Diri (Ungu Tua / Indigo) -->
-                                                <th class="py-2.5 px-4 bg-indigo-900 text-white font-bold text-left tracking-wide">
-                                                    Gambaran Diri
-                                                </th>
+                                                <th class="w-14 py-2.5 px-3 bg-gray-400 text-gray-900 border-r-2 border-gray-900 dark:border-gray-600">No.</th>
+                                                <th class="w-14 py-2.5 px-3 bg-amber-400 text-gray-900 border-r-2 border-gray-900 dark:border-gray-600">P</th>
+                                                <th class="w-14 py-2.5 px-3 bg-sky-400 text-gray-900 border-r-2 border-gray-900 dark:border-gray-600">K</th>
+                                                <th class="py-2.5 px-4 bg-indigo-900 text-white font-bold text-left tracking-wide">Gambaran Diri</th>
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y-2 divide-gray-900 dark:divide-gray-600 font-medium text-xs">
                                             @foreach ($currentQuestion['options'] as $idx => $opt)
-                                                @php
-                                                    $isMost = ($mostOpt == $opt['id']);
-                                                    $isLeast = ($leastOpt == $opt['id']);
-                                                @endphp
-                                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/60 transition {{ $isMost ? 'bg-amber-50/40 dark:bg-amber-950/20' : ($isLeast ? 'bg-sky-50/40 dark:bg-sky-950/20' : '') }}"
+                                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/60 transition"
+                                                    :class="{
+                                                        'bg-amber-50/40 dark:bg-amber-950/20': discMost == {{ $opt['id'] }},
+                                                        'bg-sky-50/40 dark:bg-sky-950/20': discLeast == {{ $opt['id'] }}
+                                                    }"
                                                     wire:key="opt-row-{{ $currentQuestion['id'] }}-{{ $opt['id'] }}">
-                                                    <!-- Kolom Nomor (Hanya tampil di baris pertama dengan rowspan) -->
                                                     @if ($idx === 0)
                                                         <td rowspan="{{ count($currentQuestion['options']) }}" class="text-center font-black text-lg bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white border-r-2 border-gray-900 dark:border-gray-600">
                                                             {{ $currentQuestionIndex + 1 }}
                                                         </td>
                                                     @endif
 
-                                                    <!-- Kolom P (Kuning / Amber - Radio Button HIJAU) -->
-                                                    <td class="text-center border-r-2 border-gray-900 dark:border-gray-600 p-0 {{ $isLeast ? 'bg-gray-200 dark:bg-gray-700 opacity-40 cursor-not-allowed' : 'bg-amber-400/90' }}">
-                                                        <label class="w-full h-11 flex items-center justify-center {{ $isLeast ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-amber-500/80 transition' }}">
+                                                    <!-- Kolom P (Kuning / Amber) -->
+                                                    <td class="text-center border-r-2 border-gray-900 dark:border-gray-600 p-0"
+                                                        :class="discLeast == {{ $opt['id'] }} ? 'bg-gray-200 dark:bg-gray-700 opacity-40 cursor-not-allowed' : 'bg-amber-400/90'">
+                                                        <label class="w-full h-11 flex items-center justify-center"
+                                                               :class="discLeast == {{ $opt['id'] }} ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-amber-500/80 transition'">
                                                             <input type="radio" 
                                                                    name="disc_most_{{ $currentQuestion['id'] }}" 
                                                                    value="{{ $opt['id'] }}" 
-                                                                   {{ $isMost ? 'checked' : '' }}
-                                                                   {{ $isLeast ? 'disabled' : '' }}
-                                                                   wire:click="saveAnswer({{ $currentQuestion['id'] }}, {{ $opt['id'] }}, null, 'most')"
-                                                                   class="w-5 h-5 text-emerald-600 focus:ring-emerald-500 focus:ring-offset-0 border-2 border-gray-900 {{ $isLeast ? 'cursor-not-allowed opacity-30' : 'cursor-pointer' }}">
+                                                                   :checked="discMost == {{ $opt['id'] }}"
+                                                                   :disabled="discLeast == {{ $opt['id'] }}"
+                                                                   @click="selectDisc({{ $opt['id'] }}, 'most')"
+                                                                   class="w-5 h-5 text-emerald-600 focus:ring-emerald-500 focus:ring-offset-0 border-2 border-gray-900"
+                                                                   :class="discLeast == {{ $opt['id'] }} ? 'cursor-not-allowed opacity-30' : 'cursor-pointer'">
                                                         </label>
                                                     </td>
 
-                                                    <!-- Kolom K (Biru / Sky - Radio Button MERAH) -->
-                                                    <td class="text-center border-r-2 border-gray-900 dark:border-gray-600 p-0 {{ $isMost ? 'bg-gray-200 dark:bg-gray-700 opacity-40 cursor-not-allowed' : 'bg-sky-400/90' }}">
-                                                        <label class="w-full h-11 flex items-center justify-center {{ $isMost ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-sky-500/80 transition' }}">
+                                                    <!-- Kolom K (Biru / Sky) -->
+                                                    <td class="text-center border-r-2 border-gray-900 dark:border-gray-600 p-0"
+                                                        :class="discMost == {{ $opt['id'] }} ? 'bg-gray-200 dark:bg-gray-700 opacity-40 cursor-not-allowed' : 'bg-sky-400/90'">
+                                                        <label class="w-full h-11 flex items-center justify-center"
+                                                               :class="discMost == {{ $opt['id'] }} ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-sky-500/80 transition'">
                                                             <input type="radio" 
                                                                    name="disc_least_{{ $currentQuestion['id'] }}" 
                                                                    value="{{ $opt['id'] }}" 
-                                                                   {{ $isLeast ? 'checked' : '' }}
-                                                                   {{ $isMost ? 'disabled' : '' }}
-                                                                   wire:click="saveAnswer({{ $currentQuestion['id'] }}, {{ $opt['id'] }}, null, 'least')"
-                                                                   class="w-5 h-5 text-rose-600 focus:ring-rose-500 focus:ring-offset-0 border-2 border-gray-900 {{ $isMost ? 'cursor-not-allowed opacity-30' : 'cursor-pointer' }}">
+                                                                   :checked="discLeast == {{ $opt['id'] }}"
+                                                                   :disabled="discMost == {{ $opt['id'] }}"
+                                                                   @click="selectDisc({{ $opt['id'] }}, 'least')"
+                                                                   class="w-5 h-5 text-rose-600 focus:ring-rose-500 focus:ring-offset-0 border-2 border-gray-900"
+                                                                   :class="discMost == {{ $opt['id'] }} ? 'cursor-not-allowed opacity-30' : 'cursor-pointer'">
                                                         </label>
                                                     </td>
 
