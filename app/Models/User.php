@@ -41,11 +41,29 @@ class User extends Authenticatable
         return $this->hasOne(ApplicantProfile::class, 'user_id');
     }
 
+    public function employeeProfile()
+    {
+        return $this->hasOne(EmployeeProfile::class, 'user_id');
+    }
+
+    public function testAttempts()
+    {
+        return $this->hasMany(TestAttempt::class, 'user_id');
+    }
+
     protected static function booted(): void
     {
         static::created(function (User $user) {
             if ($user->role_id == 3 || strtolower($user->role?->name ?? '') === 'applicant') {
                 ApplicantProfile::firstOrCreate(
+                    ['user_id' => $user->id],
+                    [
+                        'nik'       => $user->nik ?? null,
+                        'full_name' => $user->name ?? null,
+                    ]
+                );
+            } elseif ($user->role_id == 4 || strtolower($user->role?->name ?? '') === 'employee') {
+                EmployeeProfile::firstOrCreate(
                     ['user_id' => $user->id],
                     [
                         'nik'       => $user->nik ?? null,

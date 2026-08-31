@@ -24,7 +24,10 @@ class TestEvaluationController extends Controller
             'jobApplication.applicantProfile.educations',
             'jobApplication.job.company',
             'jobApplication.job.department',
+            'user.employeeProfile.department.company',
+            'user.employeeProfile.company',
             'test.category',
+            'test.department',
             'discTestResult.discProfile',
         ])->findOrFail($id);
 
@@ -33,10 +36,11 @@ class TestEvaluationController extends Controller
         if (!$discResult) {
             $user = auth()->user();
             $isRecruiter = $user && ($user->role_id == 2 || strtolower($user->role?->name ?? '') === 'recruiter');
-            $redirectRoute = $isRecruiter ? 'recruiter.test_evaluation' : 'admin.test_evaluation';
+            $isAdmin = $user && ($user->role_id == 1 || in_array(strtolower($user->role?->name ?? ''), ['admin', 'superadmin']));
+            $redirectRoute = $isAdmin ? 'admin.test_evaluation' : ($isRecruiter ? 'recruiter.test_evaluation' : 'profile');
 
             return redirect()->route($redirectRoute)
-                ->with('error', 'Laporan DISC tidak dapat dibuat: Hasil tes DISC pelamar belum tersedia.');
+                ->with('error', 'Laporan DISC tidak dapat dibuat: Hasil tes DISC belum tersedia.');
         }
 
         $line1Raw = $discResult->line_1_scores['raw'] ?? ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0, '*' => 0];
@@ -83,9 +87,10 @@ class TestEvaluationController extends Controller
 
         $dominantTrait = DiscTrait::where('dimension_code', $primaryCode)->first();
 
-        $applicantName = $attempt->jobApplication?->applicantProfile?->full_name 
-            ?? $attempt->jobApplication?->applicantProfile?->user?->name 
-            ?? 'Kandidat';
+        $isEmployeeAttempt = ($attempt->attempt_type === 'employee') || empty($attempt->job_application_id);
+        $applicantName = $isEmployeeAttempt 
+            ? ($attempt->user?->employeeProfile?->full_name ?? ($attempt->user?->name ?? 'Karyawan'))
+            : ($attempt->jobApplication?->applicantProfile?->full_name ?? ($attempt->jobApplication?->applicantProfile?->user?->name ?? 'Kandidat'));
         
         $cleanApplicantName = Str::slug($applicantName, '_');
         $patternCode = Str::slug($profile?->pattern_code ?? 'DISC', '_');

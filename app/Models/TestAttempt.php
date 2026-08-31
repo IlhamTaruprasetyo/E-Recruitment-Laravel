@@ -14,6 +14,12 @@ class TestAttempt extends Model
 
     protected $fillable = [
         'job_application_id',
+        'user_id',
+        'attempt_type',
+        'participant_name',
+        'participant_age',
+        'participant_gender',
+        'test_date',
         'test_id',
         'started_at',
         'finished_at',
@@ -27,7 +33,13 @@ class TestAttempt extends Model
     protected $casts = [
         'started_at' => 'datetime',
         'finished_at' => 'datetime',
+        'test_date' => 'date',
     ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 
     public function jobApplication(): BelongsTo
     {

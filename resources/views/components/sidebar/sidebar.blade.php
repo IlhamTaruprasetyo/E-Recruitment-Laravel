@@ -161,6 +161,47 @@
                     </div>
                 </div>
 
+                <!-- Section 3: Asesmen Karyawan (Internal) -->
+                <div>
+                    <div
+                        class="px-3 mb-2 text-[11px] font-bold tracking-wider text-gray-400 dark:text-gray-500 uppercase">
+                        Asesmen Karyawan
+                    </div>
+                    <div class="space-y-1">
+                        <x-sidebar.nested-nav-link title="Asesmen Internal" :active="request()->routeIs('admin.employee_test') ||
+                            request()->routeIs('admin.employee_test.*') ||
+                            request()->routeIs('admin.employee_test_evaluation*') ||
+                            request()->routeIs('recruiter.employee_test_evaluation*') ||
+                            request()->routeIs('admin.employee*')">
+                            <x-slot:icon>
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                                </svg>
+                            </x-slot:icon>
+
+                            @if ($isAdmin)
+                                <a href="{{ route('admin.employee_test') }}"
+                                    class="block px-3 py-2 text-xs font-medium {{ request()->routeIs('admin.employee_test') || request()->routeIs('admin.employee_test.*') ? 'text-indigo-600 dark:text-indigo-400 font-semibold bg-indigo-50/50 dark:bg-indigo-950/30' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/60' }} rounded-lg transition-colors">
+                                    Paket Asesmen Karyawan
+                                </a>
+                            @endif
+
+                            <a href="{{ $isAdmin ? route('admin.employee_test_evaluation') : route('recruiter.employee_test_evaluation') }}"
+                                class="block px-3 py-2 text-xs font-medium {{ request()->routeIs('admin.employee_test_evaluation*') || request()->routeIs('recruiter.employee_test_evaluation*') ? 'text-indigo-600 dark:text-indigo-400 font-semibold bg-indigo-50/50 dark:bg-indigo-950/30' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/60' }} rounded-lg transition-colors">
+                                Hasil & Evaluasi Karyawan
+                            </a>
+
+                            @if ($isAdmin)
+                                <a href="{{ route('admin.employee') }}"
+                                    class="block px-3 py-2 text-xs font-medium {{ request()->routeIs('admin.employee') ? 'text-indigo-600 dark:text-indigo-400 font-semibold bg-indigo-50/50 dark:bg-indigo-950/30' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/60' }} rounded-lg transition-colors">
+                                    Data Karyawan
+                                </a>
+                            @endif
+                        </x-sidebar.nested-nav-link>
+                    </div>
+                </div>
+
                 @if ($isAdmin)
                     <!-- Section 4: Data Master (Admin Only) -->
                     <div>

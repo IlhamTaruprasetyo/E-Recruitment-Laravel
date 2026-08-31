@@ -21,21 +21,28 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="font-sans antialiased bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100"
-    x-data="{ sidebarOpen: false, activeTab: '{{ request('tab', 'pribadi') }}' }" x-on:switch-tab.window="activeTab = $event.detail">
     @php
+        $user = auth()->user();
+        $roleName = strtolower($user?->role?->name ?? '');
         $isAdminOrRecruiter =
             auth()->check() &&
-            (in_array(strtolower(auth()->user()->role?->name ?? ''), ['admin', 'superadmin', 'recruiter']) ||
-                in_array(auth()->user()->role_id, [1, 2]));
-        $isApplicantProfile = auth()->check() && !$isAdminOrRecruiter;
-        $hasSidebar = $isAdminOrRecruiter || $isApplicantProfile;
+            (in_array($roleName, ['admin', 'superadmin', 'recruiter']) || in_array($user->role_id, [1, 2]));
+        $isEmployee = auth()->check() && ($user->role_id == 4 || $roleName === 'employee');
+        $isApplicantProfile = auth()->check() && !$isAdminOrRecruiter && !$isEmployee;
+        $hasSidebar = $isAdminOrRecruiter || $isApplicantProfile || $isEmployee;
+        $defaultTab = $isEmployee ? 'dashboard' : 'pribadi';
+        $currentTab = request('tab', $defaultTab);
     @endphp
+
+<body class="font-sans antialiased bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+    x-data="{ sidebarOpen: false, activeTab: '{{ $currentTab }}' }" x-on:switch-tab.window="activeTab = $event.detail">
     <div class="min-h-screen flex bg-gray-100 dark:bg-gray-900">
 
-        <!-- Admin & Recruiter Protected Sidebar Component -->
+        <!-- Sidebar Component Based on Role -->
         @if ($isAdminOrRecruiter)
             <x-sidebar.sidebar />
+        @elseif($isEmployee)
+            <livewire:employee.employee-sidebar :active-tab="request('tab', 'dashboard')" />
         @elseif($isApplicantProfile)
             <livewire:applicant.applicant-sidebar :active-tab="request('tab', 'pribadi')" />
         @endif

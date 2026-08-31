@@ -32,6 +32,16 @@ new class extends Component
                 </svg>
                 <span>{{ auth()->user()->name }}</span>
             </a>
+        @elseif(auth()->user()->role_id == 4 || strtolower(auth()->user()->role?->name ?? '') === 'employee')
+            <a
+                href="{{ route('employee.dashboard') }}"
+                class="inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-black dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition"
+            >
+                <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span>{{ auth()->user()->name }}</span>
+            </a>
         @else
             <a
                 href="{{ route('profile') }}"

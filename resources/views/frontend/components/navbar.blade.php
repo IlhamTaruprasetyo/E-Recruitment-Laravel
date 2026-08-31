@@ -62,16 +62,18 @@
 
             @auth
                 @php
-                    $isAdminUser =
-                        auth()->user()->role_id == 1 ||
-                        in_array(strtolower(auth()->user()->role?->name ?? ''), ['admin', 'superadmin']);
-                    $isRecruiterUser =
-                        auth()->user()->role_id == 2 || strtolower(auth()->user()->role?->name ?? '') === 'recruiter';
-                    $targetDashboard = $isAdminUser
-                        ? route('admin.dashboard')
-                        : ($isRecruiterUser
-                            ? route('recruiter.dashboard')
-                            : route('profile'));
+                    $roleId = auth()->user()->role_id;
+                    $roleName = strtolower(auth()->user()->role?->name ?? '');
+                    $isAdminUser = $roleId == 1 || in_array($roleName, ['admin', 'superadmin']);
+                    $isRecruiterUser = $roleId == 2 || $roleName === 'recruiter';
+                    $isEmployeeUser = $roleId == 4 || $roleName === 'employee';
+
+                    $targetDashboard = match(true) {
+                        $isAdminUser => route('admin.dashboard'),
+                        $isRecruiterUser => route('recruiter.dashboard'),
+                        $isEmployeeUser => route('employee.dashboard'),
+                        default => route('profile'),
+                    };
                     $userName = trim(auth()->user()->name ?? 'User');
                     $shortName = \Illuminate\Support\Str::words($userName, 2, '');
                 @endphp

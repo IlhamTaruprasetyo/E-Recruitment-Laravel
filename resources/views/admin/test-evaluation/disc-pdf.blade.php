@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Laporan Hasil Tes DISC - {{ $attempt->jobApplication?->applicantProfile?->full_name ?? 'Pelamar' }}</title>
+    <title>Laporan Hasil Tes DISC - {{ (($attempt->attempt_type === 'employee') || empty($attempt->job_application_id)) ? ($attempt->user?->employeeProfile?->full_name ?? ($attempt->user?->name ?? 'Karyawan')) : ($attempt->jobApplication?->applicantProfile?->full_name ?? 'Pelamar') }}</title>
     <style>
         @page {
             margin: 7mm 10mm 7mm 10mm;
@@ -371,60 +371,88 @@
         </table>
     </div>
 
-    <!-- Candidate Bio Box -->
+    <!-- Candidate / Employee Bio Box -->
     @php
+        $isEmployeeAttempt = ($attempt->attempt_type === 'employee') || empty($attempt->job_application_id);
         $applicant = $attempt->jobApplication?->applicantProfile;
-        $user = $applicant?->user;
+        $employee = $attempt->user?->employeeProfile;
+        $user = $attempt->user ?? $applicant?->user;
         $job = $attempt->jobApplication?->job;
-        $company = $job?->company;
-        $dept = $job?->department;
+        $company = $job?->company ?? $employee?->company ?? $employee?->department?->company;
+        $dept = $job?->department ?? $employee?->department ?? $attempt->test?->department;
+
+        // Prioritaskan snapshot form biodata yang diinput peserta sebelum mulai ujian
+        $participantName = !empty($attempt->participant_name)
+            ? $attempt->participant_name
+            : ($isEmployeeAttempt 
+                ? ($employee?->full_name ?? ($user?->name ?? 'Karyawan')) 
+                : ($applicant?->full_name ?? ($user?->name ?? 'Pelamar')));
+
+        $participantTitle = $isEmployeeAttempt 
+            ? ($employee?->position_title ?? ($dept?->name ?? 'Karyawan Internal')) 
+            : ($job?->title ?? '-');
+
+        $participantNik = $isEmployeeAttempt ? ($employee?->nik ?? ($user?->nik ?? '-')) : ($applicant?->nik ?? '-');
+
+        $rawGender = $attempt->participant_gender ?? ($isEmployeeAttempt ? $employee?->gender : $applicant?->gender);
+        $genderLabel = match(strtolower($rawGender ?? '')) {
+            'male', 'laki-laki', 'pria' => 'Laki-laki',
+            'female', 'perempuan', 'wanita' => 'Perempuan',
+            default => '-',
+        };
+
+        $participantAge = $attempt->participant_age 
+            ?? ($employee?->birth_date ? \Carbon\Carbon::parse($employee->birth_date)->age : ($applicant?->birth_date ? \Carbon\Carbon::parse($applicant->birth_date)->age : null));
+
+        $testDateFormatted = $attempt->test_date 
+            ? \Carbon\Carbon::parse($attempt->test_date)->translatedFormat('d F Y')
+            : \Carbon\Carbon::parse($attempt->finished_at ?? $attempt->started_at ?? now())->translatedFormat('d F Y');
     @endphp
 
     <div class="bio-box">
         <table class="w-full">
             <tr>
                 <td class="align-top" style="width: 28%;">
-                    <div class="bio-label">Nama Pelamar</div>
-                    <div class="bio-value">{{ $applicant?->full_name ?? ($user?->name ?? '-') }}</div>
+                    <div class="bio-label">{{ $isEmployeeAttempt ? 'Nama Karyawan' : 'Nama Pelamar' }}</div>
+                    <div class="bio-value">{{ $participantName }}</div>
                 </td>
                 <td class="align-top" style="width: 25%;">
-                    <div class="bio-label">Posisi Lowongan</div>
-                    <div class="bio-value">{{ $job?->title ?? '-' }}</div>
+                    <div class="bio-label">{{ $isEmployeeAttempt ? 'Jabatan / Departemen' : 'Posisi Lowongan' }}</div>
+                    <div class="bio-value">{{ $participantTitle }}</div>
                 </td>
                 <td class="align-top" style="width: 23%;">
-                    <div class="bio-label">Perusahaan / Unit</div>
-                    <div class="bio-value">{{ $company?->name ?? ($dept?->name ?? 'Head Office') }}</div>
+                    <div class="bio-label">Unit / Perusahaan</div>
+                    <div class="bio-value">{{ $company?->name ?? ($dept?->name ?? 'Mitra Karya Analitika') }}</div>
                 </td>
                 <td class="align-top" style="width: 24%;">
                     <div class="bio-label">Tanggal Pelaksanaan Tes</div>
                     <div class="bio-value">
-                        {{ \Carbon\Carbon::parse($attempt->finished_at ?? $attempt->created_at)->translatedFormat('d F Y, H:i') }}
-                        WIB
+                        {{ $testDateFormatted }}
                     </div>
                 </td>
             </tr>
             <tr>
                 <td class="align-top" style="padding-top: 5px;">
                     <div class="bio-label">NIK / Identitas</div>
-                    <div class="bio-value" style="font-size: 10px;">{{ $applicant?->nik ?? '-' }}</div>
+                    <div class="bio-value" style="font-size: 10px;">{{ $participantNik }}</div>
                 </td>
                 <td class="align-top" style="padding-top: 5px;">
-                    <div class="bio-label">Email Pelamar</div>
+                    <div class="bio-label">Email</div>
                     <div class="bio-value" style="font-size: 10px;">{{ $user?->email ?? '-' }}</div>
                 </td>
                 <td class="align-top" style="padding-top: 5px;">
                     <div class="bio-label">Jenis Kelamin / Usia</div>
                     <div class="bio-value" style="font-size: 10px;">
-                        {{ $applicant?->gender ?? '-' }}
-                        @if ($applicant?->birth_date)
-                            ({{ \Carbon\Carbon::parse($applicant->birth_date)->age }} Thn)
+                        {{ $genderLabel }}
+                        @if ($participantAge)
+                            ({{ $participantAge }} Thn)
                         @endif
                     </div>
                 </td>
                 <td class="align-top" style="padding-top: 5px;">
-                    <div class="bio-label">Status Evaluasi</div>
+                    <div class="bio-label">Tipe Peserta</div>
                     <div class="bio-value" style="font-size: 10px; color: #334155;">
-                        Profil Terbentuk (Completed)
+                        {{ $isEmployeeAttempt ? 'Karyawan Internal' : 'Kandidat Pelamar' }}
                     </div>
                 </td>
             </tr>

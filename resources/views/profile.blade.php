@@ -7,11 +7,15 @@
         </x-slot>
 
         @php
+            $user = auth()->user();
+            $roleName = strtolower($user?->role?->name ?? '');
             $isAdminOrRecruiter = auth()->check() && (
-                in_array(auth()->user()->role_id, [1, 2]) ||
-                in_array(strtolower(auth()->user()->role?->name ?? ''), ['admin', 'superadmin', 'recruiter'])
+                in_array($user->role_id, [1, 2]) ||
+                in_array($roleName, ['admin', 'superadmin', 'recruiter'])
             );
-            $roleLabel = auth()->user()->role?->name ?? ($isAdminOrRecruiter ? 'Admin' : 'Pelamar');
+            $isEmployee = auth()->check() && ($user->role_id == 4 || $roleName === 'employee');
+            $roleLabel = $user->role?->name ?? ($isAdminOrRecruiter ? 'Admin' : ($isEmployee ? 'Employee' : 'Pelamar'));
+            $employeeProfile = $isEmployee ? $user->employeeProfile : null;
         @endphp
 
         <div class="py-4 px-4 sm:px-6 lg:px-8">
@@ -54,6 +58,9 @@
                             <livewire:profile.update-password-form />
                         </div>
                     </div>
+                @elseif ($isEmployee)
+                    <!-- Employee Internal Assessment Portal -->
+                    <livewire:employee.employee-assessment-portal />
                 @else
                     <!-- Tab 1: Data Pribadi -->
                     <div x-show="activeTab === 'pribadi'" class="space-y-3" x-cloak>

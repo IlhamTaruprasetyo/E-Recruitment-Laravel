@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
         DB::table('roles')->updateOrInsert(['id' => 1], ['name' => 'Admin']);
         DB::table('roles')->updateOrInsert(['id' => 2], ['name' => 'Recruiter']);
         DB::table('roles')->updateOrInsert(['id' => 3], ['name' => 'Applicant']);
+        DB::table('roles')->updateOrInsert(['id' => 4], ['name' => 'Employee']);
 
         // 2. Seed Users
         $superadmin = User::create([

@@ -11,6 +11,8 @@ class Test extends Model
 {
     protected $fillable = [
         'job_id',
+        'test_type',
+        'department_id',
         'category_id',
         'title',
         'duration_minutes',
@@ -26,6 +28,11 @@ class Test extends Model
     public function job(): BelongsTo
     {
         return $this->belongsTo(Job::class, 'job_id');
+    }
+
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class, 'department_id');
     }
 
     public function category(): BelongsTo
