@@ -65,12 +65,15 @@ class DiscCalculatorService
             'converted' => $line3Converted,
         ];
 
-        // 4. Determine pattern code based on highest Line 3 converted scores
-        $patternCode = $this->determinePatternCode($line3Converted);
+        // 4. Determine pattern and profile using Official Standard DISC 40 Patterns
+        $evalService = app(DiscStandardEvaluationService::class);
+        $patternResult = $evalService->evaluate($line3Converted);
+        $patternIndex = $patternResult['index'] ?? 1;
 
-        // Find matching profile
-        $profile = DiscProfile::where('pattern_code', $patternCode)->first()
-            ?? DiscProfile::where('pattern_code', 'LIKE', substr($patternCode, 0, 1) . '%')->first()
+        // Find matching profile by index / ID
+        $profile = DiscProfile::find($patternIndex)
+            ?? DiscProfile::where('title', $patternResult['title'] ?? '')->first()
+            ?? DiscProfile::where('pattern_code', $patternResult['code'] ?? '')->first()
             ?? DiscProfile::first();
 
         // 5. Update or Create DiscTestResult
@@ -92,34 +95,30 @@ class DiscCalculatorService
     {
         $converted = [];
         foreach (['D', 'I', 'S', 'C'] as $attr) {
-            $raw = $rawScores[$attr] ?? 0;
+            $raw = (int) ($rawScores[$attr] ?? 0);
+            
+            // Lookup norm from database
             $norm = DiscNorm::where('line_type', $lineType)
                 ->where('attribute', $attr)
                 ->where('raw_score', $raw)
                 ->first();
 
+            if (!$norm) {
+                // Fallback for clamped bounds
+                if ($lineType === 1 || $lineType === 2) {
+                    $clamped = max(0, min(20, $raw));
+                } else {
+                    $clamped = max(-22, min(22, $raw));
+                }
+                $norm = DiscNorm::where('line_type', $lineType)
+                    ->where('attribute', $attr)
+                    ->where('raw_score', $clamped)
+                    ->first();
+            }
+
             $converted[$attr] = $norm ? (float) $norm->converted_score : (float) $raw;
         }
 
         return $converted;
-    }
-
-    /**
-     * Determine pattern code (e.g. "D", "I", "S", "C", "D-I", etc.) from Line 3 converted scores.
-     */
-    protected function determinePatternCode(array $line3Converted): string
-    {
-        // Sort dimensions by converted score descending
-        arsort($line3Converted);
-        $keys = array_keys($line3Converted);
-        $highest = $keys[0];
-        $second = $keys[1];
-
-        // If top 2 are close in score (difference <= 1.5), combine them
-        if (($line3Converted[$highest] - $line3Converted[$second]) <= 1.5 && $line3Converted[$second] > 0) {
-            return $highest . '-' . $second;
-        }
-
-        return $highest;
     }
 }

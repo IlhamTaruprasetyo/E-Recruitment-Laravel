@@ -57,6 +57,7 @@ Route::middleware(['auth', 'verified', RoleMiddleware::class . ':recruiter'])
         Route::view('candidates', 'livewire.admin.candidates.index')->name('candidate');
         Route::view('test-evaluations', 'livewire.admin.test-evaluation.index')->name('test_evaluation');
         Route::put('test-evaluations/{id}/grade', [TestEvaluationController::class, 'updateGrade'])->name('test_evaluation.grade');
+        Route::get('test-evaluations/{id}/disc-pdf', [TestEvaluationController::class, 'downloadDiscPdf'])->name('test_evaluation.disc_pdf');
         
         // Interview Schedules
         Route::view('interview-schedules', 'livewire.admin.interview-schedule.index')->name('interview_schedule');
@@ -152,6 +153,7 @@ Route::middleware(['auth', 'verified', RoleMiddleware::class . ':admin'])
             // Evaluation & Essay Grading / Evaluasi Hasil & Nilai Ujian
             Route::view('test-evaluations', 'livewire.admin.test-evaluation.index')->name('test_evaluation');
             Route::put('test-evaluations/{id}/grade', [TestEvaluationController::class, 'updateGrade'])->name('test_evaluation.grade');
+            Route::get('test-evaluations/{id}/disc-pdf', [TestEvaluationController::class, 'downloadDiscPdf'])->name('test_evaluation.disc_pdf');
         });
     });
 

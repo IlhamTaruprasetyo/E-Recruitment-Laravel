@@ -7,8 +7,126 @@ use App\Models\TestAttempt;
 use App\Models\TestAnswer;
 use Illuminate\Support\Facades\DB;
 
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\DiscTrait;
+use App\Services\DiscChartService;
+use Illuminate\Support\Str;
+
 class TestEvaluationController extends Controller
 {
+    /**
+     * Preview or download DISC test results as a PDF document.
+     */
+    public function downloadDiscPdf(Request $request, string $id)
+    {
+        $attempt = TestAttempt::with([
+            'jobApplication.applicantProfile.user',
+            'jobApplication.applicantProfile.educations',
+            'jobApplication.job.company',
+            'jobApplication.job.department',
+            'test.category',
+            'discTestResult.discProfile',
+        ])->findOrFail($id);
+
+        $discResult = $attempt->discTestResult;
+
+        if (!$discResult) {
+            $user = auth()->user();
+            $isRecruiter = $user && ($user->role_id == 2 || strtolower($user->role?->name ?? '') === 'recruiter');
+            $redirectRoute = $isRecruiter ? 'recruiter.test_evaluation' : 'admin.test_evaluation';
+
+            return redirect()->route($redirectRoute)
+                ->with('error', 'Laporan DISC tidak dapat dibuat: Hasil tes DISC pelamar belum tersedia.');
+        }
+
+        $line1Raw = $discResult->line_1_scores['raw'] ?? ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0, '*' => 0];
+        $line2Raw = $discResult->line_2_scores['raw'] ?? ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0, '*' => 0];
+        $line3Raw = $discResult->line_3_scores['raw'] ?? ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0];
+
+        $line1Conv = $discResult->line_1_scores['converted'] ?? ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0];
+        $line2Conv = $discResult->line_2_scores['converted'] ?? ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0];
+        $line3Conv = $discResult->line_3_scores['converted'] ?? ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0];
+
+        $profile = $discResult->discProfile;
+
+        // Generate grafik garis dengan garis bantu koordinat
+        $chartService = app(DiscChartService::class);
+        $chartMost = $chartService->generateLineChart($line1Conv, 'most');
+        $chartLeast = $chartService->generateLineChart($line2Conv, 'least');
+        $chartChange = $chartService->generateLineChart($line3Conv, 'change');
+
+        // Evaluasi standar DISC berdasarkan software resmi 2018 (Most, Least, Change)
+        $evalService = app(\App\Services\DiscStandardEvaluationService::class);
+        $discEval = $evalService->evaluateAll($line1Conv, $line2Conv, $line3Conv);
+
+        if (!empty($discEval['change']['index'])) {
+            $matchedProfile = \App\Models\DiscProfile::find($discEval['change']['index']);
+            if ($matchedProfile) {
+                $profile = $matchedProfile;
+            }
+        }
+
+        // Ambil trait dominan
+        $primaryCode = strtoupper(substr($profile?->pattern_code ?? 'D', 0, 1));
+        if (!in_array($primaryCode, ['D', 'I', 'S', 'C'])) {
+            $maxDim = 'D';
+            $maxScore = -999;
+            foreach (['D', 'I', 'S', 'C'] as $dim) {
+                $sc = (float) ($line3Conv[$dim] ?? 0);
+                if ($sc > $maxScore) {
+                    $maxScore = $sc;
+                    $maxDim = $dim;
+                }
+            }
+            $primaryCode = $maxDim;
+        }
+
+        $dominantTrait = DiscTrait::where('dimension_code', $primaryCode)->first();
+
+        $applicantName = $attempt->jobApplication?->applicantProfile?->full_name 
+            ?? $attempt->jobApplication?->applicantProfile?->user?->name 
+            ?? 'Kandidat';
+        
+        $cleanApplicantName = Str::slug($applicantName, '_');
+        $patternCode = Str::slug($profile?->pattern_code ?? 'DISC', '_');
+        $date = now()->format('Ymd');
+        $fileName = "DISC_Report_{$cleanApplicantName}_{$patternCode}_{$date}.pdf";
+
+        $data = compact(
+            'attempt',
+            'discResult',
+            'profile',
+            'dominantTrait',
+            'primaryCode',
+            'line1Raw',
+            'line2Raw',
+            'line3Raw',
+            'line1Conv',
+            'line2Conv',
+            'line3Conv',
+            'chartMost',
+            'chartLeast',
+            'chartChange',
+            'discEval'
+        );
+
+        $pdf = Pdf::loadView('admin.test-evaluation.disc-pdf', $data)
+            ->setPaper('a4', 'portrait')
+            ->setOption([
+                'isHtml5ParserEnabled' => true,
+                'isRemoteEnabled' => true,
+                'defaultFont' => 'sans-serif',
+                'dpi' => 120,
+            ]);
+
+        // Default ke inline preview di browser, jika ada query ?download=1 lakukan direct download
+        if ($request->query('download') == '1') {
+            return $pdf->download($fileName);
+        }
+
+        return $pdf->stream($fileName);
+    }
+
     public function updateGrade(Request $request, string $id)
     {
         $attempt = TestAttempt::with(['answers.question', 'test', 'jobApplication'])->findOrFail($id);

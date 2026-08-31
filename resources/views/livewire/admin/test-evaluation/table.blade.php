@@ -217,110 +217,136 @@
                             <td class="px-6 py-4">
                                 <div class="space-y-0.5">
                                     <span class="block font-bold text-gray-900 dark:text-white">{{ $applicantName }}</span>
-                                    <span class="text-[11px] text-gray-500 dark:text-slate-400">{{ $att->jobApplication->job->title ?? '-' }}</span>
+                                    <span class="text-[11px] text-gray-500 dark:text-slate-400 font-medium">{{ $att->jobApplication->job->title ?? '-' }}</span>
                                 </div>
                             </td>
                             <td class="px-6 py-4">
                                 <div class="space-y-0.5">
                                     <span class="font-semibold text-gray-800 dark:text-slate-200">{{ $att->test->title ?? '-' }}</span>
-                                    <span class="block text-[11px] text-gray-400">{{ $att->test->category->name ?? '-' }}</span>
+                                    <span class="block text-[11px] text-gray-400 dark:text-slate-500">{{ $att->test->category->name ?? '-' }}</span>
                                 </div>
                             </td>
                             <td class="px-6 py-4">
                                 <div class="space-y-0.5 text-[11px]">
-                                    <span class="block text-gray-700 dark:text-slate-300">
+                                    <span class="block text-gray-700 dark:text-slate-300 font-medium">
                                         {{ $att->started_at ? \Carbon\Carbon::parse($att->started_at)->timezone('Asia/Jakarta')->translatedFormat('d M Y, H:i') . ' WIB' : '-' }}
                                     </span>
                                     @if ($att->duration)
-                                        <span class="text-gray-400">Durasi: {{ round($att->duration / 60) }} menit</span>
-                                    @endif
-                                </div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="space-y-0.5 text-[11px]">
-                                    <div class="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400 font-semibold">
-                                        <span>PG: {{ number_format($att->objective_score ?? 0, 1) }}</span>
-                                    </div>
-                                    <div class="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-semibold">
-                                        <span>Essay: {{ number_format($att->essay_score ?? 0, 1) }}</span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="space-y-0.5">
-                                    @if ($att->discTestResult)
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
-                                            DISC: {{ $att->discTestResult->discProfile->pattern_code ?? 'Profile' }}
-                                        </span>
-                                        <span class="block text-[11px] text-gray-400">Tes Kepribadian</span>
-                                    @else
-                                        <span class="block text-sm font-extrabold text-gray-900 dark:text-white">
-                                            {{ number_format($att->total_score ?? 0, 1) }}
-                                        </span>
-                                        <span class="text-[11px] text-gray-400">KKM: {{ number_format($att->test->passing_score ?? 0, 0) }}</span>
+                                        <span class="text-gray-400 dark:text-slate-500">Durasi: {{ round($att->duration / 60) }} menit</span>
                                     @endif
                                 </div>
                             </td>
                             <td class="px-6 py-4">
                                 @if ($att->discTestResult || ($att->test && str_contains(strtolower($att->test->title ?? ''), 'disc')))
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
-                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        Profil Terbentuk
-                                    </span>
-                                @elseif ($hasUnreviewedEssay)
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 animate-pulse">
-                                        Perlu Koreksi Essay
-                                    </span>
-                                @elseif ($att->status === 'passed')
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                        Lulus (Passed)
-                                    </span>
-                                @elseif ($att->status === 'failed')
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
-                                        Gagal (Failed)
-                                    </span>
-                                @elseif ($att->status === 'in_progress')
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
-                                        Sedang Pengerjaan
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 border border-slate-200/60 dark:border-slate-700/60">
+                                        Self-Inventory
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-                                        Selesai (Completed)
-                                    </span>
-                                @endif
-
-                                @if ($att->jobApplication)
-                                    @php
-                                        $appStatus = $att->jobApplication->status;
-                                        $badgeBg = match(strtolower($appStatus)) {
-                                            'accepted' => 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800',
-                                            'rejected' => 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/50 border-rose-200 dark:border-rose-800',
-                                            'interview' => 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 border-indigo-200 dark:border-indigo-800',
-                                            'shortlisted' => 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/50 border-purple-200 dark:border-purple-800',
-                                            'reviewed' => 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-800',
-                                            default => 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-800',
-                                        };
-                                    @endphp
-                                    <div class="mt-1">
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border {{ $badgeBg }}">
-                                            Lamaran: {{ $appStatus }}
-                                        </span>
+                                    <div class="space-y-0.5 text-[11px]">
+                                        <div class="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400 font-semibold">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                                            <span>PG: {{ number_format($att->objective_score ?? 0, 1) }}</span>
+                                        </div>
+                                        <div class="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-semibold">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                            <span>Essay: {{ number_format($att->essay_score ?? 0, 1) }}</span>
+                                        </div>
                                     </div>
                                 @endif
                             </td>
+                            <td class="px-6 py-4">
+                                <div class="space-y-0.5">
+                                    @if ($att->discTestResult)
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                                            DISC: {{ $att->discTestResult->discProfile->pattern_code ?? 'Profile' }}
+                                        </span>
+                                        <span class="block text-[11px] text-gray-400 dark:text-slate-500">Tes Kepribadian</span>
+                                    @else
+                                        <span class="block text-sm font-extrabold text-gray-900 dark:text-white">
+                                            {{ number_format($att->total_score ?? 0, 1) }}
+                                        </span>
+                                        <span class="text-[11px] text-gray-400 dark:text-slate-500">KKM: {{ number_format($att->test->passing_score ?? 0, 0) }}</span>
+                                    @endif
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="space-y-1.5">
+                                    @if ($att->discTestResult || ($att->test && str_contains(strtolower($att->test->title ?? ''), 'disc')))
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
+                                            <svg class="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            Profil Terbentuk
+                                        </span>
+                                    @elseif ($hasUnreviewedEssay)
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 animate-pulse">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                            Perlu Koreksi Essay
+                                        </span>
+                                    @elseif ($att->status === 'passed')
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                                            <svg class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            Lulus (Passed)
+                                        </span>
+                                    @elseif ($att->status === 'failed')
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
+                                            <svg class="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                            Gagal (Failed)
+                                        </span>
+                                    @elseif ($att->status === 'in_progress')
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-ping"></span>
+                                            Sedang Pengerjaan
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                                            Selesai (Completed)
+                                        </span>
+                                    @endif
+
+                                    @if ($att->jobApplication)
+                                        @php
+                                            $appStatus = $att->jobApplication->status;
+                                            $badgeBg = match(strtolower($appStatus)) {
+                                                'accepted' => 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800',
+                                                'rejected' => 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/50 border-rose-200 dark:border-rose-800',
+                                                'interview' => 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 border-indigo-200 dark:border-indigo-800',
+                                                'shortlisted' => 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/50 border-purple-200 dark:border-purple-800',
+                                                'reviewed' => 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-800',
+                                                default => 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-800',
+                                            };
+                                        @endphp
+                                        <div>
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border {{ $badgeBg }}">
+                                                Lamaran: {{ $appStatus }}
+                                            </span>
+                                        </div>
+                                    @endif
+                                </div>
+                            </td>
                             <td class="px-6 py-4 text-right">
-                                <button @click="openGradingModal({{ \Illuminate\Support\Js::from($att) }})" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center justify-center gap-1.5 ml-auto">
-                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                    <span>{{ $att->discTestResult ? 'Lihat Hasil DISC' : 'Evaluasi / Periksa' }}</span>
-                                </button>
+                                <div class="flex items-center justify-end gap-2">
+                                    @if ($att->discTestResult)
+                                        <a href="{{ route($isRecruiter ? 'recruiter.test_evaluation.disc_pdf' : 'admin.test_evaluation.disc_pdf', $att->id) }}" target="_blank" title="Preview Laporan PDF DISC di Tab Baru" class="px-2.5 py-1.5 bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/60 dark:hover:bg-purple-900 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 rounded-xl text-xs font-semibold shadow-2xs transition-all flex items-center gap-1.5">
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                            <span class="hidden sm:inline">Preview PDF</span>
+                                        </a>
+                                    @endif
+                                    <button @click="openGradingModal({{ \Illuminate\Support\Js::from($att) }})" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center justify-center gap-1.5">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                        </svg>
+                                        <span>{{ $att->discTestResult ? 'Lihat Hasil DISC' : 'Evaluasi / Periksa' }}</span>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     @empty
@@ -376,14 +402,28 @@
                     <!-- DISC Personality Analysis Report (If DISC Result exists) -->
                     <template x-if="gradingData.disc_result">
                         <div class="my-4 p-5 rounded-2xl bg-purple-50/50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-800 space-y-4">
-                            <div class="flex items-center justify-between pb-3 border-b border-purple-200 dark:border-purple-800/80">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-purple-200 dark:border-purple-800/80 gap-3">
                                 <div>
                                     <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-purple-600 text-white uppercase tracking-wider">
                                         Hasil Profil DISC Pelamar
                                     </span>
                                     <h4 class="text-sm font-bold text-gray-900 dark:text-white mt-1" x-text="gradingData.disc_result.disc_profile ? (gradingData.disc_result.disc_profile.pattern_code + ' - ' + gradingData.disc_result.disc_profile.title) : 'Tipe Kepribadian DISC'"></h4>
                                 </div>
-                                <span class="text-xs font-semibold text-purple-700 dark:text-purple-300">Self Inventory Personality Test</span>
+                                <div class="flex items-center gap-2">
+                                    <a :href="'{{ $isRecruiter ? '/recruiter/test-evaluations/' : '/admin/test-evaluations/' }}' + gradingData.id + '/disc-pdf'" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-100/80 hover:bg-purple-200 dark:bg-purple-900/60 dark:hover:bg-purple-800 text-purple-900 dark:text-purple-200 border border-purple-200 dark:border-purple-700 rounded-xl text-xs font-semibold shadow-2xs transition-all">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                        <span>Preview PDF</span>
+                                    </a>
+                                    <a :href="'{{ $isRecruiter ? '/recruiter/test-evaluations/' : '/admin/test-evaluations/' }}' + gradingData.id + '/disc-pdf?download=1'" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-semibold shadow-sm shadow-purple-500/20 transition-all">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                        </svg>
+                                        <span>Download PDF</span>
+                                    </a>
+                                </div>
                             </div>
 
                             <!-- DISC Score Table -->
