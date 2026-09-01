@@ -139,15 +139,24 @@ class TestEvaluationController extends Controller
         $request->validate([
             'essay_scores' => 'nullable|array',
             'essay_scores.*' => 'nullable|numeric|min:0',
+            'scores' => 'nullable|array',
+            'scores.*' => 'nullable|numeric|min:0',
             'application_status' => 'nullable|string|in:Submitted,Reviewed,Shortlisted,Interview,Accepted,Rejected',
             'application_notes' => 'nullable|string|max:1000',
         ]);
+
+        $isEmployeeAttempt = ($attempt->attempt_type === 'employee') || empty($attempt->job_application_id);
+        $user = auth()->user();
+        $isRecruiter = $user && ($user->role_id == 2 || strtolower($user->role?->name ?? '') === 'recruiter');
+        $redirectRoute = $isEmployeeAttempt
+            ? ($isRecruiter ? 'recruiter.employee_test_evaluation' : 'admin.employee_test_evaluation')
+            : ($isRecruiter ? 'recruiter.test_evaluation' : 'admin.test_evaluation');
 
         try {
             DB::beginTransaction();
 
             $reviewerId = auth()->id();
-            $essayScores = $request->input('essay_scores', []);
+            $essayScores = $request->input('essay_scores') ?? $request->input('scores', []);
 
             foreach ($essayScores as $answerId => $scoreValue) {
                 if ($scoreValue !== null && $scoreValue !== '') {
@@ -199,7 +208,7 @@ class TestEvaluationController extends Controller
                 'status' => $status,
             ]);
 
-            // Update status lamaran: prioritaskan pilihan manual HR jika dipilih, jika tidak dan lulus KKM otomatis Shortlisted
+            // Update status lamaran (khusus pelamar): prioritaskan pilihan manual HR jika dipilih, jika tidak dan lulus KKM otomatis Shortlisted
             if ($attempt->jobApplication) {
                 $app = $attempt->jobApplication;
                 $newStatus = $request->input('application_status');
@@ -239,19 +248,17 @@ class TestEvaluationController extends Controller
                 }
             }
 
-            $user = auth()->user();
-            $isRecruiter = $user && ($user->role_id == 2 || strtolower($user->role?->name ?? '') === 'recruiter');
-            $redirectRoute = $isRecruiter ? 'recruiter.test_evaluation' : 'admin.test_evaluation';
-
             DB::commit();
 
+            $successMsg = $isEmployeeAttempt
+                ? 'Penilaian essay karyawan berhasil disimpan dan total skor telah diperbarui.'
+                : 'Penilaian essay pelamar berhasil disimpan dan total skor telah diperbarui.';
+
             return redirect()->route($redirectRoute)
-                ->with('update', 'Penilaian essay pelamar berhasil disimpan dan total skor telah diperbarui.');
+                ->with('grade_success', $successMsg)
+                ->with('update', $successMsg);
         } catch (\Exception $e) {
             DB::rollBack();
-            $user = auth()->user();
-            $isRecruiter = $user && ($user->role_id == 2 || strtolower($user->role?->name ?? '') === 'recruiter');
-            $redirectRoute = $isRecruiter ? 'recruiter.test_evaluation' : 'admin.test_evaluation';
 
             return redirect()->route($redirectRoute)
                 ->with('error', 'Gagal menyimpan penilaian essay: ' . $e->getMessage());

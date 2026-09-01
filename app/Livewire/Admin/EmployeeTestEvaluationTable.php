@@ -77,10 +77,7 @@ class EmployeeTestEvaluationTable extends Component
             'answers.reviewer',
             'discTestResult.discProfile',
         ])
-        ->where(function ($q) {
-            $q->where('attempt_type', 'employee')
-              ->orWhereNotNull('user_id');
-        });
+        ->where('attempt_type', 'employee');
 
         // Search Filter
         if (!empty($this->search)) {

@@ -76,7 +76,8 @@ class TestEvaluationTable extends Component
             'answers.option',
             'answers.reviewer',
             'discTestResult.discProfile',
-        ]);
+        ])
+        ->where('attempt_type', 'applicant');
 
         // Search Filter
         if (!empty($this->search)) {

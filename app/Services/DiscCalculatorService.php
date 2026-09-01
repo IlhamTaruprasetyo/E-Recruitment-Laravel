@@ -13,10 +13,20 @@ class DiscCalculatorService
     /**
      * Calculate DISC test attempt scores, graph conversions, pattern profile, and save result.
      */
-    public function calculate(TestAttempt $attempt): DiscTestResult
+    public function calculate(TestAttempt $attempt): ?DiscTestResult
     {
         // 1. Fetch all answers for this test attempt
-        $answers = $attempt->answers()->with('option')->get();
+        $answers = $attempt->answers()->with(['option', 'question'])->get();
+
+        $discAnswers = $answers->filter(function ($ans) {
+            return ($ans->question && $ans->question->question_type === 'disc')
+                || in_array(strtolower($ans->answer_type ?? ''), ['most', 'least', 'p', 'k', '1', '2']);
+        });
+
+        if ($discAnswers->isEmpty()) {
+            DiscTestResult::where('test_attempt_id', $attempt->id)->delete();
+            return null;
+        }
 
         $line1Raw = ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0, '*' => 0];
         $line2Raw = ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0, '*' => 0];

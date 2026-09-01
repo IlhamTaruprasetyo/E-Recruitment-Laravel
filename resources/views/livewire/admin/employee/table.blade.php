@@ -76,7 +76,7 @@
                                 @endif
                             </td>
                             <td class="py-4 px-6 text-center">
-                                <span class="px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 font-semibold text-[11px]">
+                                <span class="inline-flex items-center justify-center whitespace-nowrap px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 font-semibold text-[11px]">
                                     Karyawan Aktif
                                 </span>
                             </td>

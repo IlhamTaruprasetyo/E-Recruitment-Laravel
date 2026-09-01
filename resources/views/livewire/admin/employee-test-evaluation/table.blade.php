@@ -1,23 +1,57 @@
 <div class="space-y-6" x-data="{
     showGradeModal: false,
     selectedAttempt: null,
+    showPdfViewer: false,
+    activePdfUrl: null,
+    activePdfName: null,
 
     openGradeModal(attempt) {
         this.selectedAttempt = attempt;
         this.showGradeModal = true;
+        this.showPdfViewer = false;
+        this.activePdfUrl = null;
+        this.activePdfName = null;
+    },
+
+    openPdfPreview(url, name) {
+        this.activePdfUrl = url;
+        this.activePdfName = name || 'Lampiran PDF';
+        this.showPdfViewer = true;
+    },
+
+    closePdfViewer() {
+        this.showPdfViewer = false;
+        this.activePdfUrl = null;
+        this.activePdfName = null;
     }
 }">
 
     <!-- Session Notifications -->
-    @if (session('grade_success'))
+    @if (session('grade_success') || session('update'))
         <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)" x-transition class="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 flex items-center justify-between shadow-sm">
             <div class="flex items-center gap-3">
                 <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span class="text-xs font-semibold">{{ session('grade_success') }}</span>
+                <span class="text-xs font-semibold">{{ session('grade_success') ?? session('update') }}</span>
             </div>
             <button @click="show = false" class="text-emerald-500 hover:text-emerald-700 dark:hover:text-emerald-200">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" x-transition class="p-4 rounded-2xl bg-rose-50 dark:bg-rose-900/30 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 flex items-center justify-between shadow-sm">
+            <div class="flex items-center gap-3">
+                <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <span class="text-xs font-semibold">{{ session('error') }}</span>
+            </div>
+            <button @click="show = false" class="text-rose-500 hover:text-rose-700 dark:hover:text-rose-200">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -146,19 +180,19 @@
                             </td>
                             <td class="py-4 px-6 text-center">
                                 @if ($isDisc)
-                                    <span class="px-2.5 py-1 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-semibold text-[11px]">
+                                    <span class="inline-flex items-center justify-center whitespace-nowrap px-2.5 py-1 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-semibold text-[11px]">
                                         Selesai
                                     </span>
                                 @elseif ($attempt->status === 'passed')
-                                    <span class="px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 font-semibold text-[11px]">
+                                    <span class="inline-flex items-center justify-center whitespace-nowrap px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 font-semibold text-[11px]">
                                         Lolos Standar
                                     </span>
                                 @elseif ($attempt->status === 'failed')
-                                    <span class="px-2.5 py-1 rounded-full bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 font-semibold text-[11px]">
+                                    <span class="inline-flex items-center justify-center whitespace-nowrap px-2.5 py-1 rounded-full bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 font-semibold text-[11px]">
                                         Di Bawah Standar
                                     </span>
                                 @else
-                                    <span class="px-2.5 py-1 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 font-semibold text-[11px]">
+                                    <span class="inline-flex items-center justify-center whitespace-nowrap px-2.5 py-1 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 font-semibold text-[11px]">
                                         Sedang Proses
                                     </span>
                                 @endif
@@ -252,14 +286,62 @@
                         <div class="space-y-3 pt-2">
                             <h4 class="text-xs font-bold text-gray-800 dark:text-slate-200">Jawaban Essay</h4>
                             <template x-for="(ans, idx) in (selectedAttempt.answers || []).filter(a => a.question && a.question.question_type === 'essay')" :key="ans.id">
-                                <div class="p-3.5 rounded-xl bg-gray-50 dark:bg-slate-700/30 border border-gray-100 dark:border-slate-700 text-xs space-y-2">
+                                <div class="p-3.5 rounded-xl bg-gray-50 dark:bg-slate-700/30 border border-gray-100 dark:border-slate-700 text-xs space-y-2.5">
+                                    <!-- Nomor & Pertanyaan -->
                                     <div class="font-semibold text-gray-800 dark:text-slate-200" x-text="(idx + 1) + '. ' + ans.question.question"></div>
-                                    <div class="p-2.5 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-slate-300 font-mono text-[11px]" x-text="ans.essay_answer || '(Tidak ada jawaban teks)'"></div>
-                                    <div class="flex items-center justify-between pt-1">
+
+                                    <!-- Jawaban Teks -->
+                                    <div class="p-2.5 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-slate-300 font-mono text-[11px] whitespace-pre-line" x-text="ans.essay_answer || '(Tidak ada jawaban teks)'"></div>
+
+                                    <!-- Lampiran PDF / File -->
+                                    <template x-if="ans.attachment_url">
+                                        <div class="rounded-xl border border-indigo-200 dark:border-indigo-800/60 bg-indigo-50/60 dark:bg-indigo-950/30 overflow-hidden">
+                                            <!-- Header Lampiran -->
+                                            <div class="flex items-center justify-between px-3.5 py-2.5 gap-2">
+                                                <div class="flex items-center gap-2.5 min-w-0">
+                                                    <!-- Ikon PDF / File -->
+                                                    <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                                                        :class="ans.attachment_name && ans.attachment_name.toLowerCase().endsWith('.pdf') ? 'bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400' : 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400'">
+                                                        <template x-if="ans.attachment_name && ans.attachment_name.toLowerCase().endsWith('.pdf')">
+                                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM9.5 17.5c-.28 0-.5-.22-.5-.5v-4c0-.28.22-.5.5-.5s.5.22.5.5v4c0 .28-.22.5-.5.5zm2-4.5h.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5H12v1c0 .28-.22.5-.5.5s-.5-.22-.5-.5v-4c0-.28.22-.5.5-.5zm.5 2c.28 0 .5-.22.5-.5s-.22-.5-.5-.5H12v1h.5zm2.5-2h1c.83 0 1.5.67 1.5 1.5v1c0 .83-.67 1.5-1.5 1.5h-1c-.28 0-.5-.22-.5-.5v-4c0-.28.22-.5.5-.5zm.5 3h.5c.28 0 .5-.22.5-.5v-1c0-.28-.22-.5-.5-.5H15v2z"/></svg>
+                                                        </template>
+                                                        <template x-if="!(ans.attachment_name && ans.attachment_name.toLowerCase().endsWith('.pdf'))">
+                                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
+                                                        </template>
+                                                    </div>
+                                                    <div class="truncate">
+                                                        <span class="block font-semibold text-indigo-900 dark:text-indigo-200 truncate text-[11px]" x-text="ans.attachment_name || 'Lampiran File Jawaban'"></span>
+                                                        <span class="text-[10px] text-gray-500 dark:text-slate-400" x-text="ans.attachment_size ? Math.round(ans.attachment_size / 1024) + ' KB' : 'File Terlampir'"></span>
+                                                    </div>
+                                                </div>
+                                                <!-- Tombol Aksi -->
+                                                <div class="flex items-center gap-1.5 shrink-0">
+                                                    <!-- Tombol Preview PDF (hanya muncul untuk PDF) -->
+                                                    <template x-if="ans.attachment_name && ans.attachment_name.toLowerCase().endsWith('.pdf')">
+                                                        <button type="button"
+                                                            @click="openPdfPreview(ans.attachment_url, ans.attachment_name)"
+                                                            class="inline-flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-semibold text-rose-700 dark:text-rose-300 bg-rose-100 dark:bg-rose-900/40 hover:bg-rose-200 dark:hover:bg-rose-900/70 rounded-lg border border-rose-200 dark:border-rose-800 transition">
+                                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                                            <span>Preview PDF</span>
+                                                        </button>
+                                                    </template>
+                                                    <!-- Tombol Download/Buka -->
+                                                    <a :href="ans.attachment_url" target="_blank"
+                                                        class="inline-flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition">
+                                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                                        <span>Unduh</span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+
+                                    <!-- Penilaian -->
+                                    <div class="flex items-center justify-between pt-1 border-t border-gray-200 dark:border-slate-600">
                                         <span class="text-[10px] text-gray-400">Poin Maksimal: <span x-text="ans.question.points || 10"></span></span>
                                         <div class="flex items-center gap-1.5">
                                             <label class="text-[11px] font-semibold text-gray-600 dark:text-slate-300">Nilai:</label>
-                                            <input type="number" :name="'scores[' + ans.id + ']'" :value="ans.score || 0" min="0" :max="ans.question.points || 100" step="0.5" class="w-16 px-2 py-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-lg text-xs text-center font-bold focus:ring-1 focus:ring-emerald-500">
+                                            <input type="number" :name="'essay_scores[' + ans.id + ']'" :value="ans.score || 0" min="0" :max="ans.question.points || 100" step="0.5" class="w-16 px-2 py-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-lg text-xs text-center font-bold focus:ring-1 focus:ring-emerald-500">
                                         </div>
                                     </div>
                                 </div>
@@ -276,6 +358,49 @@
                         </div>
                     </form>
                 </template>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PDF VIEWER -->
+    <div x-show="showPdfViewer" x-cloak class="fixed inset-0 z-[60] overflow-hidden flex flex-col" style="display: none;">
+        <!-- Overlay -->
+        <div class="absolute inset-0 bg-gray-950/80 backdrop-blur-sm" @click="closePdfViewer()"></div>
+
+        <!-- Modal Box -->
+        <div class="relative z-10 flex flex-col w-full h-full max-w-5xl mx-auto my-4 px-4">
+            <!-- Header -->
+            <div class="flex items-center justify-between px-5 py-3.5 bg-white dark:bg-slate-800 rounded-t-2xl border border-b-0 border-gray-200 dark:border-slate-700 shadow-sm">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-lg bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 1.5L18.5 9H13V3.5z"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-gray-800 dark:text-slate-100" x-text="activePdfName"></p>
+                        <p class="text-[11px] text-gray-400">Pratinjau Lampiran Jawaban Essay</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a :href="activePdfUrl" target="_blank"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-sm transition">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                        Unduh File
+                    </a>
+                    <button type="button" @click="closePdfViewer()"
+                        class="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-xl transition">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- PDF Embed Frame -->
+            <div class="flex-1 bg-gray-100 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-b-2xl overflow-hidden shadow-2xl">
+                <iframe
+                    :src="activePdfUrl + '#toolbar=1&navpanes=0&scrollbar=1'"
+                    class="w-full h-full min-h-[70vh]"
+                    frameborder="0"
+                    allowfullscreen>
+                </iframe>
             </div>
         </div>
     </div>

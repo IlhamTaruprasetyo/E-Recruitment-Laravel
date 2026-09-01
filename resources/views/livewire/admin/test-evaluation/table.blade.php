@@ -209,6 +209,11 @@
                             $hasUnreviewedEssay = $att->answers->contains(function($ans) {
                                 return $ans->question && $ans->question->question_type === 'essay' && is_null($ans->reviewed_by);
                             });
+                            $isDisc = ($att->discTestResult && (
+                                str_contains(strtolower($att->test?->title ?? ''), 'disc') ||
+                                str_contains(strtolower($att->test?->category?->name ?? ''), 'disc') ||
+                                $att->answers->contains(fn($ans) => $ans->question?->question_type === 'disc' || in_array($ans->answer_type, ['most', 'least']))
+                            )) || ($att->test && (str_contains(strtolower($att->test->title ?? ''), 'disc') || str_contains(strtolower($att->test->category?->name ?? ''), 'disc')));
                         @endphp
                         <tr class="hover:bg-gray-50/80 dark:hover:bg-slate-800/40 transition-colors">
                             <td class="px-6 py-4 font-medium text-gray-500 dark:text-slate-400">
@@ -237,7 +242,7 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4">
-                                @if ($att->discTestResult || ($att->test && str_contains(strtolower($att->test->title ?? ''), 'disc')))
+                                @if ($isDisc)
                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 border border-slate-200/60 dark:border-slate-700/60">
                                         Self-Inventory
                                     </span>
@@ -256,12 +261,17 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="space-y-0.5">
-                                    @if ($att->discTestResult)
+                                    @if ($isDisc && $att->discTestResult)
                                         <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
                                             <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
                                             DISC: {{ $att->discTestResult->discProfile->pattern_code ?? 'Profile' }}
                                         </span>
                                         <span class="block text-[11px] text-gray-400 dark:text-slate-500">Tes Kepribadian</span>
+                                    @elseif ($isDisc)
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+                                            Belum Ada Hasil
+                                        </span>
+                                        <span class="block text-[10px] text-gray-400">Tes Kepribadian</span>
                                     @else
                                         <span class="block text-sm font-extrabold text-gray-900 dark:text-white">
                                             {{ number_format($att->total_score ?? 0, 1) }}
@@ -272,12 +282,16 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="space-y-1.5">
-                                    @if ($att->discTestResult || ($att->test && str_contains(strtolower($att->test->title ?? ''), 'disc')))
+                                    @if ($isDisc && $att->discTestResult)
                                         <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
                                             <svg class="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
                                             Profil Terbentuk
+                                        </span>
+                                    @elseif ($isDisc)
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                                            Belum Lengkap
                                         </span>
                                     @elseif ($hasUnreviewedEssay)
                                         <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 animate-pulse">
@@ -331,7 +345,7 @@
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
-                                    @if ($att->discTestResult)
+                                    @if ($isDisc && $att->discTestResult)
                                         <a href="{{ route($isRecruiter ? 'recruiter.test_evaluation.disc_pdf' : 'admin.test_evaluation.disc_pdf', $att->id) }}" target="_blank" title="Preview Laporan PDF DISC di Tab Baru" class="px-2.5 py-1.5 bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/60 dark:hover:bg-purple-900 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 rounded-xl text-xs font-semibold shadow-2xs transition-all flex items-center gap-1.5">
                                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -344,7 +358,7 @@
                                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                         </svg>
-                                        <span>{{ $att->discTestResult ? 'Lihat Hasil DISC' : 'Evaluasi / Periksa' }}</span>
+                                        <span>{{ ($isDisc && $att->discTestResult) ? 'Lihat Hasil DISC' : 'Evaluasi / Periksa' }}</span>
                                     </button>
                                 </div>
                             </td>

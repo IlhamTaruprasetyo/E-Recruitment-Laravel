@@ -574,7 +574,7 @@ class EmployeeOnlineTest extends Component
             ->sum('score');
 
         $hasEssay = collect($this->questions)->contains('question_type', 'essay');
-        $hasDisc = collect($this->questions)->contains('question_type', 'disc') || str_contains(strtolower($this->test->category?->name ?? ''), 'disc');
+        $hasDisc = collect($this->questions)->contains('question_type', 'disc');
         $hasMultipleChoice = collect($this->questions)->contains('question_type', 'multiple_choice');
 
         if ($hasDisc) {
