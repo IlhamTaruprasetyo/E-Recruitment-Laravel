@@ -156,17 +156,17 @@
                             <div class="pt-2">
                                 @if ($isCompleted)
                                     <div class="flex flex-wrap items-center justify-between gap-2">
-                                        <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                                            Nilai: <strong class="text-gray-900 dark:text-white font-bold">{{ $attempt->total_score ?? '-' }}</strong>
-                                        </span>
-                                        @if ($isDisc && $attempt->discTestResult)
-                                            <a href="{{ route('test_evaluation.disc_pdf', $attempt->id) }}" target="_blank"
-                                                class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/40 hover:bg-purple-100 dark:hover:bg-purple-900/50 border border-purple-200 dark:border-purple-800/50 rounded-xl transition w-full sm:w-auto text-center">
-                                                <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        @if ($isDisc)
+                                            <span class="inline-flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-semibold bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-emerald-800/50">
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
                                                 </svg>
-                                                Lihat Hasil DISC
-                                            </a>
+                                                Jawaban Anda Telah Tersimpan
+                                            </span>
+                                        @else
+                                            <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                                                Nilai: <strong class="text-gray-900 dark:text-white font-bold">{{ $attempt->total_score ?? '-' }}</strong>
+                                            </span>
                                         @endif
                                     </div>
                                 @elseif ($isInProgress)
@@ -266,26 +266,14 @@
                                 </span>
                                 <div class="text-right font-bold text-gray-900 dark:text-white">
                                     @if ($isDisc)
-                                        <span class="text-xs text-purple-600 dark:text-purple-400">
-                                            {{ $attempt->discTestResult?->discProfile?->pattern_name ?? 'Profil DISC' }}
+                                        <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                                             Tersimpan
                                         </span>
                                     @else
                                         Skor: {{ $attempt->total_score ?? ($attempt->objective_score ?? '-') }}
                                     @endif
                                 </div>
                             </div>
-
-                            @if ($isDisc && $attempt->discTestResult)
-                                <div class="pt-1">
-                                    <a href="{{ route('test_evaluation.disc_pdf', $attempt->id) }}" target="_blank"
-                                        class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-900/30 hover:bg-purple-100 dark:hover:bg-purple-900/60 border border-purple-200 dark:border-purple-800/50 rounded-xl transition">
-                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                        Unduh Hasil PDF DISC
-                                    </a>
-                                </div>
-                            @endif
                         </div>
                     @endforeach
                 </div>
@@ -298,9 +286,8 @@
                                 <th class="py-3 px-3">Nama Paket Asesmen</th>
                                 <th class="py-3 px-3">Kategori</th>
                                 <th class="py-3 px-3">Tanggal Pengerjaan</th>
-                                <th class="py-3 px-3">Skor Nilai</th>
+                                <th class="py-3 px-3">Skor / Hasil</th>
                                 <th class="py-3 px-3">Status</th>
-                                <th class="py-3 px-3 text-right">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
@@ -322,8 +309,8 @@
                                     </td>
                                     <td class="py-3.5 px-3 font-bold text-gray-900 dark:text-white">
                                         @if ($isDisc)
-                                            <span class="text-xs text-purple-600 dark:text-purple-400">
-                                                {{ $attempt->discTestResult?->discProfile?->pattern_name ?? 'Profil DISC Terbentuk' }}
+                                            <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                                                Tersimpan
                                             </span>
                                         @else
                                             {{ $attempt->total_score ?? ($attempt->objective_score ?? '-') }}
@@ -346,17 +333,6 @@
                                             <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300">
                                                 Sedang Dikerjakan
                                             </span>
-                                        @endif
-                                    </td>
-                                    <td class="py-3.5 px-3 text-right">
-                                        @if ($isDisc && $attempt->discTestResult)
-                                            <a href="{{ route('test_evaluation.disc_pdf', $attempt->id) }}" target="_blank"
-                                                class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-900/30 hover:bg-purple-100 dark:hover:bg-purple-900/60 border border-purple-200 dark:border-purple-800/50 rounded-lg transition">
-                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                                </svg>
-                                                PDF DISC
-                                            </a>
                                         @endif
                                     </td>
                                 </tr>

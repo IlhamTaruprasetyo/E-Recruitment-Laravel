@@ -91,6 +91,7 @@
             <!-- Filter Status -->
             <select wire:model.live="status" class="pl-3 pr-8 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition cursor-pointer">
                 <option value="">Semua Hasil</option>
+                <option value="in_progress">Sedang Mengerjakan</option>
                 <option value="disc">Tes Kepribadian DISC</option>
                 <option value="passed">Lolos Standar</option>
                 <option value="failed">Di Bawah Standar</option>
@@ -179,7 +180,12 @@
                                 @endif
                             </td>
                             <td class="py-4 px-6 text-center">
-                                @if ($isDisc)
+                                @if ($attempt->status === 'in_progress')
+                                    <span class="inline-flex items-center justify-center gap-1.5 whitespace-nowrap px-2.5 py-1 rounded-full bg-sky-100 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-semibold text-[11px] border border-sky-200 dark:border-sky-800">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-ping shrink-0"></span>
+                                        Sedang Mengerjakan
+                                    </span>
+                                @elseif ($isDisc)
                                     <span class="inline-flex items-center justify-center whitespace-nowrap px-2.5 py-1 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-semibold text-[11px]">
                                         Selesai
                                     </span>

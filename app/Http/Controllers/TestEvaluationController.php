@@ -31,12 +31,18 @@ class TestEvaluationController extends Controller
             'discTestResult.discProfile',
         ])->findOrFail($id);
 
+        $user = auth()->user();
+        $isRecruiter = $user && ($user->role_id == 2 || strtolower($user->role?->name ?? '') === 'recruiter');
+        $isAdmin = $user && ($user->role_id == 1 || in_array(strtolower($user->role?->name ?? ''), ['admin', 'superadmin']));
+
+        // Hanya Admin dan Recruiter yang diizinkan melihat / mengunduh laporan DISC
+        if (!$isAdmin && !$isRecruiter) {
+            abort(403, 'Akses ditolak. Hasil dan laporan analisis DISC hanya dapat diakses oleh Admin atau Tim HR.');
+        }
+
         $discResult = $attempt->discTestResult;
 
         if (!$discResult) {
-            $user = auth()->user();
-            $isRecruiter = $user && ($user->role_id == 2 || strtolower($user->role?->name ?? '') === 'recruiter');
-            $isAdmin = $user && ($user->role_id == 1 || in_array(strtolower($user->role?->name ?? ''), ['admin', 'superadmin']));
             $redirectRoute = $isAdmin ? 'admin.test_evaluation' : ($isRecruiter ? 'recruiter.test_evaluation' : 'profile');
 
             return redirect()->route($redirectRoute)

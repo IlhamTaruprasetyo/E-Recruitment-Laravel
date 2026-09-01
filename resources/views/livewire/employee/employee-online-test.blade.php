@@ -945,75 +945,90 @@
                 </div>
             @endif
 
-            <!-- Score Summary Card -->
-            <div
-                class="p-5 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 space-y-3">
-                <div class="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300">
-                    <span>Status Pengerjaan:</span>
-                    @if ($isWaitingReview)
-                        <span
-                            class="font-bold px-3 py-1 rounded-full text-[11px] bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
-                            Menunggu Review Essay
-                        </span>
-                    @elseif ($attempt && $attempt->status === 'passed')
-                        <span
-                            class="font-bold px-3 py-1 rounded-full text-[11px] bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                            Lulus (Passed)
-                        </span>
-                    @elseif ($attempt && $attempt->status === 'failed')
-                        <span
-                            class="font-bold px-3 py-1 rounded-full text-[11px] bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
-                            Belum Lolos KKM
-                        </span>
-                    @else
-                        <span
-                            class="font-bold px-3 py-1 rounded-full text-[11px] bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-                            Selesai (Completed)
-                        </span>
-                    @endif
-                </div>
-
-                @if ($hasMultipleChoice)
-                    <div class="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300">
-                        <span>Skor Pilihan Ganda:</span>
-                        <span class="font-extrabold text-indigo-600 dark:text-indigo-400 text-sm">
-                            {{ number_format($attempt->objective_score ?? 0, 1) }} Poin
-                        </span>
+            @if ($discResult || str_contains(strtolower($test->category?->name ?? ''), 'disc'))
+                <!-- Khusus Tes DISC: Sembunyikan detail hasil dari employee, hanya notifikasi tersimpan -->
+                <div class="p-6 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-800/60 text-center space-y-2">
+                    <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 mb-1">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
                     </div>
-                @endif
-
-                @if ($hasEssayQuestions)
+                    <h3 class="text-base font-bold text-gray-900 dark:text-white">Jawaban Anda Telah Tersimpan</h3>
+                    <p class="text-xs text-gray-600 dark:text-gray-400 max-w-md mx-auto leading-relaxed">
+                        Terima kasih telah menyelesaikan inventori kepribadian DISC. Seluruh jawaban Anda telah tersimpan dengan aman dan akan dievaluasi langsung oleh Tim HR / Tim Penilai.
+                    </p>
+                </div>
+            @else
+                <!-- Score Summary Card untuk Tes Non-DISC (Pilihan Ganda & Essay) -->
+                <div
+                    class="p-5 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 space-y-3">
                     <div class="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300">
-                        <span>Skor Essay / Uraian:</span>
-                        @if ($attempt && $attempt->essay_score !== null)
-                            <span class="font-extrabold text-amber-600 dark:text-amber-400 text-sm">
-                                {{ number_format($attempt->essay_score, 1) }} Poin
+                        <span>Status Pengerjaan:</span>
+                        @if ($isWaitingReview)
+                            <span
+                                class="font-bold px-3 py-1 rounded-full text-[11px] bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                                Menunggu Review Essay
+                            </span>
+                        @elseif ($attempt && $attempt->status === 'passed')
+                            <span
+                                class="font-bold px-3 py-1 rounded-full text-[11px] bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                                Lulus (Passed)
+                            </span>
+                        @elseif ($attempt && $attempt->status === 'failed')
+                            <span
+                                class="font-bold px-3 py-1 rounded-full text-[11px] bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
+                                Belum Lolos KKM
                             </span>
                         @else
-                            <span class="text-xs font-semibold text-amber-600 dark:text-amber-400 italic">
-                                Sedang Dinilai Tim HR
+                            <span
+                                class="font-bold px-3 py-1 rounded-full text-[11px] bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                                Selesai (Completed)
                             </span>
                         @endif
                     </div>
-                @endif
 
-                <div class="pt-2 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                    <span class="font-bold text-xs text-gray-900 dark:text-white">Total Skor Akhir:</span>
-                    @if ($isWaitingReview)
-                        <span
-                            class="text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-2.5 py-1 rounded-lg border border-amber-200 dark:border-amber-800">
-                            Menunggu Penilaian Essay
-                        </span>
-                    @else
-                        <span class="text-xl font-black text-gray-900 dark:text-white">
-                            {{ number_format($attempt->total_score ?? 0, 1) }}
-                        </span>
+                    @if ($hasMultipleChoice)
+                        <div class="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300">
+                            <span>Skor Pilihan Ganda:</span>
+                            <span class="font-extrabold text-indigo-600 dark:text-indigo-400 text-sm">
+                                {{ number_format($attempt->objective_score ?? 0, 1) }} Poin
+                            </span>
+                        </div>
                     @endif
+
+                    @if ($hasEssayQuestions)
+                        <div class="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300">
+                            <span>Skor Essay / Uraian:</span>
+                            @if ($attempt && $attempt->essay_score !== null)
+                                <span class="font-extrabold text-amber-600 dark:text-amber-400 text-sm">
+                                    {{ number_format($attempt->essay_score, 1) }} Poin
+                                </span>
+                            @else
+                                <span class="text-xs font-semibold text-amber-600 dark:text-amber-400 italic">
+                                    Sedang Dinilai Tim HR
+                                </span>
+                            @endif
+                        </div>
+                    @endif
+
+                    <div class="pt-2 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                        <span class="font-bold text-xs text-gray-900 dark:text-white">Total Skor Akhir:</span>
+                        @if ($isWaitingReview)
+                            <span
+                                class="text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-2.5 py-1 rounded-lg border border-amber-200 dark:border-amber-800">
+                                Menunggu Penilaian Essay
+                            </span>
+                        @else
+                            <span class="text-xl font-black text-gray-900 dark:text-white">
+                                {{ number_format($attempt->total_score ?? 0, 1) }}
+                            </span>
+                        @endif
+                    </div>
                 </div>
-            </div>
+            @endif
 
             <!-- DISC RESULT SECTION (IF DISC TEST) -->
-            @if ($discResult)
+            @if ($discResult && !str_contains(strtolower($test->category?->name ?? ''), 'disc'))
                 @php
                     $line1 = $discResult->line_1_scores['raw'] ?? ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0, '*' => 0];
                     $line2 = $discResult->line_2_scores['raw'] ?? ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0, '*' => 0];
