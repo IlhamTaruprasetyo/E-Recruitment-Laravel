@@ -48,6 +48,42 @@
         return 80 - (val * 8.125);
     },
 
+    getGroupedQuestions() {
+        if (!this.gradingData || !this.gradingData.answers) return [];
+        
+        let groups = [];
+        let map = {};
+
+        this.gradingData.answers.forEach(ans => {
+            let qId = ans.question_id || (ans.question ? ans.question.id : 0);
+            if (!map[qId]) {
+                map[qId] = {
+                    question_id: qId,
+                    question: ans.question,
+                    question_type: ans.question ? ans.question.question_type : (ans.answer_type === 'most' || ans.answer_type === 'least' ? 'disc' : 'multiple_choice'),
+                    points: ans.question ? ans.question.points : 1,
+                    answers: [],
+                    most_answer: null,
+                    least_answer: null,
+                    single_answer: null
+                };
+                groups.push(map[qId]);
+            }
+
+            map[qId].answers.push(ans);
+
+            if (ans.answer_type === 'most') {
+                map[qId].most_answer = ans;
+            } else if (ans.answer_type === 'least') {
+                map[qId].least_answer = ans;
+            } else {
+                map[qId].single_answer = ans;
+            }
+        });
+
+        return groups;
+    },
+
     getPolyline(scores) {
         if (!scores) return '';
         let dY = this.calcY(scores.D || 0);
@@ -344,21 +380,13 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <div class="flex items-center justify-end gap-2">
-                                    @if ($isDisc && $att->discTestResult)
-                                        <a href="{{ route($isRecruiter ? 'recruiter.test_evaluation.disc_pdf' : 'admin.test_evaluation.disc_pdf', $att->id) }}" target="_blank" title="Preview Laporan PDF DISC di Tab Baru" class="px-2.5 py-1.5 bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/60 dark:hover:bg-purple-900 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 rounded-xl text-xs font-semibold shadow-2xs transition-all flex items-center gap-1.5">
-                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                            </svg>
-                                            <span class="hidden sm:inline">Preview PDF</span>
-                                        </a>
-                                    @endif
-                                    <button @click="openGradingModal({{ \Illuminate\Support\Js::from($att) }})" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center justify-center gap-1.5">
+                                <div class="flex items-center justify-end">
+                                    <button @click="openGradingModal({{ \Illuminate\Support\Js::from($att) }})" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center justify-center gap-1.5">
                                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                         </svg>
-                                        <span>{{ ($isDisc && $att->discTestResult) ? 'Lihat Hasil DISC' : 'Evaluasi / Periksa' }}</span>
+                                        <span>{{ ($isDisc && $att->discTestResult) ? 'Riwayat Jawaban & Profil' : 'Riwayat Jawaban & Nilai' }}</span>
                                     </button>
                                 </div>
                             </td>
@@ -661,54 +689,101 @@
                         @method('PUT')
 
                         <div class="max-h-96 overflow-y-auto space-y-4 pr-1">
-                            <template x-for="(ans, index) in gradingData.answers" :key="ans.id">
-                                <div class="p-4 rounded-xl border transition" :class="ans.question && ans.question.question_type === 'essay' ? 'bg-amber-50/30 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800/60' : 'bg-gray-50/50 dark:bg-slate-800/40 border-gray-200 dark:border-slate-700'">
+                            <template x-for="(item, index) in getGroupedQuestions()" :key="item.question_id || index">
+                                <div class="p-4 rounded-xl border transition" :class="item.question_type === 'essay' ? 'bg-amber-50/30 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800/60' : (item.question_type === 'disc' || item.most_answer || item.least_answer ? 'bg-purple-50/40 dark:bg-purple-950/20 border-purple-200 dark:border-purple-800/60' : 'bg-gray-50/50 dark:bg-slate-800/40 border-gray-200 dark:border-slate-700')">
                                     
                                     <div class="flex items-start justify-between gap-3 mb-2">
                                         <div class="flex items-center gap-2">
                                             <span class="w-6 h-6 rounded-lg bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-slate-300 font-bold text-xs flex items-center justify-center" x-text="index + 1"></span>
-                                            <span class="px-2 py-0.5 rounded text-[10px] font-bold" :class="ans.question && ans.question.question_type === 'multiple_choice' ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'" x-text="ans.question && ans.question.question_type === 'multiple_choice' ? 'Pilihan Ganda' : 'Essay / Uraian'"></span>
-                                            <span class="text-xs font-bold text-gray-500 dark:text-slate-400" x-text="'(Bobot Max: ' + (ans.question ? ans.question.points : 1) + ' Poin)'"></span>
+                                            
+                                            <template x-if="item.question_type === 'multiple_choice'">
+                                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
+                                                    Pilihan Ganda
+                                                </span>
+                                            </template>
+                                            <template x-if="item.question_type === 'essay'">
+                                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300">
+                                                    Essay / Uraian
+                                                </span>
+                                            </template>
+                                            <template x-if="item.question_type === 'disc' || item.most_answer || item.least_answer">
+                                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300">
+                                                    Nomor DISC (P & K)
+                                                </span>
+                                            </template>
+
+                                            <template x-if="item.question_type !== 'disc' && !item.most_answer && !item.least_answer">
+                                                <span class="text-xs font-bold text-gray-500 dark:text-slate-400" x-text="'(Bobot Max: ' + (item.points || 1) + ' Poin)'"></span>
+                                            </template>
                                         </div>
 
                                         <!-- Reviewer badge if already reviewed -->
-                                        <template x-if="ans.reviewer">
+                                        <template x-if="item.single_answer && item.single_answer.reviewer">
                                             <span class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                                 </svg>
-                                                Dinilai oleh: <span x-text="ans.reviewer.name"></span>
+                                                Dinilai oleh: <span x-text="item.single_answer.reviewer.name"></span>
                                             </span>
                                         </template>
                                     </div>
 
                                     <!-- Pertanyaan -->
-                                    <p class="text-xs font-bold text-gray-900 dark:text-white mb-2" x-text="ans.question ? ans.question.question : '-'"></p>
+                                    <p class="text-xs font-bold text-gray-900 dark:text-white mb-2" x-text="item.question ? item.question.question : ('Nomor Soal ' + (index + 1))"></p>
 
-                                    <!-- Tipe Pilihan Ganda Display -->
-                                    <template x-if="ans.question && ans.question.question_type === 'multiple_choice'">
+                                    <!-- 1. Tipe Pilihan Ganda Display -->
+                                    <template x-if="item.question_type === 'multiple_choice' && item.single_answer">
                                         <div class="p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-xs space-y-1">
                                             <div class="flex items-center justify-between">
                                                 <span class="text-gray-500 dark:text-slate-400">Jawaban Pelamar:</span>
-                                                <span class="font-bold" :class="ans.option && ans.option.is_correct ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'" x-text="ans.option ? ans.option.option_text : 'Tidak Dijawab'"></span>
+                                                <span class="font-bold" :class="item.single_answer.option && item.single_answer.option.is_correct ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'" x-text="item.single_answer.option ? item.single_answer.option.option_text : 'Tidak Dijawab'"></span>
                                             </div>
                                             <div class="flex items-center justify-between pt-1 border-t border-gray-100 dark:border-slate-800">
                                                 <span class="text-gray-500 dark:text-slate-400">Nilai Otomatis:</span>
-                                                <span class="font-bold text-indigo-600 dark:text-indigo-400" x-text="ans.score + ' Poin'"></span>
+                                                <span class="font-bold text-indigo-600 dark:text-indigo-400" x-text="(item.single_answer.score || 0) + ' Poin'"></span>
                                             </div>
                                         </div>
                                     </template>
 
-                                    <!-- Tipe Essay Grading Box -->
-                                    <template x-if="ans.question && ans.question.question_type === 'essay'">
+                                    <!-- 2. Tipe DISC (1 Soal = P dan K) -->
+                                    <template x-if="item.question_type === 'disc' || item.most_answer || item.least_answer">
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                            <!-- Paling Sesuai (P) -->
+                                            <div class="p-3 rounded-xl bg-white dark:bg-slate-900 border-2 border-emerald-300 dark:border-emerald-700/70 shadow-2xs space-y-1">
+                                                <div class="flex items-center justify-between">
+                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-extrabold text-[10px]">
+                                                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                                        P (Paling Sesuai / Most)
+                                                    </span>
+                                                    <span class="text-[10px] font-bold text-gray-500 dark:text-slate-400" x-text="item.most_answer?.option?.most_tag || item.most_answer?.option?.attribute_tag ? 'Dimensi: ' + (item.most_answer?.option?.most_tag || item.most_answer?.option?.attribute_tag) : ''"></span>
+                                                </div>
+                                                <p class="font-bold text-gray-800 dark:text-slate-100 text-xs pt-1" x-text="item.most_answer?.option ? item.most_answer.option.option_text : '(Tidak Dipilih)'"></p>
+                                            </div>
+
+                                            <!-- Kurang Sesuai (K) -->
+                                            <div class="p-3 rounded-xl bg-white dark:bg-slate-900 border-2 border-rose-300 dark:border-rose-700/70 shadow-2xs space-y-1">
+                                                <div class="flex items-center justify-between">
+                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 font-extrabold text-[10px]">
+                                                        <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                                                        K (Kurang Sesuai / Least)
+                                                    </span>
+                                                    <span class="text-[10px] font-bold text-gray-500 dark:text-slate-400" x-text="item.least_answer?.option?.least_tag || item.least_answer?.option?.attribute_tag ? 'Dimensi: ' + (item.least_answer?.option?.least_tag || item.least_answer?.option?.attribute_tag) : ''"></span>
+                                                </div>
+                                                <p class="font-bold text-gray-800 dark:text-slate-100 text-xs pt-1" x-text="item.least_answer?.option ? item.least_answer.option.option_text : '(Tidak Dipilih)'"></p>
+                                            </div>
+                                        </div>
+                                    </template>
+
+                                    <!-- 3. Tipe Essay Grading Box -->
+                                    <template x-if="item.question_type === 'essay' && item.single_answer">
                                         <div class="space-y-3">
                                             <div class="p-3 rounded-lg bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-xs">
                                                 <span class="block text-[11px] font-semibold text-gray-400 uppercase mb-1">Jawaban Teks Pelamar:</span>
-                                                <p class="font-medium text-gray-800 dark:text-slate-200 whitespace-pre-line" x-text="ans.essay_answer || '(Pelamar tidak mengisikan jawaban teks)'"></p>
+                                                <p class="font-medium text-gray-800 dark:text-slate-200 whitespace-pre-line" x-text="item.single_answer.essay_answer || '(Pelamar tidak mengisikan jawaban teks)'"></p>
                                             </div>
 
                                             <!-- Lampiran File Pelamar (Local Storage) -->
-                                            <template x-if="ans.attachment_url">
+                                            <template x-if="item.single_answer.attachment_url">
                                                 <div class="flex items-center justify-between p-3 rounded-lg bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/60 text-xs">
                                                     <div class="flex items-center gap-2.5 min-w-0">
                                                         <div class="w-8 h-8 rounded-lg bg-indigo-600/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
@@ -717,11 +792,11 @@
                                                             </svg>
                                                         </div>
                                                         <div class="truncate">
-                                                            <span class="block font-semibold text-indigo-900 dark:text-indigo-200 truncate" x-text="ans.attachment_name || 'Lampiran File Jawaban'"></span>
-                                                            <span class="text-[10px] text-gray-500 dark:text-slate-400" x-text="(ans.attachment_size ? Math.round(ans.attachment_size / 1024) + ' KB • ' : '') + 'Lampiran Tersimpan'"></span>
+                                                            <span class="block font-semibold text-indigo-900 dark:text-indigo-200 truncate" x-text="item.single_answer.attachment_name || 'Lampiran File Jawaban'"></span>
+                                                            <span class="text-[10px] text-gray-500 dark:text-slate-400" x-text="(item.single_answer.attachment_size ? Math.round(item.single_answer.attachment_size / 1024) + ' KB • ' : '') + 'Lampiran Tersimpan'"></span>
                                                         </div>
                                                     </div>
-                                                    <a :href="ans.attachment_url" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg shadow-sm transition shrink-0 ml-2">
+                                                    <a :href="item.single_answer.attachment_url" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg shadow-sm transition shrink-0 ml-2">
                                                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                                         </svg>
@@ -731,11 +806,11 @@
                                             </template>
 
                                             <div class="flex items-center justify-between bg-amber-100/50 dark:bg-amber-950/40 p-3 rounded-lg border border-amber-200 dark:border-amber-800/80">
-                                                <label :for="'score_' + ans.id" class="text-xs font-bold text-amber-900 dark:text-amber-200">
-                                                    Beri Nilai Skor (Max: <span x-text="ans.question ? ans.question.points : 1"></span>):
+                                                <label :for="'score_' + item.single_answer.id" class="text-xs font-bold text-amber-900 dark:text-amber-200">
+                                                    Beri Nilai Skor (Max: <span x-text="item.points || 1"></span>):
                                                 </label>
                                                 <div class="flex items-center gap-2">
-                                                    <input type="number" step="0.5" min="0" :max="ans.question ? ans.question.points : 1" :name="'essay_scores[' + ans.id + ']'" :id="'score_' + ans.id" :value="ans.score !== null ? ans.score : ''" required placeholder="0" class="w-24 px-3 py-1 text-xs rounded-lg bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-700 text-gray-900 dark:text-white font-bold text-center focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                                                    <input type="number" step="0.5" min="0" :max="item.points || 1" :name="'essay_scores[' + item.single_answer.id + ']'" :id="'score_' + item.single_answer.id" :value="item.single_answer.score !== null ? item.single_answer.score : ''" required placeholder="0" class="w-24 px-3 py-1 text-xs rounded-lg bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-700 text-gray-900 dark:text-white font-bold text-center focus:ring-2 focus:ring-amber-500 focus:outline-none">
                                                     <span class="text-xs font-semibold text-amber-800 dark:text-amber-300">Poin</span>
                                                 </div>
                                             </div>

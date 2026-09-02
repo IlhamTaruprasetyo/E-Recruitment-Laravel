@@ -742,370 +742,79 @@
                 </div>
             @endif
 
-            <!-- Score Summary Card -->
-            <div class="p-5 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 space-y-3">
-                <div class="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300">
-                    <span>Status Pengerjaan:</span>
-                    @if ($isWaitingReview)
-                        <span class="font-bold px-3 py-1 rounded-full text-[11px] bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
-                            Menunggu Review Essay
-                        </span>
-                    @elseif ($attempt && $attempt->status === 'passed')
-                        <span class="font-bold px-3 py-1 rounded-full text-[11px] bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                            Lulus (Passed)
-                        </span>
-                    @elseif ($attempt && $attempt->status === 'failed')
-                        <span class="font-bold px-3 py-1 rounded-full text-[11px] bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
-                            Belum Lolos KKM
-                        </span>
-                    @else
-                        <span class="font-bold px-3 py-1 rounded-full text-[11px] bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-                            Selesai (Completed)
-                        </span>
-                    @endif
-                </div>
-
-                @if ($hasMultipleChoice)
-                    <div class="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300">
-                        <span>Skor Pilihan Ganda:</span>
-                        <span class="font-extrabold text-indigo-600 dark:text-indigo-400 text-sm">
-                            {{ number_format($attempt->objective_score ?? 0, 1) }} Poin
-                        </span>
+            @if ($discResult || str_contains(strtolower($test->category?->name ?? ''), 'disc'))
+                <!-- Khusus Tes DISC: Sembunyikan detail hasil dari pelamar, hanya notifikasi tersimpan -->
+                <div class="p-6 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-800/60 text-center space-y-2">
+                    <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 mb-1">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
                     </div>
-                @endif
-
-                @if ($hasEssayQuestions)
+                    <h3 class="text-base font-bold text-gray-900 dark:text-white">Jawaban Anda Telah Tersimpan</h3>
+                    <p class="text-xs text-gray-600 dark:text-gray-400 max-w-md mx-auto leading-relaxed">
+                        Terima kasih telah menyelesaikan inventori kepribadian DISC. Seluruh jawaban Anda telah tersimpan dengan aman dan akan dievaluasi langsung oleh Tim HR / Tim Rekruter.
+                    </p>
+                </div>
+            @else
+                <!-- Score Summary Card untuk Tes Non-DISC (Pilihan Ganda & Essay) -->
+                <div class="p-5 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 space-y-3">
                     <div class="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300">
-                        <span>Skor Essay / Uraian:</span>
-                        @if ($attempt && $attempt->essay_score !== null)
-                            <span class="font-extrabold text-amber-600 dark:text-amber-400 text-sm">
-                                {{ number_format($attempt->essay_score, 1) }} Poin
+                        <span>Status Pengerjaan:</span>
+                        @if ($isWaitingReview)
+                            <span class="font-bold px-3 py-1 rounded-full text-[11px] bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                                Menunggu Review Essay
+                            </span>
+                        @elseif ($attempt && $attempt->status === 'passed')
+                            <span class="font-bold px-3 py-1 rounded-full text-[11px] bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                                Lulus (Passed)
+                            </span>
+                        @elseif ($attempt && $attempt->status === 'failed')
+                            <span class="font-bold px-3 py-1 rounded-full text-[11px] bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
+                                Belum Lolos KKM
                             </span>
                         @else
-                            <span class="text-xs font-semibold text-amber-600 dark:text-amber-400 italic">
-                                Sedang Dinilai Tim HR
+                            <span class="font-bold px-3 py-1 rounded-full text-[11px] bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                                Selesai (Completed)
                             </span>
                         @endif
                     </div>
-                @endif
 
-                <div class="pt-2 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                    <span class="font-bold text-xs text-gray-900 dark:text-white">Total Skor Akhir:</span>
-                    @if ($isWaitingReview)
-                        <span class="text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-2.5 py-1 rounded-lg border border-amber-200 dark:border-amber-800">
-                            Menunggu Penilaian Essay
-                        </span>
-                    @else
-                        <span class="text-xl font-black text-gray-900 dark:text-white">
-                            {{ number_format($attempt->total_score ?? 0, 1) }}
-                        </span>
+                    @if ($hasMultipleChoice)
+                        <div class="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300">
+                            <span>Skor Pilihan Ganda:</span>
+                            <span class="font-extrabold text-indigo-600 dark:text-indigo-400 text-sm">
+                                {{ number_format($attempt->objective_score ?? 0, 1) }} Poin
+                            </span>
+                        </div>
                     @endif
-                </div>
-            </div>
 
-            <!-- DISC RESULT SECTION (IF DISC TEST) -->
-            @if ($discResult)
-                @php
-                    $line1 = $discResult->line_1_scores['raw'] ?? ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0, '*' => 0];
-                    $line2 = $discResult->line_2_scores['raw'] ?? ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0, '*' => 0];
-                    $line3 = $discResult->line_3_scores['raw'] ?? ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0];
-                    
-                    $line1Conv = $discResult->line_1_scores['converted'] ?? ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0];
-                    $line2Conv = $discResult->line_2_scores['converted'] ?? ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0];
-                    $line3Conv = $discResult->line_3_scores['converted'] ?? ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0];
-                    
-                    $profile = $discResult->discProfile;
-                    $applicant = $application->applicantProfile;
-                @endphp
-
-                <div class="mt-8 pt-8 border-t border-gray-100 dark:border-gray-700 text-left space-y-6">
-                    <!-- Title Header -->
-                    <div class="text-center pb-4 border-b border-gray-100 dark:border-gray-700">
-                        <span class="px-3 py-1 rounded-full text-xs font-black bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 uppercase tracking-widest">
-                            HASIL TES D I S C
-                        </span>
-                        <h3 class="text-xl font-black text-gray-900 dark:text-white mt-2">Self Inventory Personality Report</h3>
-                        <p class="text-xs text-gray-400 mt-0.5">Analisis Profil dan Kecenderungan Perilaku Kerja</p>
-                    </div>
-
-                    <!-- Applicant Bio Grid -->
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-gray-50 dark:bg-gray-900/60 p-4 rounded-2xl border border-gray-100 dark:border-gray-800 text-xs">
-                        <div>
-                            <span class="text-gray-400 block text-[11px]">Nama Lengkap</span>
-                            <span class="font-bold text-gray-900 dark:text-white">{{ $applicant->full_name ?? auth()->user()->name }}</span>
-                        </div>
-                        <div>
-                            <span class="text-gray-400 block text-[11px]">Jenis Kelamin</span>
-                            <span class="font-bold text-gray-900 dark:text-white">{{ $applicant->gender ?? 'Laki-Laki / Perempuan' }}</span>
-                        </div>
-                        <div>
-                            <span class="text-gray-400 block text-[11px]">Pola Kepribadian</span>
-                            <span class="font-black text-purple-600 dark:text-purple-400 text-sm">{{ $profile->pattern_code ?? 'DISC' }} - {{ $profile->title ?? 'Profile' }}</span>
-                        </div>
-                        <div>
-                            <span class="text-gray-400 block text-[11px]">Tanggal Tes</span>
-                            <span class="font-bold text-gray-900 dark:text-white">{{ \Carbon\Carbon::parse($attempt->finished_at ?? now())->translatedFormat('d F Y') }}</span>
-                        </div>
-                    </div>
-
-                    <!-- DISC Score Table -->
-                    <div class="overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xs">
-                        <table class="w-full text-xs text-center border-collapse">
-                            <thead>
-                                <tr class="bg-indigo-600 text-white font-bold">
-                                    <th class="py-2.5 px-4 text-left">Line / Dimensi</th>
-                                    <th class="py-2.5 px-3">D (Dominance)</th>
-                                    <th class="py-2.5 px-3">I (Influence)</th>
-                                    <th class="py-2.5 px-3">S (Steadiness)</th>
-                                    <th class="py-2.5 px-3">C (Compliance)</th>
-                                    <th class="py-2.5 px-3">*</th>
-                                    <th class="py-2.5 px-3 font-black text-amber-300">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800/80 font-medium">
-                                <tr>
-                                    <td class="py-2 px-4 text-left font-bold text-gray-800 dark:text-gray-200">1 (MOST / Gambaran Publik)</td>
-                                    <td class="py-2 px-3 font-bold">{{ $line1['D'] ?? 0 }}</td>
-                                    <td class="py-2 px-3 font-bold">{{ $line1['I'] ?? 0 }}</td>
-                                    <td class="py-2 px-3 font-bold">{{ $line1['S'] ?? 0 }}</td>
-                                    <td class="py-2 px-3 font-bold">{{ $line1['C'] ?? 0 }}</td>
-                                    <td class="py-2 px-3 text-gray-400">{{ $line1['*'] ?? 0 }}</td>
-                                    <td class="py-2 px-3 font-black text-indigo-600 dark:text-indigo-400">{{ array_sum($line1) }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="py-2 px-4 text-left font-bold text-gray-800 dark:text-gray-200">2 (LEAST / Asli Tersembunyi)</td>
-                                    <td class="py-2 px-3 font-bold">{{ $line2['D'] ?? 0 }}</td>
-                                    <td class="py-2 px-3 font-bold">{{ $line2['I'] ?? 0 }}</td>
-                                    <td class="py-2 px-3 font-bold">{{ $line2['S'] ?? 0 }}</td>
-                                    <td class="py-2 px-3 font-bold">{{ $line2['C'] ?? 0 }}</td>
-                                    <td class="py-2 px-3 text-gray-400">{{ $line2['*'] ?? 0 }}</td>
-                                    <td class="py-2 px-3 font-black text-rose-600 dark:text-rose-400">{{ array_sum($line2) }}</td>
-                                </tr>
-                                <tr class="bg-gray-50 dark:bg-gray-900/40 font-bold">
-                                    <td class="py-2 px-4 text-left text-purple-700 dark:text-purple-300">3 (CHANGE / Perceived Self)</td>
-                                    <td class="py-2 px-3 {{ ($line3['D'] ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-500' }}">{{ $line3['D'] ?? 0 }}</td>
-                                    <td class="py-2 px-3 {{ ($line3['I'] ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-500' }}">{{ $line3['I'] ?? 0 }}</td>
-                                    <td class="py-2 px-3 {{ ($line3['S'] ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-500' }}">{{ $line3['S'] ?? 0 }}</td>
-                                    <td class="py-2 px-3 {{ ($line3['C'] ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-500' }}">{{ $line3['C'] ?? 0 }}</td>
-                                    <td class="py-2 px-3 text-gray-400">-</td>
-                                    <td class="py-2 px-3 text-gray-500">-</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- 3 GRAPH VISUALIZATION CARDS (NATIVE SVG LINE CHARTS) -->
-                    @php
-                        // Helper closure untuk kalkulasi Y koordinat SVG (Rentang skor -8 s.d +8, tinggi viewBox 160, Y=0 di atas, Y=80 di tengah skor 0)
-                        $calcY = function($score) {
-                            $val = max(-8, min(8, (float) $score));
-                            // Map +8 => 15, 0 => 80, -8 => 145
-                            return 80 - ($val * 8.125);
-                        };
-                        
-                        // Titik X untuk D(35), I(85), S(135), C(185)
-                        $xPoints = ['D' => 35, 'I' => 85, 'S' => 135, 'C' => 185];
-                        
-                        $pts1 = $xPoints['D'].','.$calcY($line1Conv['D'] ?? 0).' '.$xPoints['I'].','.$calcY($line1Conv['I'] ?? 0).' '.$xPoints['S'].','.$calcY($line1Conv['S'] ?? 0).' '.$xPoints['C'].','.$calcY($line1Conv['C'] ?? 0);
-                        $pts2 = $xPoints['D'].','.$calcY($line2Conv['D'] ?? 0).' '.$xPoints['I'].','.$calcY($line2Conv['I'] ?? 0).' '.$xPoints['S'].','.$calcY($line2Conv['S'] ?? 0).' '.$xPoints['C'].','.$calcY($line2Conv['C'] ?? 0);
-                        $pts3 = $xPoints['D'].','.$calcY($line3Conv['D'] ?? 0).' '.$xPoints['I'].','.$calcY($line3Conv['I'] ?? 0).' '.$xPoints['S'].','.$calcY($line3Conv['S'] ?? 0).' '.$xPoints['C'].','.$calcY($line3Conv['C'] ?? 0);
-                    @endphp
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <!-- Graph 1: Mask Public Self (MOST) -->
-                        <div class="p-4 rounded-2xl bg-white dark:bg-gray-800 border border-rose-200 dark:border-rose-900/60 shadow-2xs space-y-3">
-                            <div class="text-center pb-2 border-b border-gray-100 dark:border-gray-700">
-                                <span class="text-[10px] font-extrabold uppercase tracking-wider text-rose-600 dark:text-rose-400">GRAPH 1 (MOST)</span>
-                                <h4 class="text-xs font-bold text-gray-900 dark:text-white">Mask / Public Self</h4>
-                            </div>
-                            
-                            <!-- SVG Chart -->
-                            <div class="relative bg-rose-50/40 dark:bg-gray-900/60 rounded-xl p-2 border border-rose-100 dark:border-rose-950">
-                                <svg viewBox="0 0 220 160" class="w-full h-44">
-                                    <!-- Grid Lines -->
-                                    <line x1="20" y1="15" x2="205" y2="15" stroke="#f43f5e" stroke-dasharray="2" stroke-opacity="0.3" />
-                                    <text x="5" y="18" fill="#9ca3af" font-size="8" font-family="monospace">+8</text>
-
-                                    <line x1="20" y1="47.5" x2="205" y2="47.5" stroke="#e5e7eb" stroke-dasharray="2" stroke-opacity="0.6" />
-                                    <text x="5" y="50.5" fill="#9ca3af" font-size="8" font-family="monospace">+4</text>
-
-                                    <!-- Zero Line (Baseline) -->
-                                    <line x1="20" y1="80" x2="205" y2="80" stroke="#f43f5e" stroke-width="1.5" stroke-opacity="0.8" />
-                                    <text x="5" y="83" fill="#f43f5e" font-size="9" font-weight="bold" font-family="monospace">0</text>
-
-                                    <line x1="20" y1="112.5" x2="205" y2="112.5" stroke="#e5e7eb" stroke-dasharray="2" stroke-opacity="0.6" />
-                                    <text x="5" y="115.5" fill="#9ca3af" font-size="8" font-family="monospace">-4</text>
-
-                                    <line x1="20" y1="145" x2="205" y2="145" stroke="#f43f5e" stroke-dasharray="2" stroke-opacity="0.3" />
-                                    <text x="5" y="148" fill="#9ca3af" font-size="8" font-family="monospace">-8</text>
-
-                                    <!-- Vertical Column Axes -->
-                                    @foreach($xPoints as $label => $x)
-                                        <line x1="{{ $x }}" y1="10" x2="{{ $x }}" y2="148" stroke="#cbd5e1" stroke-dasharray="2" stroke-opacity="0.5" />
-                                        <text x="{{ $x }}" y="158" fill="#64748b" font-size="10" font-weight="bold" text-anchor="middle">{{ $label }}</text>
-                                    @endforeach
-
-                                    <!-- Data Polyline -->
-                                    <polyline fill="none" stroke="#e11d48" stroke-width="2.5" points="{{ $pts1 }}" stroke-linecap="round" stroke-linejoin="round" />
-
-                                    <!-- Data Points & Labels -->
-                                    @foreach(['D', 'I', 'S', 'C'] as $dim)
-                                        @php 
-                                            $cx = $xPoints[$dim]; 
-                                            $cy = $calcY($line1Conv[$dim] ?? 0); 
-                                            $val = number_format($line1Conv[$dim] ?? 0, 1);
-                                        @endphp
-                                        <!-- Diamond Marker -->
-                                        <polygon points="{{ $cx }},{{ $cy - 4 }} {{ $cx + 4 }},{{ $cy }} {{ $cx }},{{ $cy + 4 }} {{ $cx - 4 }},{{ $cy }}" fill="#be123c" stroke="#ffffff" stroke-width="1.5" />
-                                        <text x="{{ $cx }}" y="{{ $cy - 6 }}" fill="#be123c" font-size="8.5" font-weight="bold" text-anchor="middle">{{ $val }}</text>
-                                    @endforeach
-                                </svg>
-                            </div>
-                            <p class="text-[10px] text-gray-400 text-center leading-tight">Perilaku yang ditampilkan saat berinteraksi di ruang sosial/publik.</p>
-                        </div>
-
-                        <!-- Graph 2: Core Private Self (LEAST) -->
-                        <div class="p-4 rounded-2xl bg-white dark:bg-gray-800 border border-amber-200 dark:border-amber-900/60 shadow-2xs space-y-3">
-                            <div class="text-center pb-2 border-b border-gray-100 dark:border-gray-700">
-                                <span class="text-[10px] font-extrabold uppercase tracking-wider text-amber-600 dark:text-amber-400">GRAPH 2 (LEAST)</span>
-                                <h4 class="text-xs font-bold text-gray-900 dark:text-white">Core / Private Self</h4>
-                            </div>
-
-                            <!-- SVG Chart -->
-                            <div class="relative bg-amber-50/40 dark:bg-gray-900/60 rounded-xl p-2 border border-amber-100 dark:border-amber-950">
-                                <svg viewBox="0 0 220 160" class="w-full h-44">
-                                    <!-- Grid Lines -->
-                                    <line x1="20" y1="15" x2="205" y2="15" stroke="#f59e0b" stroke-dasharray="2" stroke-opacity="0.3" />
-                                    <text x="5" y="18" fill="#9ca3af" font-size="8" font-family="monospace">+8</text>
-
-                                    <line x1="20" y1="47.5" x2="205" y2="47.5" stroke="#e5e7eb" stroke-dasharray="2" stroke-opacity="0.6" />
-                                    <text x="5" y="50.5" fill="#9ca3af" font-size="8" font-family="monospace">+4</text>
-
-                                    <!-- Zero Line (Baseline) -->
-                                    <line x1="20" y1="80" x2="205" y2="80" stroke="#f59e0b" stroke-width="1.5" stroke-opacity="0.8" />
-                                    <text x="5" y="83" fill="#f59e0b" font-size="9" font-weight="bold" font-family="monospace">0</text>
-
-                                    <line x1="20" y1="112.5" x2="205" y2="112.5" stroke="#e5e7eb" stroke-dasharray="2" stroke-opacity="0.6" />
-                                    <text x="5" y="115.5" fill="#9ca3af" font-size="8" font-family="monospace">-4</text>
-
-                                    <line x1="20" y1="145" x2="205" y2="145" stroke="#f59e0b" stroke-dasharray="2" stroke-opacity="0.3" />
-                                    <text x="5" y="148" fill="#9ca3af" font-size="8" font-family="monospace">-8</text>
-
-                                    <!-- Vertical Column Axes -->
-                                    @foreach($xPoints as $label => $x)
-                                        <line x1="{{ $x }}" y1="10" x2="{{ $x }}" y2="148" stroke="#cbd5e1" stroke-dasharray="2" stroke-opacity="0.5" />
-                                        <text x="{{ $x }}" y="158" fill="#64748b" font-size="10" font-weight="bold" text-anchor="middle">{{ $label }}</text>
-                                    @endforeach
-
-                                    <!-- Data Polyline -->
-                                    <polyline fill="none" stroke="#d97706" stroke-width="2.5" points="{{ $pts2 }}" stroke-linecap="round" stroke-linejoin="round" />
-
-                                    <!-- Data Points & Labels -->
-                                    @foreach(['D', 'I', 'S', 'C'] as $dim)
-                                        @php 
-                                            $cx = $xPoints[$dim]; 
-                                            $cy = $calcY($line2Conv[$dim] ?? 0); 
-                                            $val = number_format($line2Conv[$dim] ?? 0, 1);
-                                        @endphp
-                                        <polygon points="{{ $cx }},{{ $cy - 4 }} {{ $cx + 4 }},{{ $cy }} {{ $cx }},{{ $cy + 4 }} {{ $cx - 4 }},{{ $cy }}" fill="#b45309" stroke="#ffffff" stroke-width="1.5" />
-                                        <text x="{{ $cx }}" y="{{ $cy - 6 }}" fill="#b45309" font-size="8.5" font-weight="bold" text-anchor="middle">{{ $val }}</text>
-                                    @endforeach
-                                </svg>
-                            </div>
-                            <p class="text-[10px] text-gray-400 text-center leading-tight">Karakter asli ketika berada di bawah tekanan kerja atau situasi intim.</p>
-                        </div>
-
-                        <!-- Graph 3: Mirror Perceived Self (CHANGE) -->
-                        <div class="p-4 rounded-2xl bg-white dark:bg-gray-800 border border-indigo-200 dark:border-indigo-900/60 shadow-2xs space-y-3">
-                            <div class="text-center pb-2 border-b border-gray-100 dark:border-gray-700">
-                                <span class="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">GRAPH 3 (CHANGE)</span>
-                                <h4 class="text-xs font-bold text-gray-900 dark:text-white">Mirror / Perceived Self</h4>
-                            </div>
-
-                            <!-- SVG Chart -->
-                            <div class="relative bg-indigo-50/40 dark:bg-gray-900/60 rounded-xl p-2 border border-indigo-100 dark:border-indigo-950">
-                                <svg viewBox="0 0 220 160" class="w-full h-44">
-                                    <!-- Grid Lines -->
-                                    <line x1="20" y1="15" x2="205" y2="15" stroke="#6366f1" stroke-dasharray="2" stroke-opacity="0.3" />
-                                    <text x="5" y="18" fill="#9ca3af" font-size="8" font-family="monospace">+8</text>
-
-                                    <line x1="20" y1="47.5" x2="205" y2="47.5" stroke="#e5e7eb" stroke-dasharray="2" stroke-opacity="0.6" />
-                                    <text x="5" y="50.5" fill="#9ca3af" font-size="8" font-family="monospace">+4</text>
-
-                                    <!-- Zero Line (Baseline) -->
-                                    <line x1="20" y1="80" x2="205" y2="80" stroke="#6366f1" stroke-width="1.5" stroke-opacity="0.8" />
-                                    <text x="5" y="83" fill="#6366f1" font-size="9" font-weight="bold" font-family="monospace">0</text>
-
-                                    <line x1="20" y1="112.5" x2="205" y2="112.5" stroke="#e5e7eb" stroke-dasharray="2" stroke-opacity="0.6" />
-                                    <text x="5" y="115.5" fill="#9ca3af" font-size="8" font-family="monospace">-4</text>
-
-                                    <line x1="20" y1="145" x2="205" y2="145" stroke="#6366f1" stroke-dasharray="2" stroke-opacity="0.3" />
-                                    <text x="5" y="148" fill="#9ca3af" font-size="8" font-family="monospace">-8</text>
-
-                                    <!-- Vertical Column Axes -->
-                                    @foreach($xPoints as $label => $x)
-                                        <line x1="{{ $x }}" y1="10" x2="{{ $x }}" y2="148" stroke="#cbd5e1" stroke-dasharray="2" stroke-opacity="0.5" />
-                                        <text x="{{ $x }}" y="158" fill="#64748b" font-size="10" font-weight="bold" text-anchor="middle">{{ $label }}</text>
-                                    @endforeach
-
-                                    <!-- Data Polyline -->
-                                    <polyline fill="none" stroke="#4f46e5" stroke-width="2.5" points="{{ $pts3 }}" stroke-linecap="round" stroke-linejoin="round" />
-
-                                    <!-- Data Points & Labels -->
-                                    @foreach(['D', 'I', 'S', 'C'] as $dim)
-                                        @php 
-                                            $cx = $xPoints[$dim]; 
-                                            $cy = $calcY($line3Conv[$dim] ?? 0); 
-                                            $val = number_format($line3Conv[$dim] ?? 0, 1);
-                                        @endphp
-                                        <polygon points="{{ $cx }},{{ $cy - 4 }} {{ $cx + 4 }},{{ $cy }} {{ $cx }},{{ $cy + 4 }} {{ $cx - 4 }},{{ $cy }}" fill="#4338ca" stroke="#ffffff" stroke-width="1.5" />
-                                        <text x="{{ $cx }}" y="{{ $cy - 6 }}" fill="#4338ca" font-size="8.5" font-weight="bold" text-anchor="middle">{{ $val }}</text>
-                                    @endforeach
-                                </svg>
-                            </div>
-                            <p class="text-[10px] text-gray-400 text-center leading-tight">Integrasi persepsi diri dan kecenderungan adaptasi perilaku harian.</p>
-                        </div>
-                    </div>
-
-                    <!-- DESKRIPSI KEPRIBADIAN & GAMBARAN SIKAP (HIGH CONTRAST PREMIUM CARD) -->
-                    @if ($profile)
-                        <div class="p-6 rounded-2xl bg-gradient-to-br from-slate-900 via-indigo-950 to-blue-950 text-white border-2 border-indigo-500/40 shadow-xl shadow-indigo-950/30 space-y-3">
-                            <div class="flex items-center justify-between pb-3 border-b border-indigo-800/60">
-                                <div class="flex items-center gap-2.5">
-                                    <span class="p-2 rounded-xl bg-indigo-600 text-white text-sm shadow-md shadow-indigo-600/40">📖</span>
-                                    <div>
-                                        <span class="text-[10px] font-extrabold uppercase tracking-widest text-indigo-400 block">DESKRIPSI KEPRIBADIAN</span>
-                                        <h4 class="text-base font-black text-white">{{ $profile->title }} ({{ $profile->pattern_code }})</h4>
-                                    </div>
-                                </div>
-                                <span class="px-3 py-1 rounded-full text-[11px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">
-                                    DISC Profile
+                    @if ($hasEssayQuestions)
+                        <div class="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300">
+                            <span>Skor Essay / Uraian:</span>
+                            @if ($attempt && $attempt->essay_score !== null)
+                                <span class="font-extrabold text-amber-600 dark:text-amber-400 text-sm">
+                                    {{ number_format($attempt->essay_score, 1) }} Poin
                                 </span>
-                            </div>
-                            <p class="text-xs text-indigo-100/90 leading-relaxed font-normal pt-1">
-                                {{ $profile->general_description ?: 'Seorang yang praktis, analitis, dan memiliki ketelitian tinggi dalam memecahkan masalah terstruktur. Mengutamakan fakta, logika, dan prosedur kerja yang akurat.' }}
-                            </p>
+                            @else
+                                <span class="text-xs font-semibold text-amber-600 dark:text-amber-400 italic">
+                                    Sedang Dinilai Tim HR
+                                </span>
+                            @endif
                         </div>
-
-                        <!-- PROFESI YANG COCOK / SUITABLE PROFESSIONS (STANDAR INTERNASIONAL) -->
-                        @if ($profile->suitable_jobs)
-                            <div class="rounded-2xl overflow-hidden border-2 border-amber-400/70 dark:border-amber-500/50 shadow-lg shadow-amber-500/10 transition">
-                                <!-- Banner Header Kuning / Emas sesuai referensi -->
-                                <div class="bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 dark:from-amber-500 dark:via-amber-400 dark:to-yellow-500 py-3 px-4 text-center">
-                                    <h4 class="text-sm sm:text-base font-black text-gray-950 uppercase tracking-wide flex items-center justify-center gap-2">
-                                        <svg class="w-4 h-4 text-gray-950" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                        </svg>
-                                        <span>Profesi yang cocok :</span>
-                                    </h4>
-                                </div>
-                                <!-- Isi Rekomendasi Profesi -->
-                                <div class="p-5 bg-white dark:bg-slate-900 text-gray-800 dark:text-slate-100 text-xs sm:text-sm font-medium leading-relaxed text-center">
-                                    {{ $profile->suitable_jobs }}
-                                </div>
-                            </div>
-                        @endif
                     @endif
+
+                    <div class="pt-2 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                        <span class="font-bold text-xs text-gray-900 dark:text-white">Total Skor Akhir:</span>
+                        @if ($isWaitingReview)
+                            <span class="text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-2.5 py-1 rounded-lg border border-amber-200 dark:border-amber-800">
+                                Menunggu Penilaian Essay
+                            </span>
+                        @else
+                            <span class="text-xl font-black text-gray-900 dark:text-white">
+                                {{ number_format($attempt->total_score ?? 0, 1) }}
+                            </span>
+                        @endif
+                    </div>
                 </div>
             @endif
 

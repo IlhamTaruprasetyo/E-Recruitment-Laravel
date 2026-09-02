@@ -471,13 +471,16 @@
 
                         @if ($availableTest && !in_array(strtolower($status), ['rejected']))
                             @if ($latestAttempt && $latestAttempt->status !== 'in_progress')
+                                @php
+                                    $isTestDisc = str_contains(strtolower($availableTest->category?->name ?? ''), 'disc');
+                                @endphp
                                 <!-- Sudah Mengerjakan Tes -->
                                 <a href="{{ route('applicant.test', ['applicationId' => $app->id, 'testId' => $availableTest->id]) }}"
                                     class="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-xs font-semibold rounded-xl transition">
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    <span>Lihat Hasil Tes</span>
+                                    <span>{{ $isTestDisc ? 'Lihat Status Tes' : 'Lihat Hasil Tes' }}</span>
                                 </a>
                             @elseif ($canTakeTest || ($latestAttempt && $latestAttempt->status === 'in_progress'))
                                 <!-- Sudah Lolos Berkas / Diizinkan Ikut Tes -->
@@ -705,6 +708,9 @@
                                 </h4>
                                 <div class="space-y-2">
                                     @foreach ($selectedApplication->testAttempts as $attempt)
+                                        @php
+                                            $isAttemptDisc = str_contains(strtolower($attempt->test?->category?->name ?? ''), 'disc');
+                                        @endphp
                                         <div class="p-3.5 bg-gray-50 dark:bg-gray-900/40 rounded-xl border border-gray-100 dark:border-gray-800 flex items-center justify-between">
                                             <div>
                                                 <h5 class="text-xs font-bold text-gray-900 dark:text-white">
@@ -715,9 +721,15 @@
                                                 </span>
                                             </div>
                                             <div class="text-right">
-                                                <span class="text-xs font-extrabold text-indigo-600 dark:text-indigo-400">
-                                                    Skor: {{ $attempt->total_score ?? $attempt->objective_score ?? '-' }}
-                                                </span>
+                                                @if ($isAttemptDisc)
+                                                    <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                                                        Tersimpan
+                                                    </span>
+                                                @else
+                                                    <span class="text-xs font-extrabold text-indigo-600 dark:text-indigo-400">
+                                                        Skor: {{ $attempt->total_score ?? ($attempt->objective_score ?? '-') }}
+                                                    </span>
+                                                @endif
                                             </div>
                                         </div>
                                     @endforeach
