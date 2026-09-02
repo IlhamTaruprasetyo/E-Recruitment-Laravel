@@ -11,8 +11,14 @@ class TestCategoryTable extends Component
     use WithPagination;
 
     public $search = '';
+    public $perPage = 10;
 
     public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingPerPage()
     {
         $this->resetPage();
     }
@@ -28,7 +34,7 @@ class TestCategoryTable extends Component
                 });
             })
             ->orderBy('id', 'desc')
-            ->paginate(10);
+            ->paginate($this->perPage);
 
         return view('livewire.admin.test-category.table', [
             'categories' => $categories,

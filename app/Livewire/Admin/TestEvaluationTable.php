@@ -17,6 +17,7 @@ class TestEvaluationTable extends Component
     public $jobId = '';
     public $testId = '';
     public $status = '';
+    public $perPage = 10;
 
     public $sortField = 'id';
     public $sortDirection = 'desc';
@@ -37,6 +38,11 @@ class TestEvaluationTable extends Component
     }
 
     public function updatingStatus()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingPerPage()
     {
         $this->resetPage();
     }
@@ -181,7 +187,7 @@ class TestEvaluationTable extends Component
             $query->orderBy('id', $this->sortDirection);
         }
 
-        $attempts = $query->paginate(10);
+        $attempts = $query->paginate($this->perPage);
 
         return view('livewire.admin.test-evaluation.table', [
             'attempts'      => $attempts,

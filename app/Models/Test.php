@@ -13,6 +13,7 @@ class Test extends Model
         'job_id',
         'test_type',
         'department_id',
+        'target_employee_type',
         'category_id',
         'title',
         'duration_minutes',

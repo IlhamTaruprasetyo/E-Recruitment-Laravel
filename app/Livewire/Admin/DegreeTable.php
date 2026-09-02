@@ -11,8 +11,14 @@ class DegreeTable extends Component
     use WithPagination;
 
     public $search = '';
+    public $perPage = 10;
 
     public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingPerPage()
     {
         $this->resetPage();
     }
@@ -25,7 +31,7 @@ class DegreeTable extends Component
             })
             ->orderBy('rank', 'asc')
             ->orderBy('id', 'desc')
-            ->paginate(10);
+            ->paginate($this->perPage);
 
         return view('livewire.admin.degree.table', [
             'degrees' => $degrees,

@@ -21,6 +21,7 @@ class InterviewScheduleTable extends Component
     public $typeFilter = 'all'; // all, online, offline
     public $jobFilter = '';
     public $interviewerFilter = '';
+    public $perPage = 10;
 
     public $sortField = 'interview_date';
     public $sortDirection = 'asc';
@@ -51,6 +52,11 @@ class InterviewScheduleTable extends Component
     }
 
     public function updatingInterviewerFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingPerPage()
     {
         $this->resetPage();
     }
@@ -195,7 +201,7 @@ class InterviewScheduleTable extends Component
         }
 
         // Sorting
-        $schedules = $query->orderBy($this->sortField, $this->sortDirection)->paginate(10);
+        $schedules = $query->orderBy($this->sortField, $this->sortDirection)->paginate($this->perPage);
 
         // Data for Modal Form Selection (Hanya status Interview & Shortlisted)
         $activeApplications = JobApplication::with(['applicantProfile.user', 'job.company'])

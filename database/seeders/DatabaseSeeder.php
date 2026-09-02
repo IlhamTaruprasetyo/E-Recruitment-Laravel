@@ -48,7 +48,7 @@ class DatabaseSeeder extends Seeder
 
         // 3. Seed Company & Department
         $companyId = DB::table('companies')->insertGetId([
-            'name' => 'Tech Corp Indonesia',
+            'name' => 'PT Autentik Karya Analitika',
             'city' => 'Semarang',
             'province' => 'Jawa Tengah'
         ]);

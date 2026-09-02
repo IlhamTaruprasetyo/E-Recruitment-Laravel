@@ -14,6 +14,7 @@ class QuestionBankTable extends Component
     public $search = '';
     public $categoryId = '';
     public $type = '';
+    public $perPage = 10;
 
     public function updatingSearch()
     {
@@ -26,6 +27,11 @@ class QuestionBankTable extends Component
     }
 
     public function updatingType()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingPerPage()
     {
         $this->resetPage();
     }
@@ -54,7 +60,7 @@ class QuestionBankTable extends Component
                 $query->where('question_type', $this->type);
             })
             ->orderBy('id', 'desc')
-            ->paginate(10);
+            ->paginate($this->perPage);
 
         return view('livewire.admin.question-bank.table', [
             'questions' => $questions,

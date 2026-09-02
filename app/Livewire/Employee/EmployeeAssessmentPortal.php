@@ -21,9 +21,11 @@ class EmployeeAssessmentPortal extends Component
         $user = Auth::user();
         $employeeProfile = $user?->employeeProfile()->with(['company', 'department.company'])->first();
 
-        // 1. Ambil paket tes asesmen yang tersedia untuk karyawan ini (sesuai departemen atau umum)
+        // 1. Ambil paket tes asesmen yang tersedia untuk karyawan ini (sesuai departemen, umum, & target tipe pegawai)
         $tests = collect();
         if ($employeeProfile) {
+            $userType = $employeeProfile->employee_type ?: 'permanent';
+
             $tests = Test::with(['category', 'department', 'questions'])
                 ->where('test_type', 'employee')
                 ->where(function ($query) use ($employeeProfile) {
@@ -33,6 +35,11 @@ class EmployeeAssessmentPortal extends Component
                     } else {
                         $query->whereNull('department_id');
                     }
+                })
+                ->where(function ($query) use ($userType) {
+                    $query->whereNull('target_employee_type')
+                          ->orWhere('target_employee_type', 'all')
+                          ->orWhere('target_employee_type', $userType);
                 })
                 ->orderBy('id', 'desc')
                 ->get();

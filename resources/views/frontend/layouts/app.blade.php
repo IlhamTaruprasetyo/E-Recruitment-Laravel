@@ -784,11 +784,12 @@
             -webkit-background-clip: unset !important;
             background-clip: unset !important;
             -webkit-text-fill-color: #93F514 !important;
-            color: #64FBC6 !important;
+            color: #93F514 !important;
             text-shadow:
-                0 3px 8px rgba(0, 0, 0, 0.3),
-                0 0 12px rgba(147, 245, 20, 0.2),
-                0 0 28px rgba(147, 245, 20, 0.12) !important;
+                0 2px 6px rgba(0, 0, 0, 0.25),
+                0 0 10px rgba(147, 245, 20, 0.35),
+                0 0 24px rgba(147, 245, 20, 0.2),
+                0 0 48px rgba(147, 245, 20, 0.1) !important;
             filter: none !important;
         }
 

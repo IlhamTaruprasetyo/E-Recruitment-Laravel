@@ -16,6 +16,8 @@ class EmployeeTestTable extends Component
     public $search = '';
     public $departmentId = '';
     public $categoryId = '';
+    public $targetEmployeeType = '';
+    public $perPage = 10;
 
     public function updatingSearch()
     {
@@ -32,11 +34,22 @@ class EmployeeTestTable extends Component
         $this->resetPage();
     }
 
+    public function updatingTargetEmployeeType()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingPerPage()
+    {
+        $this->resetPage();
+    }
+
     public function resetFilters()
     {
         $this->search = '';
         $this->departmentId = '';
         $this->categoryId = '';
+        $this->targetEmployeeType = '';
         $this->resetPage();
     }
 
@@ -67,8 +80,11 @@ class EmployeeTestTable extends Component
             ->when($this->categoryId, function ($query) {
                 $query->where('category_id', $this->categoryId);
             })
+            ->when($this->targetEmployeeType, function ($query) {
+                $query->where('target_employee_type', $this->targetEmployeeType);
+            })
             ->orderBy('id', 'desc')
-            ->paginate(10);
+            ->paginate($this->perPage);
 
         return view('livewire.admin.employee-test.table', [
             'tests' => $tests,

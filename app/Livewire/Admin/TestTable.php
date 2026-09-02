@@ -16,6 +16,7 @@ class TestTable extends Component
     public $search = '';
     public $jobId = '';
     public $categoryId = '';
+    public $perPage = 10;
 
     public function updatingSearch()
     {
@@ -28,6 +29,11 @@ class TestTable extends Component
     }
 
     public function updatingCategoryId()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingPerPage()
     {
         $this->resetPage();
     }
@@ -63,7 +69,7 @@ class TestTable extends Component
                 $query->where('category_id', $this->categoryId);
             })
             ->orderBy('id', 'desc')
-            ->paginate(10);
+            ->paginate($this->perPage);
 
         return view('livewire.admin.test.table', [
             'tests' => $tests,

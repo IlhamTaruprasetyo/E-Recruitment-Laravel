@@ -32,10 +32,17 @@ new class extends Component
     $isRecruiter = $roleId == 2 || $roleName === 'recruiter';
     $isEmployee = $roleId == 4 || $roleName === 'employee';
     
+    $profile = $isEmployee ? $user?->employeeProfile : $user?->applicantProfile;
+
     $roleLabel = match(true) {
         $isAdmin => 'Admin',
         $isRecruiter => 'Recruiter',
-        $isEmployee => 'Karyawan',
+        $isEmployee => match($profile?->employee_type) {
+            'internship' => 'Magang',
+            'contract' => 'Kontrak',
+            'probation' => 'Probation',
+            default => 'Karyawan',
+        },
         default => 'Pelamar',
     };
 
@@ -46,7 +53,6 @@ new class extends Component
         default => route('profile'),
     };
     
-    $profile = $isEmployee ? $user?->employeeProfile : $user?->applicantProfile;
     $photoUrl = $profile && ! empty($profile->photo) ? asset('storage/' . $profile->photo) : null;
     $displayName = $profile && !empty($profile->full_name) ? $profile->full_name : ($user->name ?? 'User');
     $userInitial = strtoupper(substr($displayName, 0, 1));

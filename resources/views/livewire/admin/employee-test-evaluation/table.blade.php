@@ -117,7 +117,7 @@
         <div class="flex flex-wrap items-center gap-3 w-full flex-1">
             <div class="relative w-full sm:w-64">
                 <input wire:model.live.debounce.300ms="search" type="text" placeholder="Cari nama karyawan / NIK..."
-                    class="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl text-xs text-gray-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#93F514] focus:border-transparent transition-all">
+                    class="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl text-xs text-gray-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition cursor-pointer">
                 <svg class="w-4 h-4 text-gray-400 dark:text-slate-400 absolute left-3.5 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
@@ -129,6 +129,15 @@
                 @foreach ($departments as $dept)
                     <option value="{{ $dept->id }}">{{ $dept->name }}</option>
                 @endforeach
+            </select>
+
+            <!-- Filter Tipe Pegawai -->
+            <select wire:model.live="employeeType" class="pl-3 pr-8 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition cursor-pointer">
+                <option value="">Semua Tipe</option>
+                <option value="permanent">Karyawan Tetap</option>
+                <option value="contract">Kontrak</option>
+                <option value="internship">Magang / Intern</option>
+                <option value="probation">Probation</option>
             </select>
 
             <!-- Filter Paket Asesmen -->
@@ -149,7 +158,7 @@
                 <option value="needs_grading">Perlu Penilaian Essay</option>
             </select>
 
-            @if ($search || $departmentId || $testId || $status)
+            @if ($search || $departmentId || $employeeType || $testId || $status)
                 <button wire:click="resetFilters" class="p-2 text-gray-400 hover:text-rose-500 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-700 transition" title="Reset Filter">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -183,8 +192,19 @@
                         @endphp
                         <tr class="hover:bg-gray-50/80 dark:hover:bg-slate-700/30 transition duration-150">
                             <td class="py-4 px-6">
-                                <div class="font-bold text-gray-800 dark:text-slate-100 text-sm">
-                                    {{ $emp?->full_name ?? ($attempt->user?->name ?? 'Karyawan') }}
+                                <div class="flex items-center gap-2">
+                                    <div class="font-bold text-gray-800 dark:text-slate-100 text-sm">
+                                        {{ $emp?->full_name ?? ($attempt->user?->name ?? 'Karyawan') }}
+                                    </div>
+                                    @if ($emp?->employee_type === 'internship')
+                                        <span class="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-bold text-[10px] border border-amber-200 dark:border-amber-800/60">
+                                            Magang
+                                        </span>
+                                    @elseif ($emp?->employee_type === 'contract')
+                                        <span class="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-semibold text-[10px]">
+                                            Kontrak
+                                        </span>
+                                    @endif
                                 </div>
                                 <div class="text-[11px] text-gray-400 dark:text-slate-500 mt-0.5">
                                     NIK: {{ $emp?->nik ?? ($attempt->user?->nik ?? '-') }} ; {{ $attempt->user?->email ?? '-' }}
@@ -233,7 +253,7 @@
                             <td class="py-4 px-6 text-center">
                                 @if ($attempt->status === 'in_progress')
                                     <span class="inline-flex items-center justify-center gap-1.5 whitespace-nowrap px-2.5 py-1 rounded-full bg-sky-100 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-semibold text-[11px] border border-sky-200 dark:border-sky-800">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-ping shrink-0"></span>
+                                        {{-- <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-ping shrink-0"></span> --}}
                                         Sedang Mengerjakan
                                     </span>
                                 @elseif ($isDisc)
@@ -284,9 +304,23 @@
             </table>
         </div>
 
-        @if ($attempts->hasPages())
-            <div class="p-4 border-t border-gray-100 dark:border-slate-700">
-                {{ $attempts->links() }}
+        @if ($attempts->hasPages() || $perPage != 10)
+            <div class="p-4 border-t border-gray-100 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-gray-500 dark:text-slate-400">Tampilkan</span>
+                    <select wire:model.live="perPage" class="pl-2.5 pr-7 py-1.5 text-xs rounded-lg bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition cursor-pointer">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <span class="text-xs text-gray-500 dark:text-slate-400">data per halaman</span>
+                </div>
+                @if ($attempts->hasPages())
+                    <div>
+                        {{ $attempts->links() }}
+                    </div>
+                @endif
             </div>
         @endif
     </div>

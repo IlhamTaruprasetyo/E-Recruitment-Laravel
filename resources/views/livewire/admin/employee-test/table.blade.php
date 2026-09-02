@@ -10,6 +10,7 @@
     editData: {
         id: '{{ old('id', '') }}',
         department_id: '{{ old('department_id', '') }}',
+        target_employee_type: '{{ old('target_employee_type', 'all') }}',
         category_id: '{{ old('category_id', '') }}',
         title: '{{ old('title', '') }}',
         duration_minutes: '{{ old('duration_minutes', '60') }}',
@@ -27,6 +28,7 @@
     detailData: {
         id: '',
         department_name: '',
+        target_employee_type: 'all',
         category_name: '',
         title: '',
         duration_minutes: 0,
@@ -51,6 +53,7 @@
         this.editData = {
             id: test.id,
             department_id: test.department_id || '',
+            target_employee_type: test.target_employee_type || 'all',
             category_id: test.category_id,
             title: test.title,
             duration_minutes: test.duration_minutes,
@@ -179,6 +182,15 @@
                     @endforeach
                 </select>
 
+                <!-- Filter Target Peserta -->
+                <select wire:model.live="targetEmployeeType" class="px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition max-w-[160px]">
+                    <option value="">Semua</option>
+                    <option value="all">Semua TES (Umum)</option>
+                    <option value="internship">Magang</option>
+                    <option value="permanent">Karyawan Tetap</option>
+                    <option value="contract">Karyawan Kontrak</option>
+                </select>
+
                 <!-- Filter Kategori -->
                 <select wire:model.live="categoryId" class="px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition max-w-[160px]">
                     <option value="">Semua Kategori</option>
@@ -187,7 +199,7 @@
                     @endforeach
                 </select>
 
-                @if ($search || $departmentId || $categoryId)
+                @if ($search || $departmentId || $targetEmployeeType || $categoryId)
                     <button wire:click="resetFilters" class="px-3 py-2 text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition">
                         Reset
                     </button>
@@ -207,7 +219,7 @@
     <div class="relative bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
         
         <!-- Livewire Loading Overlay -->
-        <div wire:loading wire:target="search, departmentId, categoryId, previousPage, nextPage, gotoPage" class="absolute inset-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-[1px] flex items-center justify-center z-10 transition">
+        <div wire:loading wire:target="search, departmentId, targetEmployeeType, categoryId, previousPage, nextPage, gotoPage" class="absolute inset-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-[1px] flex items-center justify-center z-10 transition">
             <div class="flex items-center gap-2.5 px-4 py-2.5 bg-slate-900/90 dark:bg-slate-800/90 text-white rounded-xl shadow-xl text-xs font-semibold">
                 <svg class="animate-spin w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -223,7 +235,7 @@
                     <tr class="border-b border-gray-200 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/50 text-gray-500 dark:text-slate-400 uppercase tracking-wider font-semibold">
                         <th class="px-6 py-4 w-12">No</th>
                         <th class="px-6 py-4">Judul Paket Asesmen</th>
-                        <th class="px-6 py-4">Target Departemen</th>
+                        <th class="px-6 py-4">Target Departemen & Sasaran</th>
                         <th class="px-6 py-4">Kategori Soal</th>
                         <th class="px-6 py-4">Durasi & KKM</th>
                         <th class="px-6 py-4">Soal & Opsi Acak</th>
@@ -250,15 +262,35 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4">
-                                @if ($t->department)
-                                    <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-                                        {{ $t->department->name }}
-                                    </span>
-                                @else
-                                    <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                                        Semua Departemen (Umum)
-                                    </span>
-                                @endif
+                                <div class="flex flex-col gap-1 items-start">
+                                    @if ($t->department)
+                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                                            {{ $t->department->name }}
+                                        </span>
+                                    @else
+                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                                            Semua Departemen
+                                        </span>
+                                    @endif
+
+                                    @if ($t->target_employee_type === 'internship')
+                                        <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                                            Magang
+                                        </span>
+                                    @elseif ($t->target_employee_type === 'permanent')
+                                        <span class="px-2.5 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                                            Karyawan Tetap
+                                        </span>
+                                    @elseif ($t->target_employee_type === 'contract')
+                                        <span class="px-2.5 py-0.5 rounded-md text-[10px] font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                                            Karyawan Kontrak
+                                        </span>
+                                    @else
+                                        <span class="text-[10px] text-gray-400">
+                                            Semua Karyawan & Magang
+                                        </span>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-6 py-4">
                                 <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 border border-gray-200 dark:border-slate-700">
@@ -330,9 +362,23 @@
             </table>
         </div>
 
-        @if ($tests->hasPages())
-            <div class="px-6 py-4 border-t border-gray-200 dark:border-slate-800">
-                {{ $tests->links() }}
+        @if ($tests->hasPages() || $perPage != 10)
+            <div class="px-6 py-4 border-t border-gray-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-gray-500 dark:text-slate-400">Tampilkan</span>
+                    <select wire:model.live="perPage" class="pl-2.5 pr-7 py-1.5 text-xs rounded-lg bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition cursor-pointer">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <span class="text-xs text-gray-500 dark:text-slate-400">data per halaman</span>
+                </div>
+                @if ($tests->hasPages())
+                    <div>
+                        {{ $tests->links() }}
+                    </div>
+                @endif
             </div>
         @endif
     </div>
@@ -375,14 +421,33 @@
                                         </option>
                                     @endforeach
                                 </select>
-                                <span class="text-[10px] text-gray-400">Kosongkan jika berlaku untuk seluruh staf internal</span>
+                                <span class="text-[10px] text-gray-400">Kosongkan jika berlaku untuk seluruh departemen</span>
                                 @error('department_id')
                                     <p class="mt-1 text-[11px] text-rose-500">{{ $message }}</p>
                                 @enderror
                             </div>
 
-                            <!-- Kategori Soal -->
+                            <!-- Sasaran / Target Peserta (Magang / Tetap / Semua) -->
                             <div>
+                                <label for="create_target_employee_type" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                    Sasaran / Target Peserta <span class="text-rose-500">*</span>
+                                </label>
+                                <select name="target_employee_type" id="create_target_employee_type" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                    <option value="all" {{ old('target_employee_type') == 'all' ? 'selected' : '' }}>Semua (Karyawan & Magang)</option>
+                                    <option value="internship" {{ old('target_employee_type') == 'internship' ? 'selected' : '' }}>Magang (Internship)</option>
+                                    <option value="permanent" {{ old('target_employee_type') == 'permanent' ? 'selected' : '' }}>Karyawan Tetap</option>
+                                    <option value="contract" {{ old('target_employee_type') == 'contract' ? 'selected' : '' }}>Karyawan Kontrak</option>
+                                </select>
+                                <span class="text-[10px] text-gray-400">Tentukan siapa saja yang dapat melihat dan mengerjakan tes ini</span>
+                                @error('target_employee_type')
+                                    <p class="mt-1 text-[11px] text-rose-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Kategori Soal -->
+                            <div class="sm:col-span-2">
                                 <label for="create_category_id" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
                                     Kategori Soal <span class="text-rose-500">*</span>
                                 </label>
@@ -585,14 +650,33 @@
                                         <option value="{{ $dept->id }}">{{ $dept->name }} {{ $dept->company ? '('.$dept->company->name.')' : '' }}</option>
                                     @endforeach
                                 </select>
-                                <span class="text-[10px] text-gray-400">Kosongkan jika berlaku untuk seluruh staf internal</span>
+                                <span class="text-[10px] text-gray-400">Kosongkan jika berlaku untuk seluruh departemen</span>
                                 @error('department_id')
                                     <p class="mt-1 text-[11px] text-rose-500">{{ $message }}</p>
                                 @enderror
                             </div>
 
-                            <!-- Kategori Soal -->
+                            <!-- Sasaran / Target Peserta -->
                             <div>
+                                <label for="edit_target_employee_type" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                    Sasaran / Target Peserta <span class="text-rose-500">*</span>
+                                </label>
+                                <select name="target_employee_type" id="edit_target_employee_type" x-model="editData.target_employee_type" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                    <option value="all">Semua (Karyawan & Magang)</option>
+                                    <option value="internship">Magang (Internship)</option>
+                                    <option value="permanent">Karyawan Tetap</option>
+                                    <option value="contract">Karyawan Kontrak</option>
+                                </select>
+                                <span class="text-[10px] text-gray-400">Tentukan siapa saja yang dapat melihat dan mengerjakan tes ini</span>
+                                @error('target_employee_type')
+                                    <p class="mt-1 text-[11px] text-rose-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Kategori Soal -->
+                            <div class="sm:col-span-2">
                                 <label for="edit_category_id" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
                                     Kategori Soal <span class="text-rose-500">*</span>
                                 </label>

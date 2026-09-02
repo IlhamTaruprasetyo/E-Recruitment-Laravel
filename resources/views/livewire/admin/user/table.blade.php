@@ -88,7 +88,7 @@
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white">Daftar Pengguna</h3>
-                <p class="text-xs text-gray-500 dark:text-slate-400">Kelola pengguna sistem dan pembagian hak akses (Admin, Recruiter, Pelamar).</p>
+                <p class="text-xs text-gray-500 dark:text-slate-400">Kelola pengguna sistem dan pembagian hak akses (Admin, Recruiter, Karyawan dan Pelamar).</p>
             </div>
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
                 <!-- Role Filter Dropdown -->
@@ -243,9 +243,23 @@
             </table>
         </div>
 
-        @if ($users->hasPages())
-            <div class="px-6 py-4 border-t border-gray-200 dark:border-slate-800">
-                {{ $users->links() }}
+        @if ($users->hasPages() || $perPage != 10)
+            <div class="px-6 py-4 border-t border-gray-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-gray-500 dark:text-slate-400">Tampilkan</span>
+                    <select wire:model.live="perPage" class="pl-2.5 pr-7 py-1.5 text-xs rounded-lg bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition cursor-pointer">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <span class="text-xs text-gray-500 dark:text-slate-400">data per halaman</span>
+                </div>
+                @if ($users->hasPages())
+                    <div>
+                        {{ $users->links() }}
+                    </div>
+                @endif
             </div>
         @endif
     </div>

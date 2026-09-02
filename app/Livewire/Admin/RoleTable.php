@@ -11,8 +11,14 @@ class RoleTable extends Component
     use WithPagination;
 
     public $search = '';
+    public $perPage = 10;
 
     public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingPerPage()
     {
         $this->resetPage();
     }
@@ -25,7 +31,7 @@ class RoleTable extends Component
                 $query->whereRaw('LOWER(name) LIKE ?', ['%' . $search . '%']);
             })
             ->orderBy('id', 'asc')
-            ->paginate(10);
+            ->paginate($this->perPage);
 
         return view('livewire.admin.role.table', [
             'roles' => $roles,

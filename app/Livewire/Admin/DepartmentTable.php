@@ -12,8 +12,14 @@ class DepartmentTable extends Component
     use WithPagination;
 
     public $search = '';
+    public $perPage = 10;
 
     public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingPerPage()
     {
         $this->resetPage();
     }
@@ -32,7 +38,7 @@ class DepartmentTable extends Component
                 });
             })
             ->orderBy('id', 'desc')
-            ->paginate(10);
+            ->paginate($this->perPage);
 
         $companies = Company::all();
 

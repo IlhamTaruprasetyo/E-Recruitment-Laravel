@@ -17,6 +17,7 @@ class ApplicantTable extends Component
     public $statusFilter = '';
     public array $selectedStatuses = [];
     public array $selectedColumns = ['applicant', 'job', 'applied_at', 'status', 'actions'];
+    public $perPage = 10;
 
     public $sortField = 'id';
     public $sortDirection = 'desc';
@@ -32,6 +33,11 @@ class ApplicantTable extends Component
     }
 
     public function updatingSelectedStatuses()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingPerPage()
     {
         $this->resetPage();
     }
@@ -147,7 +153,7 @@ class ApplicantTable extends Component
         ->when($this->sortField === 'id' || !in_array($this->sortField, ['position', 'company', 'applicant', 'applied_at', 'status']), function ($query) {
             $query->orderBy('job_applications.id', $this->sortDirection);
         })
-        ->paginate(10);
+        ->paginate($this->perPage);
 
         return view('livewire.admin.applicants.table', [
             'applications'     => $applications,

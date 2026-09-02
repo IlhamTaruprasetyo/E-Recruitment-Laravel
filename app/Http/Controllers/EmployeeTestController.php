@@ -13,6 +13,7 @@ class EmployeeTestController extends Controller
     {
         $request->validate([
             'department_id' => 'nullable|exists:departments,id',
+            'target_employee_type' => 'nullable|string|in:all,permanent,contract,internship',
             'category_id' => 'required|exists:test_categories,id',
             'title' => 'required|string|max:255',
             'duration_minutes' => 'required|integer|min:1',
@@ -35,6 +36,7 @@ class EmployeeTestController extends Controller
                 'test_type' => 'employee',
                 'job_id' => null,
                 'department_id' => $request->filled('department_id') ? $request->department_id : null,
+                'target_employee_type' => $request->filled('target_employee_type') ? $request->target_employee_type : 'all',
                 'category_id' => $request->category_id,
                 'title' => $request->title,
                 'duration_minutes' => $request->duration_minutes,
@@ -68,6 +70,7 @@ class EmployeeTestController extends Controller
 
         $request->validate([
             'department_id' => 'nullable|exists:departments,id',
+            'target_employee_type' => 'nullable|string|in:all,permanent,contract,internship',
             'category_id' => 'required|exists:test_categories,id',
             'title' => 'required|string|max:255',
             'duration_minutes' => 'required|integer|min:1',
@@ -88,6 +91,7 @@ class EmployeeTestController extends Controller
 
             $test->update([
                 'department_id' => $request->filled('department_id') ? $request->department_id : null,
+                'target_employee_type' => $request->filled('target_employee_type') ? $request->target_employee_type : 'all',
                 'category_id' => $request->category_id,
                 'title' => $request->title,
                 'duration_minutes' => $request->duration_minutes,

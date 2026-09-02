@@ -19,6 +19,7 @@ new #[Layout('layouts.guest')] class extends Component {
     public string $password_confirmation = '';
 
     // Field khusus Karyawan Internal
+    public string $employee_type = 'permanent'; // 'permanent' | 'contract' | 'internship'
     public string $company_passkey = '';
     public string $department_id = '';
     public string $position_title = '';
@@ -45,6 +46,7 @@ new #[Layout('layouts.guest')] class extends Component {
 
         if ($this->account_type === 'employee') {
             $expectedPasskey = env('EMPLOYEE_REGISTRATION_PASSKEY', 'MIKA2026');
+            $rules['employee_type'] = ['required', 'in:permanent,contract,internship'];
             $rules['company_passkey'] = [
                 'required',
                 'string',
@@ -80,6 +82,7 @@ new #[Layout('layouts.guest')] class extends Component {
                     'department_id' => !empty($this->department_id) ? (int)$this->department_id : null,
                     'company_id' => $dept?->company_id,
                     'position_title' => $this->position_title ?: null,
+                    'employee_type' => $this->employee_type ?: 'permanent',
                 ]
             );
         }
@@ -349,6 +352,28 @@ new #[Layout('layouts.guest')] class extends Component {
                     </div>
 
                     @if ($account_type === 'employee')
+                        <!-- EMPLOYEE ONLY: Tipe Pegawai / Status Hubungan Kerja -->
+                        <div>
+                            <label for="employee_type" class="block text-xs font-semibold text-gray-300 mb-1">
+                                Status / Kategori Pegawai <span class="text-[#93F514]">*</span>
+                            </label>
+                            <div class="relative">
+                                <select wire:model="employee_type" 
+                                        id="employee_type" 
+                                        required
+                                        class="w-full px-3.5 py-2.5 bg-black/60 border border-white/15 focus:border-[#93F514] focus:ring-1 focus:ring-[#93F514] rounded-xl text-sm text-white transition outline-none cursor-pointer">
+                                    <option value="permanent" class="bg-gray-900 text-white">Karyawan Tetap (Permanent)</option>
+                                    <option value="contract" class="bg-gray-900 text-white">Karyawan Kontrak (Contract / PKWT)</option>
+                                    <option value="internship" class="bg-gray-900 text-white">Magang / Internship</option>
+                                </select>
+                            </div>
+                            @if ($errors->has('employee_type'))
+                                <p class="mt-1 text-xs text-red-400 font-normal">
+                                    {{ $errors->first('employee_type') }}
+                                </p>
+                            @endif
+                        </div>
+
                         <!-- EMPLOYEE ONLY: Departemen & Posisi Grid -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-3">
                             <!-- Departemen -->

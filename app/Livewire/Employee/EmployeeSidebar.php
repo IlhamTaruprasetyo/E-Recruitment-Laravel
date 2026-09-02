@@ -23,9 +23,11 @@ class EmployeeSidebar extends Component
         $user = Auth::user();
         $employeeProfile = $user?->employeeProfile()->with(['company', 'department.company'])->first();
 
-        // Hitung tes yang tersedia untuk karyawan ini (berdasarkan departemennya atau umum)
+        // Hitung tes yang tersedia untuk karyawan ini (sesuai departemen, umum, & target tipe pegawai)
         $availableTestsCount = 0;
         if ($employeeProfile) {
+            $userType = $employeeProfile->employee_type ?: 'permanent';
+
             $availableTestsCount = Test::where('test_type', 'employee')
                 ->where(function ($query) use ($employeeProfile) {
                     if ($employeeProfile->department_id) {
@@ -35,6 +37,11 @@ class EmployeeSidebar extends Component
                         $query->whereNull('department_id');
                     }
                 })
+                ->where(function ($query) use ($userType) {
+                    $query->whereNull('target_employee_type')
+                          ->orWhere('target_employee_type', 'all')
+                          ->orWhere('target_employee_type', $userType);
+                })
                 ->count();
         }
 
@@ -42,7 +49,8 @@ class EmployeeSidebar extends Component
         $completedAttemptsCount = 0;
         if ($user) {
             $completedAttemptsCount = TestAttempt::where('user_id', $user->id)
-                ->whereNotNull('finished_at')
+                ->where('attempt_type', 'employee')
+                ->where('status', '!=', 'in_progress')
                 ->count();
         }
 

@@ -473,12 +473,12 @@
                                     @if ($job->status === 'Open')
                                         @if ($job->is_expired)
                                             <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800" title="Lowongan Open tetapi tanggal deadline sudah terlewat">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                                {{-- <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> --}}
                                                 Open (Expired)
                                             </span>
                                         @else
                                             <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                                {{-- <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> --}}
                                                 Open
                                             </span>
                                         @endif
@@ -531,9 +531,23 @@
             </table>
         </div>
 
-        @if ($jobs->hasPages())
-            <div class="px-6 py-4 border-t border-gray-200 dark:border-slate-800">
-                {{ $jobs->links() }}
+        @if ($jobs->hasPages() || $perPage != 10)
+            <div class="px-6 py-4 border-t border-gray-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-gray-500 dark:text-slate-400">Tampilkan</span>
+                    <select wire:model.live="perPage" class="pl-2.5 pr-7 py-1.5 text-xs rounded-lg bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition cursor-pointer">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <span class="text-xs text-gray-500 dark:text-slate-400">data per halaman</span>
+                </div>
+                @if ($jobs->hasPages())
+                    <div>
+                        {{ $jobs->links() }}
+                    </div>
+                @endif
             </div>
         @endif
     </div>

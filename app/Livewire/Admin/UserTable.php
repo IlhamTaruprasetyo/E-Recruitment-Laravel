@@ -13,6 +13,7 @@ class UserTable extends Component
 
     public $search = '';
     public $roleFilter = '';
+    public $perPage = 10;
 
     public function updatingSearch()
     {
@@ -20,6 +21,11 @@ class UserTable extends Component
     }
 
     public function updatingRoleFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingPerPage()
     {
         $this->resetPage();
     }
@@ -39,7 +45,7 @@ class UserTable extends Component
                 $query->where('role_id', $this->roleFilter);
             })
             ->orderBy('id', 'desc')
-            ->paginate(10);
+            ->paginate($this->perPage);
 
         $roles = Role::orderBy('id', 'asc')->get();
 

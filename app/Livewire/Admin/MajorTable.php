@@ -11,8 +11,14 @@ class MajorTable extends Component
     use WithPagination;
 
     public $search = '';
+    public $perPage = 10;
 
     public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingPerPage()
     {
         $this->resetPage();
     }
@@ -24,7 +30,7 @@ class MajorTable extends Component
                 $query->whereRaw('LOWER(name) LIKE ?', ['%' . $search . '%']);
             })
             ->orderBy('id', 'desc')
-            ->paginate(10);
+            ->paginate($this->perPage);
 
         return view('livewire.admin.major.table', [
             'majors' => $majors,

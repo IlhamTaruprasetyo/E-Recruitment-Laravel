@@ -407,13 +407,20 @@
         $testDateFormatted = $attempt->test_date 
             ? \Carbon\Carbon::parse($attempt->test_date)->translatedFormat('d F Y')
             : \Carbon\Carbon::parse($attempt->finished_at ?? $attempt->started_at ?? now())->translatedFormat('d F Y');
+
+        $employeeTypeLabel = match($employee?->employee_type) {
+            'internship' => 'Magang (Internship)',
+            'contract' => 'Karyawan Kontrak',
+            'probation' => 'Masa Percobaan (Probation)',
+            default => 'Karyawan Tetap',
+        };
     @endphp
 
     <div class="bio-box">
         <table class="w-full">
             <tr>
                 <td class="align-top" style="width: 28%;">
-                    <div class="bio-label">{{ $isEmployeeAttempt ? 'Nama Karyawan' : 'Nama Pelamar' }}</div>
+                    <div class="bio-label">{{ $isEmployeeAttempt ? ($employee?->employee_type === 'internship' ? 'Nama Peserta Magang' : 'Nama Karyawan') : 'Nama Pelamar' }}</div>
                     <div class="bio-value">{{ $participantName }}</div>
                 </td>
                 <td class="align-top" style="width: 25%;">
@@ -450,9 +457,9 @@
                     </div>
                 </td>
                 <td class="align-top" style="padding-top: 5px;">
-                    <div class="bio-label">Tipe Peserta</div>
-                    <div class="bio-value" style="font-size: 10px; color: #334155;">
-                        {{ $isEmployeeAttempt ? 'Karyawan Internal' : 'Kandidat Pelamar' }}
+                    <div class="bio-label">Status Peserta</div>
+                    <div class="bio-value" style="font-size: 10px; font-weight: bold; color: {{ $isEmployeeAttempt && $employee?->employee_type === 'internship' ? '#b45309' : '#334155' }};">
+                        {{ $isEmployeeAttempt ? $employeeTypeLabel : 'Kandidat Pelamar' }}
                     </div>
                 </td>
             </tr>

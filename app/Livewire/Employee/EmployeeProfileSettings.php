@@ -25,6 +25,8 @@ class EmployeeProfileSettings extends Component
 
     public $position_title;
 
+    public $employee_type = 'permanent';
+
     public $photo;
 
     public $cropped_photo_base64;
@@ -47,6 +49,7 @@ class EmployeeProfileSettings extends Component
         $this->company_id = $profile->company_id;
         $this->department_id = $profile->department_id;
         $this->position_title = $profile->position_title;
+        $this->employee_type = $profile->employee_type ?? 'permanent';
         $this->current_photo_url = $profile->photo
             ? asset('storage/' . $profile->photo) . '?v=' . time()
             : null;
@@ -88,6 +91,7 @@ class EmployeeProfileSettings extends Component
             'company_id' => 'nullable|exists:companies,id',
             'department_id' => 'nullable|exists:departments,id',
             'position_title' => 'nullable|string|max:255',
+            'employee_type' => 'required|in:permanent,contract,internship,probation',
             'photo' => 'nullable|image|max:5120',
         ];
     }

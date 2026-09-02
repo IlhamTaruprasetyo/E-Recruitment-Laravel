@@ -14,6 +14,7 @@ class EmployeeProfile extends Model
         'company_id',
         'department_id',
         'position_title',
+        'employee_type',
         'phone_number',
         'gender',
         'birth_date',

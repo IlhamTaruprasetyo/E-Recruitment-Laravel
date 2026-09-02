@@ -15,8 +15,10 @@ class EmployeeTestEvaluationTable extends Component
 
     public $search = '';
     public $departmentId = '';
+    public $employeeType = '';
     public $testId = '';
     public $status = '';
+    public $perPage = 10;
 
     public $sortField = 'id';
     public $sortDirection = 'desc';
@@ -31,12 +33,22 @@ class EmployeeTestEvaluationTable extends Component
         $this->resetPage();
     }
 
+    public function updatingEmployeeType()
+    {
+        $this->resetPage();
+    }
+
     public function updatingTestId()
     {
         $this->resetPage();
     }
 
     public function updatingStatus()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingPerPage()
     {
         $this->resetPage();
     }
@@ -56,6 +68,7 @@ class EmployeeTestEvaluationTable extends Component
     {
         $this->search = '';
         $this->departmentId = '';
+        $this->employeeType = '';
         $this->testId = '';
         $this->status = '';
         $this->sortField = 'id';
@@ -105,6 +118,13 @@ class EmployeeTestEvaluationTable extends Component
             });
         }
 
+        // Filter Tipe Pegawai (Karyawan vs Magang)
+        if (!empty($this->employeeType)) {
+            $query->whereHas('user.employeeProfile', function ($ep) {
+                $ep->where('employee_type', $this->employeeType);
+            });
+        }
+
         // Filter Paket Asesmen
         if (!empty($this->testId)) {
             $query->where('test_id', $this->testId);
@@ -143,7 +163,7 @@ class EmployeeTestEvaluationTable extends Component
             $query->orderBy('id', $this->sortDirection);
         }
 
-        $attempts = $query->paginate(10);
+        $attempts = $query->paginate($this->perPage);
 
         return view('livewire.admin.employee-test-evaluation.table', [
             'attempts' => $attempts,
