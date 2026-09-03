@@ -17,6 +17,7 @@ class JobController extends Controller
         $request->validate([
             'company_id' => 'required|exists:companies,id',
             'department_id' => 'required|exists:departments,id',
+            'position_id' => 'nullable|exists:positions,id',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'employment_type' => 'required|string|max:255',
@@ -31,6 +32,7 @@ class JobController extends Controller
         $data = Job::create([
             'company_id' => $request->company_id,
             'department_id' => $request->department_id,
+            'position_id' => $request->position_id ?: null,
             'title' => $request->title,
             'description' => !empty($request->description) ? $request->description : '-',
             'employment_type' => $request->employment_type,
@@ -62,6 +64,7 @@ class JobController extends Controller
         $request->validate([
             'company_id' => 'sometimes|required|exists:companies,id',
             'department_id' => 'sometimes|required|exists:departments,id',
+            'position_id' => 'sometimes|nullable|exists:positions,id',
             'title' => 'sometimes|required|string|max:255',
             'description' => 'sometimes|nullable|string',
             'employment_type' => 'sometimes|required|string|max:255',
@@ -79,6 +82,7 @@ class JobController extends Controller
         $data->update([
             'company_id' => $request->input('company_id', $data->company_id),
             'department_id' => $request->input('department_id', $data->department_id),
+            'position_id' => $request->has('position_id') ? ($request->position_id ?: null) : $data->position_id,
             'title' => $request->input('title', $data->title),
             'description' => !empty($newDesc) ? $newDesc : ($data->description ?? '-'),
             'employment_type' => $request->input('employment_type', $data->employment_type),

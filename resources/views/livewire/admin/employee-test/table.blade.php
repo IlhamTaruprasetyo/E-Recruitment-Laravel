@@ -6,10 +6,13 @@
 
     createCategoryId: '{{ old('category_id', '') }}',
     createSelectedQuestions: [],
+    createTargetScope: '{{ old('target_scope', old('department_ids') ? 'specific' : 'all') }}',
+    createSelectedDepartments: {{ json_encode(array_map('strval', old('department_ids', []))) }},
 
     editData: {
         id: '{{ old('id', '') }}',
-        department_id: '{{ old('department_id', '') }}',
+        target_scope: 'all',
+        department_ids: [],
         target_employee_type: '{{ old('target_employee_type', 'all') }}',
         category_id: '{{ old('category_id', '') }}',
         title: '{{ old('title', '') }}',
@@ -27,6 +30,7 @@
 
     detailData: {
         id: '',
+        departments: [],
         department_name: '',
         target_employee_type: 'all',
         category_name: '',
@@ -50,9 +54,17 @@
             qIds = test.questions.map(q => q.id.toString());
         }
 
+        let deptIds = [];
+        if (test.departments && test.departments.length > 0) {
+            deptIds = test.departments.map(d => d.id.toString());
+        } else if (test.department_id) {
+            deptIds = [test.department_id.toString()];
+        }
+
         this.editData = {
             id: test.id,
-            department_id: test.department_id || '',
+            target_scope: deptIds.length > 0 ? 'specific' : 'all',
+            department_ids: deptIds,
             target_employee_type: test.target_employee_type || 'all',
             category_id: test.category_id,
             title: test.title,
@@ -74,9 +86,18 @@
     },
 
     openDetailModal(test) {
+        let depts = test.departments || [];
+        if (depts.length === 0 && test.department) {
+            depts = [test.department];
+        }
+
         this.detailData = {
             id: test.id,
-            department_name: test.department ? (test.department.name + (test.department.company ? ' - ' + test.department.company.name : '')) : 'Semua Departemen (Umum)',
+            departments: depts,
+            department_name: depts.length > 0 
+                ? depts.map(d => d.name + (d.company ? ' (' + d.company.name + ')' : '')).join(', ')
+                : 'Semua Departemen (Umum)',
+            target_employee_type: test.target_employee_type || 'all',
             category_name: test.category ? test.category.name : '-',
             title: test.title,
             duration_minutes: test.duration_minutes,
@@ -159,7 +180,7 @@
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div>
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white">Merakit Paket Asesmen Karyawan</h3>
-                <p class="text-xs text-gray-500 dark:text-slate-400">Atur durasi, KKM, jumlah soal, opsi acak, dan rakit pertanyaan tes untuk karyawan internal.</p>
+                <p class="text-xs text-gray-500 dark:text-slate-400">Atur durasi, KKM, jumlah soal, opsi acak, dan rakit pertanyaan tes untuk karyawan tetap,kontrak, magang.</p>
             </div>
             <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
                 <!-- Search Input -->
@@ -262,8 +283,24 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="flex flex-col gap-1 items-start">
-                                    @if ($t->department)
+                                <div class="flex flex-col gap-1.5 items-start">
+                                    @php
+                                        $deptCount = $t->departments->count();
+                                    @endphp
+                                    @if ($deptCount > 0)
+                                        <div class="flex flex-wrap gap-1 max-w-xs">
+                                            @foreach ($t->departments->take(2) as $d)
+                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800" title="{{ $d->name }} {{ $d->company ? '('.$d->company->name.')' : '' }}">
+                                                    {{ $d->name }}
+                                                </span>
+                                            @endforeach
+                                            @if ($deptCount > 2)
+                                                <span class="px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700" title="{{ $t->departments->pluck('name')->implode(', ') }}">
+                                                    +{{ $deptCount - 2 }} lainnya
+                                                </span>
+                                            @endif
+                                        </div>
+                                    @elseif ($t->department)
                                         <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
                                             {{ $t->department->name }}
                                         </span>
@@ -409,26 +446,60 @@
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <!-- Target Departemen -->
-                            <div>
-                                <label for="create_department_id" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                            <div class="sm:col-span-1">
+                                <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
                                     Target Departemen
                                 </label>
-                                <select name="department_id" id="create_department_id" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                                    <option value="">Semua Departemen (Umum)</option>
-                                    @foreach ($departments as $dept)
-                                        <option value="{{ $dept->id }}" {{ old('department_id') == $dept->id ? 'selected' : '' }}>
-                                            {{ $dept->name }} {{ $dept->company ? '('.$dept->company->name.')' : '' }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <span class="text-[10px] text-gray-400">Kosongkan jika berlaku untuk seluruh departemen</span>
-                                @error('department_id')
+                                
+                                <div class="flex items-center gap-3 mb-2">
+                                    <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                                        <input type="radio" name="target_scope" value="all" x-model="createTargetScope" @change="createSelectedDepartments = []" class="text-indigo-600 focus:ring-indigo-500">
+                                        <span class="text-xs font-medium text-gray-700 dark:text-slate-300">Semua Departemen</span>
+                                    </label>
+                                    <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                                        <input type="radio" name="target_scope" value="specific" x-model="createTargetScope" class="text-indigo-600 focus:ring-indigo-500">
+                                        <span class="text-xs font-medium text-gray-700 dark:text-slate-300">Pilih Spesifik</span>
+                                    </label>
+                                </div>
+
+                                <div x-show="createTargetScope === 'specific'" x-transition class="border border-gray-200 dark:border-slate-700 rounded-xl p-2.5 bg-gray-50 dark:bg-slate-800/60 space-y-2">
+                                    <div class="flex items-center justify-between pb-1.5 border-b border-gray-200 dark:border-slate-700">
+                                        <span class="text-[11px] font-semibold text-gray-600 dark:text-slate-400" x-text="createSelectedDepartments.length + ' dipilih'"></span>
+                                        <button type="button" 
+                                            @click="
+                                                let allDeptIds = {{ json_encode($departments->pluck('id')->map(fn($id) => (string)$id)) }};
+                                                if (createSelectedDepartments.length === allDeptIds.length) {
+                                                    createSelectedDepartments = [];
+                                                } else {
+                                                    createSelectedDepartments = allDeptIds;
+                                                }
+                                            " 
+                                            class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
+                                            <span x-text="createSelectedDepartments.length === {{ count($departments) }} ? 'Hapus Semua' : 'Pilih Semua'"></span>
+                                        </button>
+                                    </div>
+                                    <div class="max-h-36 overflow-y-auto space-y-1 pr-1">
+                                        @foreach ($departments as $dept)
+                                            <label class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-800 cursor-pointer text-xs text-gray-700 dark:text-slate-300 transition">
+                                                <input type="checkbox" name="department_ids[]" value="{{ $dept->id }}" x-model="createSelectedDepartments" class="rounded text-indigo-600 focus:ring-indigo-500">
+                                                <span class="truncate">{{ $dept->name }} <span class="text-[10px] text-gray-400">{{ $dept->company ? '('.$dept->company->name.')' : '' }}</span></span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                <template x-if="createTargetScope === 'all'">
+                                    <span class="text-[10px] text-emerald-600 dark:text-emerald-400 block mt-1 font-medium">
+                                        ✓ Tes ini akan tersedia untuk seluruh departemen perusahaan.
+                                    </span>
+                                </template>
+                                @error('department_ids')
                                     <p class="mt-1 text-[11px] text-rose-500">{{ $message }}</p>
                                 @enderror
                             </div>
 
                             <!-- Sasaran / Target Peserta (Magang / Tetap / Semua) -->
-                            <div>
+                            <div class="sm:col-span-1">
                                 <label for="create_target_employee_type" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
                                     Sasaran / Target Peserta <span class="text-rose-500">*</span>
                                 </label>
@@ -640,24 +711,60 @@
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <!-- Target Departemen -->
-                            <div>
-                                <label for="edit_department_id" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                            <div class="sm:col-span-1">
+                                <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
                                     Target Departemen
                                 </label>
-                                <select name="department_id" id="edit_department_id" x-model="editData.department_id" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                                    <option value="">Semua Departemen (Umum)</option>
-                                    @foreach ($departments as $dept)
-                                        <option value="{{ $dept->id }}">{{ $dept->name }} {{ $dept->company ? '('.$dept->company->name.')' : '' }}</option>
-                                    @endforeach
-                                </select>
-                                <span class="text-[10px] text-gray-400">Kosongkan jika berlaku untuk seluruh departemen</span>
-                                @error('department_id')
+                                
+                                <div class="flex items-center gap-3 mb-2">
+                                    <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                                        <input type="radio" name="target_scope" value="all" x-model="editData.target_scope" @change="editData.department_ids = []" class="text-indigo-600 focus:ring-indigo-500">
+                                        <span class="text-xs font-medium text-gray-700 dark:text-slate-300">Semua Departemen</span>
+                                    </label>
+                                    <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                                        <input type="radio" name="target_scope" value="specific" x-model="editData.target_scope" class="text-indigo-600 focus:ring-indigo-500">
+                                        <span class="text-xs font-medium text-gray-700 dark:text-slate-300">Pilih Spesifik</span>
+                                    </label>
+                                </div>
+
+                                <div x-show="editData.target_scope === 'specific'" x-transition class="border border-gray-200 dark:border-slate-700 rounded-xl p-2.5 bg-gray-50 dark:bg-slate-800/60 space-y-2">
+                                    <div class="flex items-center justify-between pb-1.5 border-b border-gray-200 dark:border-slate-700">
+                                        <span class="text-[11px] font-semibold text-gray-600 dark:text-slate-400" x-text="editData.department_ids.length + ' dipilih'"></span>
+                                        <button type="button" 
+                                            @click="
+                                                let allDeptIds = {{ json_encode($departments->pluck('id')->map(fn($id) => (string)$id)) }};
+                                                if (editData.department_ids.length === allDeptIds.length) {
+                                                    editData.department_ids = [];
+                                                } else {
+                                                    editData.department_ids = allDeptIds;
+                                                }
+                                            " 
+                                            class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
+                                            <span x-text="editData.department_ids.length === {{ count($departments) }} ? 'Hapus Semua' : 'Pilih Semua'"></span>
+                                        </button>
+                                    </div>
+                                    <div class="max-h-36 overflow-y-auto space-y-1 pr-1">
+                                        @foreach ($departments as $dept)
+                                            <label class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-800 cursor-pointer text-xs text-gray-700 dark:text-slate-300 transition">
+                                                <input type="checkbox" name="department_ids[]" value="{{ $dept->id }}" x-model="editData.department_ids" class="rounded text-indigo-600 focus:ring-indigo-500">
+                                                <span class="truncate">{{ $dept->name }} <span class="text-[10px] text-gray-400">{{ $dept->company ? '('.$dept->company->name.')' : '' }}</span></span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                <template x-if="editData.target_scope === 'all'">
+                                    <span class="text-[10px] text-emerald-600 dark:text-emerald-400 block mt-1 font-medium">
+                                        ✓ Tes ini akan tersedia untuk seluruh departemen perusahaan.
+                                    </span>
+                                </template>
+                                @error('department_ids')
                                     <p class="mt-1 text-[11px] text-rose-500">{{ $message }}</p>
                                 @enderror
                             </div>
 
                             <!-- Sasaran / Target Peserta -->
-                            <div>
+                            <div class="sm:col-span-1">
                                 <label for="edit_target_employee_type" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
                                     Sasaran / Target Peserta <span class="text-rose-500">*</span>
                                 </label>
@@ -852,9 +959,20 @@
 
                     <!-- Parameter Badges -->
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                        <div class="p-3 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
-                            <span class="block text-[10px] text-gray-400 font-semibold uppercase">Target</span>
-                            <span class="text-xs font-bold text-gray-800 dark:text-slate-200" x-text="detailData.department_name"></span>
+                        <div class="col-span-2 sm:col-span-4 p-3 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
+                            <span class="block text-[10px] text-gray-400 font-semibold uppercase mb-1">Target Departemen</span>
+                            <template x-if="detailData.departments && detailData.departments.length > 0">
+                                <div class="flex flex-wrap gap-1.5">
+                                    <template x-for="dept in detailData.departments" :key="dept.id">
+                                        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800" x-text="dept.name + (dept.company ? ' (' + dept.company.name + ')' : '')"></span>
+                                    </template>
+                                </div>
+                            </template>
+                            <template x-if="!detailData.departments || detailData.departments.length === 0">
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                                    Semua Departemen (Umum)
+                                </span>
+                            </template>
                         </div>
                         <div class="p-3 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
                             <span class="block text-[10px] text-gray-400 font-semibold uppercase">Durasi Ujian</span>
@@ -867,6 +985,10 @@
                         <div class="p-3 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
                             <span class="block text-[10px] text-gray-400 font-semibold uppercase">Opsi Acak</span>
                             <span class="text-xs font-bold" :class="detailData.is_random ? 'text-emerald-600' : 'text-gray-500'" x-text="detailData.is_random ? 'Acak Soal' : 'Urutan Tetap'"></span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
+                            <span class="block text-[10px] text-gray-400 font-semibold uppercase">Target Peserta</span>
+                            <span class="text-xs font-bold text-gray-800 dark:text-slate-200 capitalize" x-text="detailData.target_employee_type === 'all' ? 'Semua Karyawan & Magang' : detailData.target_employee_type"></span>
                         </div>
                     </div>
 

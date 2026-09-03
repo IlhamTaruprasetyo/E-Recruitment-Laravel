@@ -83,6 +83,7 @@ class EmployeeTestEvaluationTable extends Component
 
         $query = TestAttempt::with([
             'user.employeeProfile.department',
+            'user.employeeProfile.position',
             'test.category',
             'test.department',
             'answers.question.options',
@@ -103,7 +104,10 @@ class EmployeeTestEvaluationTable extends Component
                 })
                 ->orWhereHas('user.employeeProfile', function ($ep) use ($search) {
                     $ep->whereRaw('LOWER(full_name) LIKE ?', ['%' . $search . '%'])
-                       ->orWhereRaw('LOWER(position_title) LIKE ?', ['%' . $search . '%']);
+                       ->orWhereRaw('LOWER(position_title) LIKE ?', ['%' . $search . '%'])
+                       ->orWhereHas('position', function ($pq) use ($search) {
+                           $pq->whereRaw('LOWER(name) LIKE ?', ['%' . $search . '%']);
+                       });
                 })
                 ->orWhereHas('test', function ($t) use ($search) {
                     $t->whereRaw('LOWER(title) LIKE ?', ['%' . $search . '%']);

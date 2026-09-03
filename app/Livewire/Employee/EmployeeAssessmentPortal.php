@@ -26,14 +26,18 @@ class EmployeeAssessmentPortal extends Component
         if ($employeeProfile) {
             $userType = $employeeProfile->employee_type ?: 'permanent';
 
-            $tests = Test::with(['category', 'department', 'questions'])
+            $tests = Test::with(['category', 'departments', 'department', 'questions'])
                 ->where('test_type', 'employee')
                 ->where(function ($query) use ($employeeProfile) {
+                    $query->where(function ($general) {
+                        $general->whereDoesntHave('departments')
+                                ->whereNull('department_id');
+                    });
+
                     if ($employeeProfile->department_id) {
-                        $query->where('department_id', $employeeProfile->department_id)
-                              ->orWhereNull('department_id');
-                    } else {
-                        $query->whereNull('department_id');
+                        $query->orWhereHas('departments', function ($q) use ($employeeProfile) {
+                            $q->where('departments.id', $employeeProfile->department_id);
+                        })->orWhere('department_id', $employeeProfile->department_id);
                     }
                 })
                 ->where(function ($query) use ($userType) {

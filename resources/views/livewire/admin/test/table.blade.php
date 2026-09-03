@@ -6,10 +6,13 @@
 
     createCategoryId: '{{ old('category_id', '') }}',
     createSelectedQuestions: [],
+    createTargetJobScope: '{{ old('target_job_scope', old('job_ids') ? 'specific' : 'all') }}',
+    createSelectedJobs: {{ json_encode(array_map('strval', old('job_ids', []))) }},
 
     editData: {
         id: '{{ old('id', '') }}',
-        job_id: '{{ old('job_id', '') }}',
+        target_job_scope: 'all',
+        job_ids: [],
         category_id: '{{ old('category_id', '') }}',
         title: '{{ old('title', '') }}',
         duration_minutes: '{{ old('duration_minutes', '60') }}',
@@ -26,6 +29,7 @@
 
     detailData: {
         id: '',
+        jobs: [],
         job_title: '',
         category_name: '',
         title: '',
@@ -48,9 +52,17 @@
             qIds = test.questions.map(q => q.id.toString());
         }
 
+        let jIds = [];
+        if (test.jobs && test.jobs.length > 0) {
+            jIds = test.jobs.map(j => j.id.toString());
+        } else if (test.job_id) {
+            jIds = [test.job_id.toString()];
+        }
+
         this.editData = {
             id: test.id,
-            job_id: test.job_id,
+            target_job_scope: jIds.length > 0 ? 'specific' : 'all',
+            job_ids: jIds,
             category_id: test.category_id,
             title: test.title,
             duration_minutes: test.duration_minutes,
@@ -71,9 +83,17 @@
     },
 
     openDetailModal(test) {
+        let assignedJobs = test.jobs || [];
+        if (assignedJobs.length === 0 && test.job) {
+            assignedJobs = [test.job];
+        }
+
         this.detailData = {
             id: test.id,
-            job_title: test.job ? test.job.title : '-',
+            jobs: assignedJobs,
+            job_title: assignedJobs.length > 0 
+                ? assignedJobs.map(j => j.title).join(', ')
+                : 'Semua Lowongan (Umum)',
             category_name: test.category ? test.category.name : '-',
             title: test.title,
             duration_minutes: test.duration_minutes,
@@ -249,9 +269,33 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4">
-                                <span class="font-medium text-gray-800 dark:text-slate-200">
-                                    {{ $t->job->title ?? '-' }}
-                                </span>
+                                <div class="flex flex-col gap-1 items-start">
+                                    @php
+                                        $jobCount = $t->jobs->count();
+                                    @endphp
+                                    @if ($jobCount > 0)
+                                        <div class="flex flex-wrap gap-1 max-w-xs">
+                                            @foreach ($t->jobs->take(2) as $j)
+                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800" title="{{ $j->title }} {{ $j->company ? '('.$j->company->name.')' : '' }}">
+                                                    {{ $j->title }}
+                                                </span>
+                                            @endforeach
+                                            @if ($jobCount > 2)
+                                                <span class="px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700" title="{{ $t->jobs->pluck('title')->implode(', ') }}">
+                                                    +{{ $jobCount - 2 }} lainnya
+                                                </span>
+                                            @endif
+                                        </div>
+                                    @elseif ($t->job)
+                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                                            {{ $t->job->title }}
+                                        </span>
+                                    @else
+                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                                            Semua Lowongan (Umum)
+                                        </span>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-6 py-4">
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-slate-200 border border-gray-200 dark:border-slate-700">
@@ -383,19 +427,54 @@
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <!-- Lowongan Kerja -->
-                            <div>
-                                <label for="create_job_id" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                    Lowongan Kerja Terkait <span class="text-rose-500">*</span>
+                            <div class="sm:col-span-1">
+                                <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                    Target Lowongan Kerja
                                 </label>
-                                <select name="job_id" id="create_job_id" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                                    <option value="">-- Pilih Lowongan Kerja --</option>
-                                    @foreach ($jobs as $job)
-                                        <option value="{{ $job->id }}" {{ old('job_id') == $job->id ? 'selected' : '' }}>
-                                            {{ $job->title }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('job_id')
+                                
+                                <div class="flex items-center gap-3 mb-2">
+                                    <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                                        <input type="radio" name="target_job_scope" value="all" x-model="createTargetJobScope" @change="createSelectedJobs = []" class="text-indigo-600 focus:ring-indigo-500">
+                                        <span class="text-xs font-medium text-gray-700 dark:text-slate-300">Semua Lowongan</span>
+                                    </label>
+                                    <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                                        <input type="radio" name="target_job_scope" value="specific" x-model="createTargetJobScope" class="text-indigo-600 focus:ring-indigo-500">
+                                        <span class="text-xs font-medium text-gray-700 dark:text-slate-300">Pilih Spesifik</span>
+                                    </label>
+                                </div>
+
+                                <div x-show="createTargetJobScope === 'specific'" x-transition class="border border-gray-200 dark:border-slate-700 rounded-xl p-2.5 bg-gray-50 dark:bg-slate-800/60 space-y-2">
+                                    <div class="flex items-center justify-between pb-1.5 border-b border-gray-200 dark:border-slate-700">
+                                        <span class="text-[11px] font-semibold text-gray-600 dark:text-slate-400" x-text="createSelectedJobs.length + ' dipilih'"></span>
+                                        <button type="button" 
+                                            @click="
+                                                let allJobIds = {{ json_encode($jobs->pluck('id')->map(fn($id) => (string)$id)) }};
+                                                if (createSelectedJobs.length === allJobIds.length) {
+                                                    createSelectedJobs = [];
+                                                } else {
+                                                    createSelectedJobs = allJobIds;
+                                                }
+                                            " 
+                                            class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
+                                            <span x-text="createSelectedJobs.length === {{ count($jobs) }} ? 'Hapus Semua' : 'Pilih Semua'"></span>
+                                        </button>
+                                    </div>
+                                    <div class="max-h-36 overflow-y-auto space-y-1 pr-1">
+                                        @foreach ($jobs as $job)
+                                            <label class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-800 cursor-pointer text-xs text-gray-700 dark:text-slate-300 transition">
+                                                <input type="checkbox" name="job_ids[]" value="{{ $job->id }}" x-model="createSelectedJobs" class="rounded text-indigo-600 focus:ring-indigo-500">
+                                                <span class="truncate">{{ $job->title }} <span class="text-[10px] text-gray-400">{{ $job->company ? '('.$job->company->name.')' : '' }}</span></span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                <template x-if="createTargetJobScope === 'all'">
+                                    <span class="text-[10px] text-emerald-600 dark:text-emerald-400 block mt-1 font-medium">
+                                        ✓ Tes ini akan berlaku untuk seluruh posisi lowongan rekrutmen.
+                                    </span>
+                                </template>
+                                @error('job_ids')
                                     <p class="mt-1 text-[11px] text-rose-500">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -594,17 +673,54 @@
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <!-- Lowongan Kerja -->
-                            <div>
-                                <label for="edit_job_id" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                    Lowongan Kerja Terkait <span class="text-rose-500">*</span>
+                            <div class="sm:col-span-1">
+                                <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                    Target Lowongan Kerja
                                 </label>
-                                <select name="job_id" id="edit_job_id" x-model="editData.job_id" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                                    <option value="">-- Pilih Lowongan Kerja --</option>
-                                    @foreach ($jobs as $job)
-                                        <option value="{{ $job->id }}">{{ $job->title }}</option>
-                                    @endforeach
-                                </select>
-                                @error('job_id')
+                                
+                                <div class="flex items-center gap-3 mb-2">
+                                    <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                                        <input type="radio" name="target_job_scope" value="all" x-model="editData.target_job_scope" @change="editData.job_ids = []" class="text-indigo-600 focus:ring-indigo-500">
+                                        <span class="text-xs font-medium text-gray-700 dark:text-slate-300">Semua Lowongan</span>
+                                    </label>
+                                    <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                                        <input type="radio" name="target_job_scope" value="specific" x-model="editData.target_job_scope" class="text-indigo-600 focus:ring-indigo-500">
+                                        <span class="text-xs font-medium text-gray-700 dark:text-slate-300">Pilih Spesifik</span>
+                                    </label>
+                                </div>
+
+                                <div x-show="editData.target_job_scope === 'specific'" x-transition class="border border-gray-200 dark:border-slate-700 rounded-xl p-2.5 bg-gray-50 dark:bg-slate-800/60 space-y-2">
+                                    <div class="flex items-center justify-between pb-1.5 border-b border-gray-200 dark:border-slate-700">
+                                        <span class="text-[11px] font-semibold text-gray-600 dark:text-slate-400" x-text="editData.job_ids.length + ' dipilih'"></span>
+                                        <button type="button" 
+                                            @click="
+                                                let allJobIds = {{ json_encode($jobs->pluck('id')->map(fn($id) => (string)$id)) }};
+                                                if (editData.job_ids.length === allJobIds.length) {
+                                                    editData.job_ids = [];
+                                                } else {
+                                                    editData.job_ids = allJobIds;
+                                                }
+                                            " 
+                                            class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
+                                            <span x-text="editData.job_ids.length === {{ count($jobs) }} ? 'Hapus Semua' : 'Pilih Semua'"></span>
+                                        </button>
+                                    </div>
+                                    <div class="max-h-36 overflow-y-auto space-y-1 pr-1">
+                                        @foreach ($jobs as $job)
+                                            <label class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-800 cursor-pointer text-xs text-gray-700 dark:text-slate-300 transition">
+                                                <input type="checkbox" name="job_ids[]" value="{{ $job->id }}" x-model="editData.job_ids" class="rounded text-indigo-600 focus:ring-indigo-500">
+                                                <span class="truncate">{{ $job->title }} <span class="text-[10px] text-gray-400">{{ $job->company ? '('.$job->company->name.')' : '' }}</span></span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                <template x-if="editData.target_job_scope === 'all'">
+                                    <span class="text-[10px] text-emerald-600 dark:text-emerald-400 block mt-1 font-medium">
+                                        ✓ Tes ini akan berlaku untuk seluruh posisi lowongan rekrutmen.
+                                    </span>
+                                </template>
+                                @error('job_ids')
                                     <p class="mt-1 text-[11px] text-rose-500">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -786,9 +902,20 @@
 
                     <!-- Parameter Badges -->
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                        <div class="p-3 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
-                            <span class="block text-[10px] text-gray-400 font-semibold uppercase">Lowongan</span>
-                            <span class="text-xs font-bold text-gray-800 dark:text-slate-200" x-text="detailData.job_title"></span>
+                        <div class="col-span-2 sm:col-span-4 p-3 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
+                            <span class="block text-[10px] text-gray-400 font-semibold uppercase mb-1">Target Lowongan</span>
+                            <template x-if="detailData.jobs && detailData.jobs.length > 0">
+                                <div class="flex flex-wrap gap-1.5">
+                                    <template x-for="job in detailData.jobs" :key="job.id">
+                                        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800" x-text="job.title + (job.company ? ' (' + job.company.name + ')' : '')"></span>
+                                    </template>
+                                </div>
+                            </template>
+                            <template x-if="!detailData.jobs || detailData.jobs.length === 0">
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                                    Semua Lowongan (Umum)
+                                </span>
+                            </template>
                         </div>
                         <div class="p-3 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
                             <span class="block text-[10px] text-gray-400 font-semibold uppercase">Durasi Ujian</span>

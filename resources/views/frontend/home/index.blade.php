@@ -547,8 +547,21 @@
                 duration: 6000,
                 progress: 0,
                 isPaused: false,
+                observer: null,
                 init() {
                     this.startAutoplay();
+                    if ('IntersectionObserver' in window) {
+                        this.observer = new IntersectionObserver((entries) => {
+                            entries.forEach(entry => {
+                                if (entry.isIntersecting) {
+                                    this.resume();
+                                } else {
+                                    this.pause();
+                                }
+                            });
+                        }, { threshold: 0.05 });
+                        this.observer.observe(this.$el);
+                    }
                 },
                 next() {
                     this.currentSlide = (this.currentSlide + 1) % this.slides.length;
@@ -622,17 +635,18 @@
             </div>
 
             <!-- Main Inner Container -->
-            <div class="relative z-10 p-6 sm:p-10 lg:p-14">
+            <div class="relative z-10 p-6 sm:p-10 lg:p-14" @mouseenter="pause()" @mouseleave="resume()">
 
-                <!-- Slides Content -->
-                <template x-for="(slide, index) in slides" :key="index">
-                    <div x-show="currentSlide === index" x-transition:enter="transition ease-out duration-700"
-                        x-transition:enter-start="opacity-0 translate-x-16"
-                        x-transition:enter-end="opacity-100 translate-x-0"
-                        x-transition:leave="transition ease-in duration-500 absolute inset-0"
-                        x-transition:leave-start="opacity-100 translate-x-0"
-                        x-transition:leave-end="opacity-0 -translate-x-16"
-                        class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center min-h-[460px]">
+                <!-- Slides Content Wrapper with consistent minimum height to prevent layout shift -->
+                <div class="relative min-h-[580px] sm:min-h-[500px] lg:min-h-[460px] flex items-center">
+                    <template x-for="(slide, index) in slides" :key="index">
+                        <div x-show="currentSlide === index" x-transition:enter="transition ease-out duration-500"
+                            x-transition:enter-start="opacity-0 translate-x-8"
+                            x-transition:enter-end="opacity-100 translate-x-0"
+                            x-transition:leave="transition ease-in duration-400 absolute inset-0"
+                            x-transition:leave-start="opacity-100 translate-x-0"
+                            x-transition:leave-end="opacity-0 -translate-x-8"
+                            class="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
 
                         <!-- Left Column: Typography & Description -->
                         <div class="lg:col-span-5 flex flex-col justify-between h-full space-y-6">
@@ -689,8 +703,7 @@
                         </div>
 
                         <!-- Right Column: Staggered Dynamic Photo Collage & Floating Badge -->
-                        <div class="lg:col-span-7 relative flex items-center justify-center lg:justify-end py-6 lg:py-0"
-                            @mouseenter="pause()" @mouseleave="resume()">
+                        <div class="lg:col-span-7 relative flex items-center justify-center lg:justify-end py-6 lg:py-0">
                             <div class="relative w-full max-w-[560px] h-[340px] sm:h-[390px]">
 
                                 <!-- Main Large Photo (Left Background Layer) -->
@@ -743,8 +756,9 @@
 
                     </div>
                 </template>
+            </div>
 
-                <!-- Bottom Navigation Bar: Arrows + Live Animated Progress Indicator Lines -->
+            <!-- Bottom Navigation Bar: Arrows + Live Animated Progress Indicator Lines -->
                 <div
                     class="mt-8 pt-6 border-t border-[#93F514]/20 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <!-- Prev / Next Navigation Arrows -->

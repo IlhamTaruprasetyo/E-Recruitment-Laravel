@@ -13,6 +13,7 @@ class EmployeeProfile extends Model
         'full_name',
         'company_id',
         'department_id',
+        'position_id',
         'position_title',
         'employee_type',
         'phone_number',
@@ -38,5 +39,10 @@ class EmployeeProfile extends Model
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class);
+    }
+
+    public function position(): BelongsTo
+    {
+        return $this->belongsTo(Position::class);
     }
 }

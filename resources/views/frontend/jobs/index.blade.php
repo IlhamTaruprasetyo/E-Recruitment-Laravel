@@ -537,9 +537,16 @@
                                         <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">
                                             {{ $job->company?->name ?? 'Perusahaan Mitra' }}
                                         </h4>
-                                        <span class="text-xs text-[#93F514] font-semibold">
-                                            {{ $job->department?->name ?? 'Umum' }}
-                                        </span>
+                                        <div class="flex items-center gap-1.5 flex-wrap mt-0.5">
+                                            <span class="text-xs text-[#93F514] font-semibold">
+                                                {{ $job->department?->name ?? 'Umum' }}
+                                            </span>
+                                            @if ($job->position)
+                                                <span class="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-[#93F514]/10 text-[#93F514] border border-[#93F514]/30 font-semibold">
+                                                    <span>{{ $job->position->name }}</span>
+                                                </span>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                                 <span
@@ -670,6 +677,11 @@
                                     <span class="text-xs text-[#93F514] font-semibold">
                                         {{ $job->department?->name ?? 'Umum' }}
                                     </span>
+                                    @if ($job->position)
+                                        <span class="inline-flex items-center gap-1 text-[11px] px-2.5 py-0.5 rounded-full bg-[#93F514]/10 text-[#93F514] border border-[#93F514]/30 font-semibold">
+                                            <span>Posisi: {{ $job->position->name }}</span>
+                                        </span>
+                                    @endif
                                     <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514]">
                                         {{ $job->employment_type }}
                                     </span>
@@ -754,7 +766,7 @@
 
         <!-- Pagination -->
         <div class="mt-10 mb-16">
-            {{ $jobs->links() }}
+            {{ $jobs->links('frontend.components.pagination') }}
         </div>
 
         <!-- Temukan Lowongan Berdasarkan Perusahaan (Di Bawah Menu Daftar Lowongan & Rata Tengah) -->

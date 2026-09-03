@@ -77,7 +77,7 @@
                             Data Master
                         </div>
                         <div class="space-y-1">
-                            <x-sidebar.nested-nav-link title="Perusahaan" :active="request()->routeIs('admin.company*') || request()->routeIs('admin.department*')">
+                            <x-sidebar.nested-nav-link title="Perusahaan" :active="request()->routeIs('admin.company*') || request()->routeIs('admin.department*') || request()->routeIs('admin.position*')">
                                 <x-slot:icon>
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
@@ -93,6 +93,10 @@
                                 <a href="{{ route('admin.department') }}"
                                     class="block px-3 py-2 text-xs font-medium {{ request()->routeIs('admin.department*') ? 'text-indigo-600 dark:text-indigo-400 font-semibold bg-indigo-50/50 dark:bg-indigo-950/30' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/60' }} rounded-lg transition-colors">
                                     Departemen / Divisi
+                                </a>
+                                <a href="{{ route('admin.position') }}"
+                                    class="block px-3 py-2 text-xs font-medium {{ request()->routeIs('admin.position*') ? 'text-indigo-600 dark:text-indigo-400 font-semibold bg-indigo-50/50 dark:bg-indigo-950/30' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/60' }} rounded-lg transition-colors">
+                                    Jabatan / Posisi
                                 </a>
                             </x-sidebar.nested-nav-link>
                         </div>

@@ -2,12 +2,14 @@
     showCreateModal: {{ $errors->any() && !old('is_edit') ? 'true' : 'false' }},
     showEditModal: {{ $errors->any() && old('is_edit') ? 'true' : 'false' }},
     showDeleteModal: false,
+    createDepartmentId: '{{ old('department_id', '') }}',
     createQuill: null,
     editQuill: null,
     editData: {
         id: '{{ old('id', '') }}',
         company_id: '{{ old('company_id', '') }}',
         department_id: '{{ old('department_id', '') }}',
+        position_id: '{{ old('position_id', '') }}',
         title: '{{ old('title', '') }}',
         description: '{{ old('description', '') }}',
         employment_type: '{{ old('employment_type', 'Full-time') }}',
@@ -21,6 +23,20 @@
     deleteData: {
         id: '',
         title: ''
+    },
+    onPositionSelect(event, isEdit = false) {
+        let select = event.target;
+        let selectedText = select.options[select.selectedIndex]?.dataset?.name || '';
+        if (selectedText) {
+            if (!isEdit) {
+                let titleInput = document.getElementById('title');
+                if (titleInput) {
+                    titleInput.value = selectedText;
+                }
+            } else {
+                this.editData.title = selectedText;
+            }
+        }
     },
     initQuillCreate() {
         if (this.createQuill) return;
@@ -107,6 +123,7 @@
             id: job.id,
             company_id: job.company_id || '',
             department_id: job.department_id || '',
+            position_id: job.position_id || '',
             title: job.title || '',
             description: job.description || '',
             employment_type: job.employment_type || 'Full-time',
@@ -435,7 +452,12 @@
                                         @endif
                                         @if ($job->department)
                                             <span class="text-[11px] text-gray-500 dark:text-slate-400">
-                                                • {{ $job->department->name }}
+                                                - {{ $job->department->name }}
+                                            </span>
+                                        @endif
+                                        @if ($job->position)
+                                            <span class="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-100 dark:border-emerald-900/50">
+                                                {{ $job->position->name }}
                                             </span>
                                         @endif
                                     </div>
@@ -592,19 +614,38 @@
                                 </select>
                             </div>
 
-                            <!-- Department -->
-                            <div>
-                                <label for="department_id" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                    Departemen <span class="text-rose-500">*</span>
-                                </label>
-                                <select name="department_id" id="department_id" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                                    <option value="">-- Pilih Departemen --</option>
-                                    @foreach ($departments as $dept)
-                                        <option value="{{ $dept->id }}" {{ old('department_id') == $dept->id ? 'selected' : '' }}>
-                                            {{ $dept->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                            <!-- Department & Master Position Grid -->
+                            <div class="col-span-1 sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <!-- Department -->
+                                <div>
+                                    <label for="department_id" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                        Departemen <span class="text-rose-500">*</span>
+                                    </label>
+                                    <select name="department_id" id="department_id" x-model="createDepartmentId" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                        <option value="">-- Pilih Departemen --</option>
+                                        @foreach ($departments as $dept)
+                                            <option value="{{ $dept->id }}" {{ old('department_id') == $dept->id ? 'selected' : '' }}>
+                                                {{ $dept->name }} {{ $dept->company ? '('.$dept->company->name.')' : '' }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <!-- Position Master Selection -->
+                                <div>
+                                    <label for="position_id" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1 flex items-center justify-between">
+                                        <span>Posisi / Jabatan Baku</span>
+                                        <span class="text-[10px] text-gray-400 font-normal">Pilih otomatis</span>
+                                    </label>
+                                    <select name="position_id" id="position_id" @change="onPositionSelect($event, false)" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                        <option value="">-- Bebas / Tanpa Posisi Baku --</option>
+                                        @foreach ($positions as $pos)
+                                            <option value="{{ $pos->id }}" data-name="{{ $pos->name }}" x-show="!createDepartmentId || createDepartmentId == '{{ $pos->department_id }}'" {{ old('position_id') == $pos->id ? 'selected' : '' }}>
+                                                {{ $pos->name }} ({{ $pos->department?->name }})
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
@@ -765,19 +806,38 @@
                                 </select>
                             </div>
 
-                            <!-- Department -->
-                            <div>
-                                <label for="edit_department_id" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                    Departemen
-                                </label>
-                                <select name="department_id" id="edit_department_id" x-model="editData.department_id" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                                    <option value="">-- Pilih Departemen --</option>
-                                    @foreach ($departments as $dept)
-                                        <option value="{{ $dept->id }}">
-                                            {{ $dept->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                            <!-- Department & Master Position Grid -->
+                            <div class="col-span-1 sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <!-- Department -->
+                                <div>
+                                    <label for="edit_department_id" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                        Departemen
+                                    </label>
+                                    <select name="department_id" id="edit_department_id" x-model="editData.department_id" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                        <option value="">-- Pilih Departemen --</option>
+                                        @foreach ($departments as $dept)
+                                            <option value="{{ $dept->id }}">
+                                                {{ $dept->name }} {{ $dept->company ? '('.$dept->company->name.')' : '' }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <!-- Position Master Selection -->
+                                <div>
+                                    <label for="edit_position_id" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1 flex items-center justify-between">
+                                        <span>Posisi / Jabatan Baku</span>
+                                        <span class="text-[10px] text-gray-400 font-normal">Pilih otomatis</span>
+                                    </label>
+                                    <select name="position_id" id="edit_position_id" x-model="editData.position_id" @change="onPositionSelect($event, true)" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                        <option value="">-- Bebas / Tanpa Posisi Baku --</option>
+                                        @foreach ($positions as $pos)
+                                            <option value="{{ $pos->id }}" data-name="{{ $pos->name }}" x-show="!editData.department_id || editData.department_id == '{{ $pos->department_id }}'">
+                                                {{ $pos->name }} ({{ $pos->department?->name }})
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             </div>
                         </div>
 

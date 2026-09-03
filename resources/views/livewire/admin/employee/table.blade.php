@@ -32,20 +32,20 @@
             </div>
 
             <!-- Filter Departemen -->
-            <select wire:model.live="departmentId" class="px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition max-w-[180px]">
-                <option value="">Semua Departemen</option>
+            <select wire:model.live="departmentId" class="px-3 py-2 text-xs rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition max-w-[180px] [color-scheme:light] dark:[color-scheme:dark]">
+                <option value="" class="bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400">Semua Departemen</option>
                 @foreach ($departments as $dept)
-                    <option value="{{ $dept->id }}">{{ $dept->name }} {{ $dept->company ? '('.$dept->company->name.')' : '' }}</option>
+                    <option value="{{ $dept->id }}" class="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">{{ $dept->name }} {{ $dept->company ? '('.$dept->company->name.')' : '' }}</option>
                 @endforeach
             </select>
 
             <!-- Filter Tipe Pegawai -->
-            <select wire:model.live="employeeType" class="px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition max-w-[160px]">
-                <option value="">Semua Tipe</option>
-                <option value="permanent">Karyawan Tetap</option>
-                <option value="contract">Kontrak</option>
-                <option value="internship">Magang</option>
-                <option value="probation">Probation</option>
+            <select wire:model.live="employeeType" class="px-3 py-2 text-xs rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition max-w-[160px] [color-scheme:light] dark:[color-scheme:dark]">
+                <option value="" class="bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400">Semua Tipe</option>
+                <option value="permanent" class="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">Karyawan Tetap</option>
+                <option value="contract" class="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">Kontrak</option>
+                <option value="internship" class="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">Magang</option>
+                <option value="probation" class="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">Probation</option>
             </select>
 
             @if ($search || $departmentId || $employeeType)
@@ -126,7 +126,7 @@
                             </td>
                             <td class="py-4 px-6">
                                 @php
-                                    $pos = trim($emp->position_title ?? '');
+                                    $pos = trim($emp->position?->name ?? ($emp->position_title ?? ''));
                                     $isGeneric = empty($pos) || strtolower($pos) === 'magang' || strtolower($pos) === 'intern' || strtolower($pos) === 'staff internal';
                                 @endphp
                                 <div class="font-semibold text-gray-800 dark:text-slate-200">
@@ -138,7 +138,11 @@
                                         {{ 'Staff ' . ($emp->department?->name ?? 'Internal') }}
                                     @endif
                                 </div>
-                                @if ($emp->employee_type === 'internship' && !$isGeneric)
+                                @if ($emp->position)
+                                    <span class="inline-flex items-center text-[10px] text-indigo-600 dark:text-indigo-400 font-medium">
+                                        {{ $emp->position->department?->name }}
+                                    </span>
+                                @elseif ($emp->employee_type === 'internship' && !$isGeneric)
                                     <span class="text-[10px] text-amber-600 dark:text-amber-400 block mt-0.5 font-medium">Posisi Magang</span>
                                 @endif
                             </td>
@@ -318,7 +322,41 @@
                             @error('promoteTargetType') <span class="text-[11px] text-rose-500 mt-1 block">{{ $message }}</span> @enderror
                         </div>
 
-                        <!-- 2. Jabatan / Posisi Baru -->
+                        <!-- 2. Departemen & Posisi Baru Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                    Penempatan Departemen
+                                </label>
+                                <select wire:model.live="promoteDepartmentId"
+                                    class="w-full px-3.5 py-2.5 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition cursor-pointer">
+                                    <option value="">-- Tetap di Departemen Saat Ini --</option>
+                                    @foreach ($departments as $dept)
+                                        <option value="{{ $dept->id }}">{{ $dept->name }} {{ $dept->company ? '('.$dept->company->name.')' : '' }}</option>
+                                    @endforeach
+                                </select>
+                                @error('promoteDepartmentId') <span class="text-[11px] text-rose-500 mt-1 block">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1 flex items-center justify-between">
+                                    <span>Pilih Posisi Baku</span>
+                                    <span class="text-[10px] text-gray-400 font-normal">Otomatis</span>
+                                </label>
+                                <select wire:model.live="promotePositionId"
+                                    class="w-full px-3.5 py-2.5 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition cursor-pointer">
+                                    <option value="">-- Pilih Posisi Baru --</option>
+                                    @foreach ($positions as $pos)
+                                        @if (!$promoteDepartmentId || $promoteDepartmentId == $pos->department_id)
+                                            <option value="{{ $pos->id }}">{{ $pos->name }} ({{ $pos->department?->name }})</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                                @error('promotePositionId') <span class="text-[11px] text-rose-500 mt-1 block">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+
+                        <!-- 3. Jabatan / Posisi Baru -->
                         <div>
                             <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
                                 Jabatan / Posisi Baru <span class="text-rose-500">*</span>
@@ -327,21 +365,6 @@
                                 class="w-full px-3.5 py-2.5 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition font-medium">
                             <span class="text-[10px] text-gray-400 mt-0.5 block">Sesuaikan nama jabatan resmi karyawan.</span>
                             @error('promoteNewPosition') <span class="text-[11px] text-rose-500 mt-1 block">{{ $message }}</span> @enderror
-                        </div>
-
-                        <!-- 3. Departemen / Divisi (Opsional jika pindah divisi) -->
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                Penempatan Departemen / Divisi
-                            </label>
-                            <select wire:model="promoteDepartmentId"
-                                class="w-full px-3.5 py-2.5 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition cursor-pointer">
-                                <option value="">-- Tetap di Departemen Saat Ini --</option>
-                                @foreach ($departments as $dept)
-                                    <option value="{{ $dept->id }}">{{ $dept->name }} {{ $dept->company ? '('.$dept->company->name.')' : '' }}</option>
-                                @endforeach
-                            </select>
-                            @error('promoteDepartmentId') <span class="text-[11px] text-rose-500 mt-1 block">{{ $message }}</span> @enderror
                         </div>
 
                         <!-- Modal Actions -->
@@ -417,34 +440,54 @@
                                 Status / Kategori Hubungan Kerja <span class="text-rose-500">*</span>
                             </label>
                             <select wire:model="editEmployeeType" required
-                                class="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800 text-indigo-900 dark:text-indigo-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition cursor-pointer">
-                                <option value="permanent">Karyawan Tetap (Permanent)</option>
-                                <option value="contract">Karyawan Kontrak (Contract)</option>
-                                <option value="internship">Magang / Internship</option>
-                                <option value="probation">Masa Percobaan (Probation)</option>
+                                class="w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl bg-white dark:bg-slate-800 border border-indigo-300 dark:border-indigo-600/70 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none transition cursor-pointer [color-scheme:light] dark:[color-scheme:dark]">
+                                <option value="permanent" class="bg-white dark:bg-slate-800 text-gray-900 dark:text-white py-1">Karyawan Tetap (Permanent)</option>
+                                <option value="contract" class="bg-white dark:bg-slate-800 text-gray-900 dark:text-white py-1">Karyawan Kontrak (Contract)</option>
+                                <option value="internship" class="bg-white dark:bg-slate-800 text-gray-900 dark:text-white py-1">Magang / Internship</option>
+                                <option value="probation" class="bg-white dark:bg-slate-800 text-gray-900 dark:text-white py-1">Masa Percobaan (Probation)</option>
                             </select>
                             @error('editEmployeeType') <span class="text-[11px] text-rose-500 mt-1 block">{{ $message }}</span> @enderror
                         </div>
 
-                        <!-- Departemen / Divisi -->
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                Departemen / Divisi
-                            </label>
-                            <select wire:model="editDepartmentId"
-                                class="w-full px-3.5 py-2.5 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition cursor-pointer">
-                                <option value="">-- Pilih Departemen --</option>
-                                @foreach ($departments as $dept)
-                                    <option value="{{ $dept->id }}">{{ $dept->name }} {{ $dept->company ? '('.$dept->company->name.')' : '' }}</option>
-                                @endforeach
-                            </select>
-                            @error('editDepartmentId') <span class="text-[11px] text-rose-500 mt-1 block">{{ $message }}</span> @enderror
+                        <!-- Departemen / Divisi & Master Posisi Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                    Departemen / Divisi
+                                </label>
+                                <select wire:model.live="editDepartmentId"
+                                    class="w-full px-3.5 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none transition cursor-pointer [color-scheme:light] dark:[color-scheme:dark]">
+                                    <option value="" class="bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400">-- Pilih Departemen --</option>
+                                    @foreach ($departments as $dept)
+                                        <option value="{{ $dept->id }}" class="bg-white dark:bg-slate-800 text-gray-900 dark:text-white py-1">{{ $dept->name }} {{ $dept->company ? '('.$dept->company->name.')' : '' }}</option>
+                                    @endforeach
+                                </select>
+                                @error('editDepartmentId') <span class="text-[11px] text-rose-500 mt-1 block">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1 flex items-center justify-between">
+                                    <span>Pilih Posisi Baku</span>
+                                    <span class="text-[10px] text-gray-400 font-normal">Otomatis</span>
+                                </label>
+                                <select wire:model.live="editPositionId"
+                                    class="w-full px-3.5 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none transition cursor-pointer [color-scheme:light] dark:[color-scheme:dark]">
+                                    <option value="">-- Bebas / Khusus --</option>
+                                    @foreach ($positions as $pos)
+                                        @if (!$editDepartmentId || $editDepartmentId == $pos->department_id)
+                                            <option value="{{ $pos->id }}">{{ $pos->name }} ({{ $pos->department?->name }})</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                                @error('editPositionId') <span class="text-[11px] text-rose-500 mt-1 block">{{ $message }}</span> @enderror
+                            </div>
                         </div>
 
                         <!-- Posisi / Jabatan -->
                         <div>
-                            <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                Jabatan / Posisi
+                            <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1 flex items-center justify-between">
+                                <span>Jabatan / Posisi Karyawan</span>
+                                <span class="text-[10px] text-gray-400 font-normal">Dapat disesuaikan</span>
                             </label>
                             <input type="text" wire:model="editPositionTitle" placeholder="Contoh: Junior Backend Dev"
                                 class="w-full px-3.5 py-2.5 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">

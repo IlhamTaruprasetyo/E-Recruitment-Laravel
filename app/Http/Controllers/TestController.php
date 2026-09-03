@@ -12,7 +12,9 @@ class TestController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'job_id' => 'required|exists:jobs,id',
+            'job_id' => 'nullable|exists:jobs,id',
+            'job_ids' => 'nullable|array',
+            'job_ids.*' => 'exists:jobs,id',
             'category_id' => 'required|exists:test_categories,id',
             'title' => 'required|string|max:255',
             'duration_minutes' => 'required|integer|min:1',
@@ -31,8 +33,17 @@ class TestController extends Controller
                 ? count($selectedQuestions) 
                 : (int) $request->total_questions;
 
+            // Handle job_ids (multi-select) or legacy single job_id
+            $jobIds = $request->input('job_ids', []);
+            if (empty($jobIds) && $request->filled('job_id')) {
+                $jobIds = [$request->job_id];
+            }
+            $jobIds = array_values(array_filter($jobIds));
+            $primaryJobId = !empty($jobIds) ? $jobIds[0] : null;
+
             $test = Test::create([
-                'job_id' => $request->job_id,
+                'test_type' => 'recruitment',
+                'job_id' => $primaryJobId,
                 'category_id' => $request->category_id,
                 'title' => $request->title,
                 'duration_minutes' => $request->duration_minutes,
@@ -40,6 +51,9 @@ class TestController extends Controller
                 'total_questions' => $totalQuestions,
                 'is_random' => $request->boolean('is_random'),
             ]);
+
+            // Sync many-to-many jobs
+            $test->jobs()->sync($jobIds);
 
             if (!empty($selectedQuestions)) {
                 $syncData = [];
@@ -65,7 +79,9 @@ class TestController extends Controller
         $test = Test::findOrFail($id);
 
         $request->validate([
-            'job_id' => 'required|exists:jobs,id',
+            'job_id' => 'nullable|exists:jobs,id',
+            'job_ids' => 'nullable|array',
+            'job_ids.*' => 'exists:jobs,id',
             'category_id' => 'required|exists:test_categories,id',
             'title' => 'required|string|max:255',
             'duration_minutes' => 'required|integer|min:1',
@@ -84,8 +100,19 @@ class TestController extends Controller
                 ? count($selectedQuestions) 
                 : (int) $request->total_questions;
 
+            // Handle job_ids (multi-select) or legacy single job_id
+            $jobIds = $request->input('job_ids', []);
+            if ($request->has('job_ids')) {
+                $jobIds = array_values(array_filter($jobIds));
+            } elseif ($request->filled('job_id')) {
+                $jobIds = [$request->job_id];
+            } else {
+                $jobIds = [];
+            }
+            $primaryJobId = !empty($jobIds) ? $jobIds[0] : null;
+
             $test->update([
-                'job_id' => $request->job_id,
+                'job_id' => $primaryJobId,
                 'category_id' => $request->category_id,
                 'title' => $request->title,
                 'duration_minutes' => $request->duration_minutes,
@@ -93,6 +120,9 @@ class TestController extends Controller
                 'total_questions' => $totalQuestions,
                 'is_random' => $request->boolean('is_random'),
             ]);
+
+            // Sync many-to-many jobs
+            $test->jobs()->sync($jobIds);
 
             if (!empty($selectedQuestions)) {
                 $syncData = [];
@@ -117,14 +147,17 @@ class TestController extends Controller
 
     public function destroy(string $id)
     {
-        $test = Test::findOrFail($id);
+        try {
+            $test = Test::findOrFail($id);
+            $test->jobs()->detach();
+            $test->questions()->detach();
+            $test->delete();
 
-        if (!$test->delete()) {
             return redirect()->route('admin.test')
-                ->with('error', 'Paket Ujian gagal dihapus.');
+                ->with('delete', 'Paket Ujian berhasil dihapus.');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.test')
+                ->with('error', 'Paket Ujian gagal dihapus: ' . $e->getMessage());
         }
-
-        return redirect()->route('admin.test')
-            ->with('delete', 'Paket Ujian berhasil dihapus.');
     }
 }

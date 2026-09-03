@@ -19,4 +19,15 @@ class Department extends Model
     {
         return $this->hasMany(Job::class);
     }
+
+    public function tests()
+    {
+        return $this->belongsToMany(Test::class, 'department_test', 'department_id', 'test_id')
+                    ->withTimestamps();
+    }
+
+    public function positions()
+    {
+        return $this->hasMany(Position::class);
+    }
 }

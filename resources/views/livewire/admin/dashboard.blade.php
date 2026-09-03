@@ -333,7 +333,7 @@
                             <div>
                                 <h4 class="text-sm font-semibold text-slate-900 dark:text-white">{{ $job->title }}
                                 </h4>
-                                <p class="text-xs text-slate-500">{{ $job->department->name ?? 'Dept' }} • Kuota:
+                                <p class="text-xs text-slate-500">{{ $job->department->name ?? 'Dept' }} - Kuota:
                                     {{ $job->quota ?? '-' }}</p>
                             </div>
                             <span

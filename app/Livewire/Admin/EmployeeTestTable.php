@@ -63,8 +63,8 @@ class EmployeeTestTable extends Component
             ->orderBy('id', 'desc')
             ->get();
 
-        $tests = Test::with(['department.company', 'category', 'questions'])
-            ->withCount(['questions', 'attempts'])
+        $tests = Test::with(['departments.company', 'department.company', 'category', 'questions'])
+            ->withCount(['questions', 'attempts', 'departments'])
             ->where('test_type', 'employee')
             ->when($this->search, function ($query) {
                 $search = strtolower(trim($this->search));
@@ -72,9 +72,14 @@ class EmployeeTestTable extends Component
             })
             ->when($this->departmentId, function ($query) {
                 if ($this->departmentId === 'all') {
-                    $query->whereNull('department_id');
+                    $query->whereDoesntHave('departments')
+                          ->whereNull('department_id');
                 } else {
-                    $query->where('department_id', $this->departmentId);
+                    $query->where(function ($q) {
+                        $q->whereHas('departments', function ($d) {
+                            $d->where('departments.id', $this->departmentId);
+                        })->orWhere('department_id', $this->departmentId);
+                    });
                 }
             })
             ->when($this->categoryId, function ($query) {

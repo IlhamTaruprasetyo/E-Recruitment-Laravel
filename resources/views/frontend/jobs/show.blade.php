@@ -175,6 +175,9 @@
                             <p class="text-sm text-[#93F514] font-medium mt-1">
                                 {{ $job->company?->name ?? 'Perusahaan Mitra' }} &bull; <span
                                     class="text-gray-400">{{ $job->department?->name ?? 'Umum' }}</span>
+                                @if ($job->position)
+                                    <span class="text-[#93F514]">Posisi: {{ $job->position->name }}</span>
+                                @endif
                             </p>
                         </div>
                     </div>

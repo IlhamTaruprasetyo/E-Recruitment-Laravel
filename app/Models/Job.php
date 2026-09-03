@@ -10,7 +10,7 @@ class Job extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'company_id', 'department_id', 'title', 'description', 
+        'company_id', 'department_id', 'position_id', 'title', 'description', 
         'employment_type', 'location', 'salary_min', 'salary_max', 
         'quota', 'deadline', 'status'
     ];
@@ -127,6 +127,11 @@ class Job extends Model
         return $this->belongsTo(Department::class);
     }
 
+    public function position()
+    {
+        return $this->belongsTo(Position::class);
+    }
+
     public function jobApplications()
     {
         return $this->hasMany(JobApplication::class);
@@ -144,6 +149,7 @@ class Job extends Model
 
     public function tests()
     {
-        return $this->hasMany(Test::class, 'job_id');
+        return $this->belongsToMany(Test::class, 'job_test', 'job_id', 'test_id')
+                    ->withTimestamps();
     }
 }

@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use App\Models\Department;
+use App\Models\Position;
 use App\Models\EmployeeProfile;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
@@ -22,12 +23,34 @@ new #[Layout('layouts.guest')] class extends Component {
     public string $employee_type = 'permanent'; // 'permanent' | 'contract' | 'internship'
     public string $company_passkey = '';
     public string $department_id = '';
+    public string $position_id = '';
     public string $position_title = '';
+
+    public function updatedDepartmentId(): void
+    {
+        if ($this->position_id) {
+            $pos = Position::find($this->position_id);
+            if ($pos && (string) $pos->department_id !== (string) $this->department_id) {
+                $this->position_id = '';
+            }
+        }
+    }
+
+    public function updatedPositionId(): void
+    {
+        if ($this->position_id) {
+            $pos = Position::find($this->position_id);
+            if ($pos) {
+                $this->position_title = $pos->name;
+            }
+        }
+    }
 
     public function with(): array
     {
         return [
             'departments' => Department::with('company')->orderBy('name')->get(),
+            'positions' => Position::with('department')->orderBy('name')->get(),
         ];
     }
 
@@ -63,6 +86,7 @@ new #[Layout('layouts.guest')] class extends Component {
                 },
             ];
             $rules['department_id'] = ['nullable', 'exists:departments,id'];
+            $rules['position_id'] = ['nullable', 'exists:positions,id'];
             $rules['position_title'] = ['nullable', 'string', 'max:100'];
         }
 
@@ -80,14 +104,18 @@ new #[Layout('layouts.guest')] class extends Component {
 
         if ($this->account_type === 'employee') {
             $dept = !empty($this->department_id) ? Department::find($this->department_id) : null;
+            $pos = !empty($this->position_id) ? Position::find($this->position_id) : null;
+            $finalPosTitle = $this->position_title ?: ($pos?->name ?? null);
+
             EmployeeProfile::updateOrCreate(
                 ['user_id' => $user->id],
                 [
                     'nik' => $user->nik,
                     'full_name' => $user->name,
                     'department_id' => !empty($this->department_id) ? (int)$this->department_id : null,
+                    'position_id' => !empty($this->position_id) ? (int)$this->position_id : null,
                     'company_id' => $dept?->company_id,
-                    'position_title' => $this->position_title ?: null,
+                    'position_title' => $finalPosTitle,
                     'employee_type' => $this->employee_type ?: 'permanent',
                 ]
             );
@@ -390,7 +418,7 @@ new #[Layout('layouts.guest')] class extends Component {
                                     Departemen / Divisi
                                 </label>
                                 <div class="relative">
-                                    <select wire:model="department_id" 
+                                    <select wire:model.live="department_id" 
                                             id="department_id" 
                                             class="w-full px-3.5 py-2.5 bg-black/60 border border-white/15 focus:border-[#93F514] focus:ring-1 focus:ring-[#93F514] rounded-xl text-sm text-white transition outline-none cursor-pointer">
                                         <option value="" class="bg-gray-900 text-gray-400">-- Pilih Departemen --</option>
@@ -408,22 +436,50 @@ new #[Layout('layouts.guest')] class extends Component {
                                 @endif
                             </div>
 
-                            <!-- Posisi / Jabatan -->
+                            <!-- Pilihan Posisi Baku (Master Data) -->
                             <div>
-                                <label for="position_title" class="block text-xs font-semibold text-gray-300 mb-1">
-                                    Jabatan / Posisi
+                                <label for="position_id" class="block text-xs font-semibold text-gray-300 mb-1 flex items-center justify-between">
+                                    <span>Pilih Jabatan Baku</span>
+                                    <span class="text-[10px] text-gray-400 font-normal">Otomatis</span>
                                 </label>
-                                <input wire:model="position_title" 
-                                       id="position_title" 
-                                       type="text" 
-                                       placeholder="Contoh: Staff IT, Supervisor, dll"
-                                       class="w-full px-3.5 py-2.5 bg-black/40 border border-white/15 focus:border-[#93F514] focus:ring-1 focus:ring-[#93F514] rounded-xl text-sm text-white placeholder-gray-500 transition outline-none" />
-                                @if ($errors->has('position_title'))
+                                <div class="relative">
+                                    <select wire:model.live="position_id" 
+                                            id="position_id" 
+                                            class="w-full px-3.5 py-2.5 bg-black/60 border border-white/15 focus:border-[#93F514] focus:ring-1 focus:ring-[#93F514] rounded-xl text-sm text-white transition outline-none cursor-pointer">
+                                        <option value="" class="bg-gray-900 text-gray-400">-- Pilih Posisi (Opsional) --</option>
+                                        @foreach ($positions as $pos)
+                                            @if (!$department_id || $department_id == $pos->department_id)
+                                                <option value="{{ $pos->id }}" class="bg-gray-900 text-white">
+                                                    {{ $pos->name }} ({{ $pos->department?->name }})
+                                                </option>
+                                            @endif
+                                        @endforeach
+                                    </select>
+                                </div>
+                                @if ($errors->has('position_id'))
                                     <p class="mt-1 text-xs text-red-400 font-normal">
-                                        {{ $errors->first('position_title') }}
+                                        {{ $errors->first('position_id') }}
                                     </p>
                                 @endif
                             </div>
+                        </div>
+
+                        <!-- Posisi / Jabatan Input Kustom -->
+                        <div>
+                            <label for="position_title" class="block text-xs font-semibold text-gray-300 mb-1 flex items-center justify-between">
+                                <span>Nama Jabatan / Posisi Spesifik</span>
+                                <span class="text-[10px] text-gray-400 font-normal">Dapat disesuaikan</span>
+                            </label>
+                            <input wire:model="position_title" 
+                                   id="position_title" 
+                                   type="text" 
+                                   placeholder="Contoh: Staff IT, Supervisor, dll"
+                                   class="w-full px-3.5 py-2.5 bg-black/40 border border-white/15 focus:border-[#93F514] focus:ring-1 focus:ring-[#93F514] rounded-xl text-sm text-white placeholder-gray-500 transition outline-none" />
+                            @if ($errors->has('position_title'))
+                                <p class="mt-1 text-xs text-red-400 font-normal">
+                                    {{ $errors->first('position_title') }}
+                                </p>
+                            @endif
                         </div>
 
                         <!-- EMPLOYEE ONLY: Token Perusahaan (Passkey) -->

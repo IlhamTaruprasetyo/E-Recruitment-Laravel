@@ -93,10 +93,10 @@
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
                 <!-- Role Filter Dropdown -->
                 <div class="w-full sm:w-44">
-                    <select wire:model.live="roleFilter" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                        <option value="">Semua Role</option>
+                    <select wire:model.live="roleFilter" class="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition [color-scheme:light] dark:[color-scheme:dark]">
+                        <option value="" class="bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400">Semua Role</option>
                         @foreach ($roles as $r)
-                            <option value="{{ $r->id }}">{{ $r->name }}</option>
+                            <option value="{{ $r->id }}" class="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">{{ $r->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -329,10 +329,10 @@
                                 <label for="role_id" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
                                     Role Hak Akses <span class="text-rose-500">*</span>
                                 </label>
-                                <select name="role_id" id="role_id" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                                    <option value="">-- Pilih Role --</option>
+                                <select name="role_id" id="role_id" required class="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition [color-scheme:light] dark:[color-scheme:dark]">
+                                    <option value="" class="bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400">-- Pilih Role --</option>
                                     @foreach ($roles as $r)
-                                        <option value="{{ $r->id }}" {{ old('role_id') == $r->id ? 'selected' : '' }}>
+                                        <option value="{{ $r->id }}" {{ old('role_id') == $r->id ? 'selected' : '' }} class="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">
                                             {{ $r->name }}
                                         </option>
                                     @endforeach
@@ -421,11 +421,11 @@
 
                             <div>
                                 <label for="edit_role_id" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                    Role Hak Akses
+                                    Role Hak Akses <span class="text-rose-500">*</span>
                                 </label>
-                                <select name="role_id" id="edit_role_id" x-model="editData.role_id" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                <select name="role_id" id="edit_role_id" x-model="editData.role_id" required class="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition [color-scheme:light] dark:[color-scheme:dark]">
                                     @foreach ($roles as $r)
-                                        <option value="{{ $r->id }}">
+                                        <option value="{{ $r->id }}" class="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">
                                             {{ $r->name }}
                                         </option>
                                     @endforeach

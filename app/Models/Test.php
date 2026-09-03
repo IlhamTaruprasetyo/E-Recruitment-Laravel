@@ -31,9 +31,21 @@ class Test extends Model
         return $this->belongsTo(Job::class, 'job_id');
     }
 
+    public function jobs(): BelongsToMany
+    {
+        return $this->belongsToMany(Job::class, 'job_test', 'test_id', 'job_id')
+                    ->withTimestamps();
+    }
+
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class, 'department_id');
+    }
+
+    public function departments(): BelongsToMany
+    {
+        return $this->belongsToMany(Department::class, 'department_test', 'test_id', 'department_id')
+                    ->withTimestamps();
     }
 
     public function category(): BelongsTo

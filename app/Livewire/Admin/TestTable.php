@@ -56,14 +56,28 @@ class TestTable extends Component
             ->orderBy('id', 'desc')
             ->get();
 
-        $tests = Test::with(['job', 'category', 'questions'])
-            ->withCount(['questions', 'attempts'])
+        $tests = Test::with(['jobs.company', 'jobs.department', 'job.company', 'category', 'questions'])
+            ->withCount(['questions', 'attempts', 'jobs'])
+            ->where(function ($q) {
+                $q->where('test_type', 'recruitment')
+                  ->orWhereNull('test_type')
+                  ->orWhereNotNull('job_id')
+                  ->orWhereHas('jobs');
+            })
             ->when($this->search, function ($query) {
                 $search = strtolower(trim($this->search));
                 $query->whereRaw('LOWER(title) LIKE ?', ['%' . $search . '%']);
             })
             ->when($this->jobId, function ($query) {
-                $query->where('job_id', $this->jobId);
+                if ($this->jobId === 'all') {
+                    $query->whereDoesntHave('jobs')->whereNull('job_id');
+                } else {
+                    $query->where(function ($q) {
+                        $q->whereHas('jobs', function ($j) {
+                            $j->where('jobs.id', $this->jobId);
+                        })->orWhere('job_id', $this->jobId);
+                    });
+                }
             })
             ->when($this->categoryId, function ($query) {
                 $query->where('category_id', $this->categoryId);

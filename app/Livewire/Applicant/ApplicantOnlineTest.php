@@ -65,7 +65,17 @@ class ApplicantOnlineTest extends Component
             $this->test = Test::with(['category', 'questions.options'])->findOrFail($testId);
         } else {
             $this->test = Test::with(['category', 'questions.options'])
-                ->where('job_id', $this->application->job_id)
+                ->where(function ($q) {
+                    $q->whereHas('jobs', function ($j) {
+                        $j->where('jobs.id', $this->application->job_id);
+                    })
+                    ->orWhere('job_id', $this->application->job_id)
+                    ->orWhere(function ($allJobs) {
+                        $allJobs->whereDoesntHave('jobs')
+                                ->whereNull('job_id')
+                                ->where('test_type', 'recruitment');
+                    });
+                })
                 ->first();
         }
 

@@ -72,7 +72,10 @@ class TestEvaluationTable extends Component
     public function render()
     {
         $jobs = Job::orderBy('title', 'asc')->get();
-        $tests = Test::orderBy('title', 'asc')->get();
+        $tests = Test::where(function ($q) {
+            $q->where('test_type', 'recruitment')
+              ->orWhereNull('test_type');
+        })->orderBy('title', 'asc')->get();
 
         $query = TestAttempt::with([
             'jobApplication.applicantProfile.user',

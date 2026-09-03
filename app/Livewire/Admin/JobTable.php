@@ -7,6 +7,7 @@ use Livewire\WithPagination;
 use App\Models\Job;
 use App\Models\Company;
 use App\Models\Department;
+use App\Models\Position;
 
 class JobTable extends Component
 {
@@ -27,7 +28,7 @@ class JobTable extends Component
 
     public function render()
     {
-        $jobs = Job::with(['company', 'department'])
+        $jobs = Job::with(['company', 'department', 'position'])
             ->when($this->search, function ($query) {
                 $search = strtolower(trim($this->search));
                 $query->where(function ($q) use ($search) {
@@ -39,6 +40,9 @@ class JobTable extends Component
                       })
                       ->orWhereHas('department', function ($dq) use ($search) {
                           $dq->whereRaw('LOWER(name) LIKE ?', ['%' . $search . '%']);
+                      })
+                      ->orWhereHas('position', function ($pq) use ($search) {
+                          $pq->whereRaw('LOWER(name) LIKE ?', ['%' . $search . '%']);
                       });
                 });
             })
@@ -47,11 +51,13 @@ class JobTable extends Component
 
         $companies = Company::all();
         $departments = Department::all();
+        $positions = Position::orderBy('name')->get();
 
         return view('livewire.admin.jobs.table', [
             'jobs' => $jobs,
             'companies' => $companies,
             'departments' => $departments,
+            'positions' => $positions,
         ]);
     }
 }

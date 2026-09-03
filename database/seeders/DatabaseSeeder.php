@@ -59,11 +59,45 @@ class DatabaseSeeder extends Seeder
             'description' => 'Software & Hardware Division'
         ]);
 
+        // 3b. Seed Positions
+        $frontendPosId = DB::table('positions')->insertGetId([
+            'department_id' => $deptId,
+            'name' => 'Frontend Developer',
+            'description' => 'Mengembangkan antarmuka pengguna berbasis web.',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $backendPosId = DB::table('positions')->insertGetId([
+            'department_id' => $deptId,
+            'name' => 'Backend Developer',
+            'description' => 'Mengembangkan arsitektur server, API, dan basis data.',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $iotPosId = DB::table('positions')->insertGetId([
+            'department_id' => $deptId,
+            'name' => 'IoT Engineer',
+            'description' => 'Merancang dan mengintegrasikan perangkat keras mikrokontroler.',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $qaPosId = DB::table('positions')->insertGetId([
+            'department_id' => $deptId,
+            'name' => 'Quality Assurance (QA)',
+            'description' => 'Melakukan pengujian mutu dan otomatisasi sistem perangkat lunak.',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
         // 4. Seed Jobs
         DB::table('jobs')->insert([
             [
                 'company_id' => $companyId,
                 'department_id' => $deptId,
+                'position_id' => $frontendPosId,
                 'title' => 'Frontend Developer',
                 'description' => 'Menguasai React JS, TailwindCSS.',
                 'employment_type' => 'Full-time',
@@ -77,6 +111,7 @@ class DatabaseSeeder extends Seeder
             [
                 'company_id' => $companyId,
                 'department_id' => $deptId,
+                'position_id' => $iotPosId,
                 'title' => 'IoT Engineer',
                 'description' => 'Pengalaman dengan ESP32 dan Arduino.',
                 'employment_type' => 'Contract',

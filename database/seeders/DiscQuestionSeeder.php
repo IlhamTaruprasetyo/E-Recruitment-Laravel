@@ -23,7 +23,7 @@ class DiscQuestionSeeder extends Seeder
         // 24 Nomor Soal DISC standar dengan 4 Opsi (disesuaikan 100% presisi dengan DISC TEST SOFTWARE 2018 - Copy.xlsx)
         $questionsData = [
             1 => [
-                ['text' => 'Gampang gaul, Mudah setuju', 'most_tag' => 'S', 'least_tag' => 'S', 'tag' => 'S'],
+                ['text' => 'Gampangan, Mudah setuju', 'most_tag' => 'S', 'least_tag' => 'S', 'tag' => 'S'],
                 ['text' => 'Percaya, Mudah percaya pada orang', 'most_tag' => 'I', 'least_tag' => 'I', 'tag' => 'I'],
                 ['text' => 'Petualang, Mengambil resiko', 'most_tag' => '*', 'least_tag' => 'D', 'tag' => '*'],
                 ['text' => 'Toleran, Menghormati', 'most_tag' => 'C', 'least_tag' => 'C', 'tag' => 'C'],

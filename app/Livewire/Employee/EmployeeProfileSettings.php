@@ -4,6 +4,7 @@ namespace App\Livewire\Employee;
 
 use App\Models\Company;
 use App\Models\Department;
+use App\Models\Position;
 use App\Models\EmployeeProfile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -22,6 +23,8 @@ class EmployeeProfileSettings extends Component
     public $company_id;
 
     public $department_id;
+
+    public $position_id;
 
     public $position_title;
 
@@ -48,7 +51,8 @@ class EmployeeProfileSettings extends Component
         $this->full_name = $profile->full_name ?? $user->name;
         $this->company_id = $profile->company_id;
         $this->department_id = $profile->department_id;
-        $this->position_title = $profile->position_title;
+        $this->position_id = $profile->position_id ? (string) $profile->position_id : null;
+        $this->position_title = $profile->position_title ?? ($profile->position?->name ?? '');
         $this->employee_type = $profile->employee_type ?? 'permanent';
         $this->current_photo_url = $profile->photo
             ? asset('storage/' . $profile->photo) . '?v=' . time()
@@ -61,6 +65,7 @@ class EmployeeProfileSettings extends Component
             $department = Department::find($this->department_id);
             if (! $department || (string) $department->company_id !== (string) $this->company_id) {
                 $this->department_id = null;
+                $this->position_id = null;
             }
         }
     }
@@ -71,6 +76,22 @@ class EmployeeProfileSettings extends Component
             $department = Department::find($this->department_id);
             if ($department?->company_id) {
                 $this->company_id = $department->company_id;
+            }
+            if ($this->position_id) {
+                $pos = Position::find($this->position_id);
+                if ($pos && (string) $pos->department_id !== (string) $this->department_id) {
+                    $this->position_id = null;
+                }
+            }
+        }
+    }
+
+    public function updatedPositionId(): void
+    {
+        if ($this->position_id) {
+            $pos = Position::find($this->position_id);
+            if ($pos) {
+                $this->position_title = $pos->name;
             }
         }
     }
@@ -90,6 +111,7 @@ class EmployeeProfileSettings extends Component
             'full_name' => 'required|string|max:255',
             'company_id' => 'nullable|exists:companies,id',
             'department_id' => 'nullable|exists:departments,id',
+            'position_id' => 'nullable|exists:positions,id',
             'position_title' => 'nullable|string|max:255',
             'employee_type' => 'required|in:permanent,contract,internship,probation',
             'photo' => 'nullable|image|max:5120',
@@ -108,6 +130,7 @@ class EmployeeProfileSettings extends Component
     {
         $this->company_id = $this->company_id ?: null;
         $this->department_id = $this->department_id ?: null;
+        $this->position_id = $this->position_id ?: null;
 
         $validatedData = $this->validate();
 
@@ -173,10 +196,12 @@ class EmployeeProfileSettings extends Component
             ->when($this->company_id, fn ($query) => $query->where('company_id', $this->company_id))
             ->orderBy('name')
             ->get();
+        $positions = Position::with('department')->orderBy('name')->get();
 
         return view('livewire.employee.employee-profile-settings', [
             'companies' => $companies,
             'departments' => $departments,
+            'positions' => $positions,
         ]);
     }
 }

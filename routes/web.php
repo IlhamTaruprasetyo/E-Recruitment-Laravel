@@ -11,6 +11,7 @@ use App\Http\Controllers\InterviewScheduleController;
 use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\MajorController;
+use App\Http\Controllers\PositionController;
 use App\Http\Controllers\QuestionBankController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TestCategoryController;
@@ -143,6 +144,12 @@ Route::middleware(['auth', 'verified', RoleMiddleware::class.':admin'])
             Route::post('departments', [DepartmentController::class, 'store'])->name('department.store');
             Route::put('departments/{id}', [DepartmentController::class, 'update'])->name('department.update');
             Route::delete('departments/{id}', [DepartmentController::class, 'destroy'])->name('department.destroy');
+
+            // Data Master Position / Jabatan
+            Route::view('positions', 'livewire.admin.position.index')->name('position');
+            Route::post('positions', [PositionController::class, 'store'])->name('position.store');
+            Route::put('positions/{id}', [PositionController::class, 'update'])->name('position.update');
+            Route::delete('positions/{id}', [PositionController::class, 'destroy'])->name('position.destroy');
 
             // Data Master Major / Jurusan
             Route::view('majors', 'livewire.admin.major.index')->name('major');
