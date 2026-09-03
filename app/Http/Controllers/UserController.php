@@ -15,9 +15,12 @@ class UserController extends Controller
         $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|string|email|max:255|unique:users,email',
-            'nik'      => 'nullable|string|max:20',
+            'nik'      => 'nullable|digits:16|unique:users,nik',
             'role_id'  => 'required|exists:roles,id',
             'password' => 'required|string|min:6',
+        ], [
+            'nik.digits' => 'NIK harus berupa 16 digit angka.',
+            'nik.unique' => 'NIK sudah digunakan oleh pengguna lain.',
         ]);
 
         $user = User::create([
@@ -42,9 +45,12 @@ class UserController extends Controller
         $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'nik'      => 'nullable|string|max:20',
+            'nik'      => ['nullable', 'digits:16', Rule::unique('users')->ignore($user->id)],
             'role_id'  => 'required|exists:roles,id',
             'password' => 'nullable|string|min:6',
+        ], [
+            'nik.digits' => 'NIK harus berupa 16 digit angka.',
+            'nik.unique' => 'NIK sudah digunakan oleh pengguna lain.',
         ]);
 
         $data = [
@@ -59,6 +65,13 @@ class UserController extends Controller
         }
 
         $user->update($data);
+
+        if ($user->employeeProfile) {
+            $user->employeeProfile->update([
+                'nik' => $request->nik,
+                'full_name' => $request->name,
+            ]);
+        }
 
         return redirect()->route('admin.user')->with('create', 'Pengguna berhasil diperbarui');
     }

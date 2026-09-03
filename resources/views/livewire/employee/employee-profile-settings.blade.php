@@ -125,8 +125,8 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">NIK</label>
-                    <input type="text" wire:model="nik" placeholder="Masukkan NIK"
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">NIK (16 Digit Sesuai KTP)</label>
+                    <input type="text" wire:model="nik" maxlength="16" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="16 digit nomor NIK"
                         class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition">
                     @error('nik') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                 </div>

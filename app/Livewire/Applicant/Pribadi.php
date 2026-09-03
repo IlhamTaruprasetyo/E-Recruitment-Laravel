@@ -76,7 +76,7 @@ class Pribadi extends Component
     protected function rules()
     {
         return [
-            'nik' => 'nullable|string|max:20',
+            'nik' => 'nullable|digits:16',
             'full_name' => 'required|string|max:255',
             'gender' => 'nullable|string|in:Laki-laki,Perempuan',
             'birth_place' => 'nullable|string|max:100',
@@ -89,6 +89,13 @@ class Pribadi extends Component
             'about_me' => 'nullable|string|max:1000',
             'photo' => 'nullable|image|max:5120',
             'cv_file' => 'nullable|file|max:10240',
+        ];
+    }
+
+    protected function messages()
+    {
+        return [
+            'nik.digits' => 'NIK harus terdiri dari 16 digit angka.',
         ];
     }
 

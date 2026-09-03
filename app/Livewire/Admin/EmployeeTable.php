@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\EmployeeProfile;
 use App\Models\Department;
+use Illuminate\Validation\Rule;
 
 class EmployeeTable extends Component
 {
@@ -24,6 +25,11 @@ class EmployeeTable extends Component
     public $editEmployeeType = 'permanent';
     public $editDepartmentId = '';
     public $editPositionTitle = '';
+
+    // Modal Delete State
+    public $showDeleteModal = false;
+    public $deleteId = null;
+    public $deleteName = '';
 
     // Modal Double Permission Promosi State
     public $showPromoteModal = false;
@@ -83,30 +89,85 @@ class EmployeeTable extends Component
 
     public function saveEmployee()
     {
+        $employee = EmployeeProfile::findOrFail($this->editId);
+
         $this->validate([
             'editFullName' => 'required|string|max:255',
+            'editNik' => [
+                'required',
+                'digits:16',
+                Rule::unique('employee_profiles', 'nik')->ignore($this->editId),
+                Rule::unique('users', 'nik')->ignore($employee->user_id),
+            ],
             'editEmployeeType' => 'required|in:permanent,contract,internship,probation',
             'editDepartmentId' => 'nullable|exists:departments,id',
             'editPositionTitle' => 'nullable|string|max:255',
+        ], [
+            'editFullName.required' => 'Nama lengkap wajib diisi.',
+            'editNik.required' => 'NIK wajib diisi.',
+            'editNik.digits' => 'NIK harus terdiri dari 16 digit angka.',
+            'editNik.unique' => 'NIK sudah digunakan oleh pegawai/pengguna lain.',
+            'editEmployeeType.required' => 'Tipe status pegawai wajib dipilih.',
         ]);
 
-        $employee = EmployeeProfile::findOrFail($this->editId);
         $dept = $this->editDepartmentId ? Department::find($this->editDepartmentId) : null;
 
         $employee->update([
             'full_name' => $this->editFullName,
+            'nik' => $this->editNik,
             'employee_type' => $this->editEmployeeType,
             'department_id' => $this->editDepartmentId ?: null,
             'company_id' => $dept?->company_id ?? $employee->company_id,
             'position_title' => $this->editPositionTitle ?: null,
         ]);
 
-        if ($employee->user && $employee->user->name !== $this->editFullName) {
-            $employee->user->update(['name' => $this->editFullName]);
+        if ($employee->user) {
+            $userUpdates = [];
+            if ($employee->user->name !== $this->editFullName) {
+                $userUpdates['name'] = $this->editFullName;
+            }
+            if ($employee->user->nik !== $this->editNik) {
+                $userUpdates['nik'] = $this->editNik;
+            }
+            if (!empty($userUpdates)) {
+                $employee->user->update($userUpdates);
+            }
         }
 
         $this->closeEditModal();
         session()->flash('message', 'Data dan status pegawai berhasil diperbarui.');
+    }
+
+    public function openDeleteModal($id)
+    {
+        $employee = EmployeeProfile::with('user')->findOrFail($id);
+        $this->deleteId = $employee->id;
+        $this->deleteName = $employee->full_name ?? ($employee->user?->name ?? 'Karyawan');
+        $this->showDeleteModal = true;
+    }
+
+    public function closeDeleteModal()
+    {
+        $this->showDeleteModal = false;
+        $this->reset(['deleteId', 'deleteName']);
+    }
+
+    public function deleteEmployee()
+    {
+        if ($this->deleteId) {
+            $employee = EmployeeProfile::findOrFail($this->deleteId);
+            $name = $employee->full_name;
+            $user = $employee->user;
+
+            $employee->delete();
+
+            if ($user && $user->role_id === 4) {
+                $user->delete();
+            }
+
+            $this->closeDeleteModal();
+            session()->flash('message', "Data pegawai '{$name}' berhasil dihapus.");
+        }
     }
 
     public function openPromoteModal($id)

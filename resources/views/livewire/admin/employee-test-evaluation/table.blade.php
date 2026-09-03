@@ -174,6 +174,7 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="border-b border-gray-100 dark:border-slate-700/80 bg-gray-50/50 dark:bg-slate-700/20 text-[11px] font-bold text-gray-400 dark:text-slate-400 uppercase tracking-wider">
+                        <th class="py-4 px-6 w-12 text-center">No</th>
                         <th class="py-4 px-6">Karyawan</th>
                         <th class="py-4 px-6">Departemen / Posisi</th>
                         <th class="py-4 px-6">Paket Asesmen</th>
@@ -184,13 +185,16 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-slate-700/50 text-xs">
-                    @forelse ($attempts as $attempt)
+                    @forelse ($attempts as $index => $attempt)
                         @php
                             $emp = $attempt->user?->employeeProfile;
                             $discResult = $attempt->discTestResult;
                             $isDisc = $discResult || str_contains(strtolower($attempt->test?->title ?? ''), 'disc');
                         @endphp
                         <tr class="hover:bg-gray-50/80 dark:hover:bg-slate-700/30 transition duration-150">
+                            <td class="py-4 px-6 text-center font-medium text-gray-400 dark:text-slate-500">
+                                {{ $attempts->firstItem() + $index }}
+                            </td>
                             <td class="py-4 px-6">
                                 <div class="flex items-center gap-2">
                                     <div class="font-bold text-gray-800 dark:text-slate-100 text-sm">
@@ -290,7 +294,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="py-12 text-center text-gray-400 dark:text-slate-500">
+                            <td colspan="8" class="py-12 text-center text-gray-400 dark:text-slate-500">
                                 <div class="flex flex-col items-center justify-center gap-2">
                                     <svg class="w-8 h-8 text-gray-300 dark:text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />

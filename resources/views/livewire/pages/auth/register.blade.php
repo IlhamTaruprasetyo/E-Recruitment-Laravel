@@ -39,9 +39,15 @@ new #[Layout('layouts.guest')] class extends Component {
         $rules = [
             'account_type' => ['required', 'in:applicant,employee'],
             'name' => ['required', 'string', 'max:255'],
-            'nik' => ['required', 'string', 'max:20', 'unique:users,nik'],
+            'nik' => ['required', 'digits:16', 'unique:users,nik'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
+        ];
+
+        $messages = [
+            'nik.required' => 'Nomor Induk Kependudukan (NIK) wajib diisi.',
+            'nik.digits' => 'NIK harus terdiri dari tepat 16 digit angka.',
+            'nik.unique' => 'NIK ini sudah terdaftar dalam sistem.',
         ];
 
         if ($this->account_type === 'employee') {
@@ -60,7 +66,7 @@ new #[Layout('layouts.guest')] class extends Component {
             $rules['position_title'] = ['nullable', 'string', 'max:100'];
         }
 
-        $validated = $this->validate($rules);
+        $validated = $this->validate($rules, $messages);
 
         $userData = [
             'name' => $validated['name'],
@@ -268,7 +274,7 @@ new #[Layout('layouts.guest')] class extends Component {
                     <!-- NIK Field -->
                     <div>
                         <label for="nik" class="block text-xs font-semibold text-gray-300 mb-1">
-                            {{ $account_type === 'employee' ? 'NIK / Nomor Induk Karyawan' : 'Nomor Induk Kependudukan (NIK KTP)' }}
+                            Nomor Induk Kependudukan (NIK KTP - 16 Digit)
                         </label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
@@ -280,11 +286,13 @@ new #[Layout('layouts.guest')] class extends Component {
                                    id="nik" 
                                    type="text" 
                                    name="nik" 
-                                   maxlength="20"
+                                   maxlength="16"
+                                   inputmode="numeric"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                                    required 
                                    autofocus 
                                    autocomplete="nik" 
-                                   placeholder="{{ $account_type === 'employee' ? 'Contoh: NIK Karyawan atau KTP' : '16 digit nomor NIK KTP' }}"
+                                   placeholder="16 digit nomor NIK sesuai KTP"
                                    class="w-full pl-10 pr-4 py-2.5 bg-black/40 border border-white/15 focus:border-[#93F514] focus:ring-1 focus:ring-[#93F514] rounded-xl text-sm text-white placeholder-gray-500 transition outline-none" />
                         </div>
                         @if ($errors->has('nik'))

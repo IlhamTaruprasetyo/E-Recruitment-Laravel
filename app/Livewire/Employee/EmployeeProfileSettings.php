@@ -83,9 +83,9 @@ class EmployeeProfileSettings extends Component
         return [
             'nik' => [
                 'nullable',
-                'string',
-                'max:20',
+                'digits:16',
                 Rule::unique('employee_profiles', 'nik')->ignore($profile?->id),
+                Rule::unique('users', 'nik')->ignore($user->id),
             ],
             'full_name' => 'required|string|max:255',
             'company_id' => 'nullable|exists:companies,id',
@@ -93,6 +93,14 @@ class EmployeeProfileSettings extends Component
             'position_title' => 'nullable|string|max:255',
             'employee_type' => 'required|in:permanent,contract,internship,probation',
             'photo' => 'nullable|image|max:5120',
+        ];
+    }
+
+    protected function messages(): array
+    {
+        return [
+            'nik.digits' => 'NIK harus berupa 16 digit angka.',
+            'nik.unique' => 'NIK sudah digunakan oleh pengguna lain.',
         ];
     }
 

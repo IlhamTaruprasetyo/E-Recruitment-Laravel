@@ -166,7 +166,14 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4">
-                                <span class="font-mono text-gray-600 dark:text-slate-300">{{ $user->nik ?? '-' }}</span>
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <span class="font-mono text-gray-600 dark:text-slate-300">{{ $user->nik ?? '-' }}</span>
+                                    @if($user->nik && strlen(preg_replace('/[^0-9]/', '', $user->nik)) !== 16)
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200 dark:border-rose-800" title="Format NIK harus 16 digit angka">
+                                            Bukan 16 Digit
+                                        </span>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-6 py-4">
                                 @php
@@ -310,9 +317,9 @@
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label for="nik" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                    NIK / Nomor Induk KTP
+                                    NIK / Nomor Induk KTP (16 Digit)
                                 </label>
-                                <input type="text" name="nik" id="nik" value="{{ old('nik') }}" placeholder="16 digit NIK" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                <input type="text" name="nik" id="nik" value="{{ old('nik') }}" maxlength="16" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="16 digit angka NIK" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
                                 @error('nik')
                                     <p class="mt-1 text-[11px] text-rose-500">{{ $message }}</p>
                                 @enderror
@@ -407,9 +414,9 @@
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label for="edit_nik" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                    NIK
+                                    NIK / Nomor Induk KTP (16 Digit)
                                 </label>
-                                <input type="text" name="nik" id="edit_nik" x-model="editData.nik" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                <input type="text" name="nik" id="edit_nik" x-model="editData.nik" maxlength="16" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="16 digit angka NIK" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
                             </div>
 
                             <div>
