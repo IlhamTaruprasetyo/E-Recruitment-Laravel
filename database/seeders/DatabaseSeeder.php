@@ -22,82 +22,90 @@ class DatabaseSeeder extends Seeder
         DB::table('roles')->updateOrInsert(['id' => 4], ['name' => 'Employee']);
 
         // 2. Seed Users
-        $superadmin = User::create([
-            'role_id' => 1,
-            'nik' => '0000000000000000',
-            'name' => 'Administrator',
-            'email' => 'admin@mail.com',
-            'password' => Hash::make('admin123'),
-        ]);
+        User::firstOrCreate(
+            ['email' => 'admin@mail.com'],
+            [
+                'role_id' => 1,
+                'nik' => '0000000000000000',
+                'name' => 'Administrator',
+                'password' => Hash::make('admin123'),
+            ]
+        );
 
-        $applicant = User::create([
-            'role_id' => 3,
-            'nik' => '3374000011112222',
-            'name' => 'Ilham Taruprasetyo',
-            'email' => 'ilham@gmail.com',
-            'password' => Hash::make('ilham123'),
-        ]);
+        User::firstOrCreate(
+            ['email' => 'ilham@gmail.com'],
+            [
+                'role_id' => 3,
+                'nik' => '3374000011112222',
+                'name' => 'Ilham Taruprasetyo',
+                'password' => Hash::make('ilham123'),
+            ]
+        );
 
-        $recruiter = User::create([
-            'role_id' => 2,
-            'nik' => '9999999999999999',
-            'name' => 'Recruiter Team',
-            'email' => 'recruiter@mail.com',
-            'password' => Hash::make('recruiter123'),
-        ]);
+        User::firstOrCreate(
+            ['email' => 'recruiter@mail.com'],
+            [
+                'role_id' => 2,
+                'nik' => '9999999999999999',
+                'name' => 'Recruiter Team',
+                'password' => Hash::make('recruiter123'),
+            ]
+        );
 
         // 3. Seed Company & Department
-        $companyId = DB::table('companies')->insertGetId([
-            'name' => 'PT Autentik Karya Analitika',
-            'city' => 'Semarang',
-            'province' => 'Jawa Tengah'
-        ]);
+        $company = DB::table('companies')->where('name', 'PT Autentik Karya Analitika')->first();
+        if (!$company) {
+            $companyId = DB::table('companies')->insertGetId([
+                'name' => 'PT Autentik Karya Analitika',
+                'city' => 'Semarang',
+                'province' => 'Jawa Tengah'
+            ]);
+        } else {
+            $companyId = $company->id;
+        }
 
-        $deptId = DB::table('departments')->insertGetId([
-            'company_id' => $companyId,
-            'name' => 'Engineering',
-            'description' => 'Software & Hardware Division'
-        ]);
+        $dept = DB::table('departments')->where('company_id', $companyId)->where('name', 'Engineering')->first();
+        if (!$dept) {
+            $deptId = DB::table('departments')->insertGetId([
+                'company_id' => $companyId,
+                'name' => 'Engineering',
+                'description' => 'Software & Hardware Division'
+            ]);
+        } else {
+            $deptId = $dept->id;
+        }
 
         // 3b. Seed Positions
-        $frontendPosId = DB::table('positions')->insertGetId([
-            'department_id' => $deptId,
-            'name' => 'Frontend Developer',
-            'description' => 'Mengembangkan antarmuka pengguna berbasis web.',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        $positionsData = [
+            ['name' => 'Frontend Developer', 'description' => 'Mengembangkan antarmuka pengguna berbasis web.'],
+            ['name' => 'Backend Developer', 'description' => 'Mengembangkan arsitektur server, API, dan basis data.'],
+            ['name' => 'IoT Engineer', 'description' => 'Merancang dan mengintegrasikan perangkat keras mikrokontroler.'],
+            ['name' => 'Quality Assurance (QA)', 'description' => 'Melakukan pengujian mutu dan otomatisasi sistem perangkat lunak.'],
+        ];
 
-        $backendPosId = DB::table('positions')->insertGetId([
-            'department_id' => $deptId,
-            'name' => 'Backend Developer',
-            'description' => 'Mengembangkan arsitektur server, API, dan basis data.',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        $iotPosId = DB::table('positions')->insertGetId([
-            'department_id' => $deptId,
-            'name' => 'IoT Engineer',
-            'description' => 'Merancang dan mengintegrasikan perangkat keras mikrokontroler.',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        $qaPosId = DB::table('positions')->insertGetId([
-            'department_id' => $deptId,
-            'name' => 'Quality Assurance (QA)',
-            'description' => 'Melakukan pengujian mutu dan otomatisasi sistem perangkat lunak.',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        $positionMap = [];
+        foreach ($positionsData as $pos) {
+            $existing = DB::table('positions')->where('department_id', $deptId)->where('name', $pos['name'])->first();
+            if (!$existing) {
+                $posId = DB::table('positions')->insertGetId([
+                    'department_id' => $deptId,
+                    'name' => $pos['name'],
+                    'description' => $pos['description'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            } else {
+                $posId = $existing->id;
+            }
+            $positionMap[$pos['name']] = $posId;
+        }
 
         // 4. Seed Jobs
-        DB::table('jobs')->insert([
-            [
+        if (DB::table('jobs')->where('company_id', $companyId)->where('title', 'Frontend Developer')->count() === 0) {
+            DB::table('jobs')->insert([
                 'company_id' => $companyId,
                 'department_id' => $deptId,
-                'position_id' => $frontendPosId,
+                'position_id' => $positionMap['Frontend Developer'] ?? null,
                 'title' => 'Frontend Developer',
                 'description' => 'Menguasai React JS, TailwindCSS.',
                 'employment_type' => 'Full-time',
@@ -107,11 +115,14 @@ class DatabaseSeeder extends Seeder
                 'quota' => 2,
                 'deadline' => Carbon::now()->addDays(30),
                 'status' => 'Open'
-            ],
-            [
+            ]);
+        }
+
+        if (DB::table('jobs')->where('company_id', $companyId)->where('title', 'IoT Engineer')->count() === 0) {
+            DB::table('jobs')->insert([
                 'company_id' => $companyId,
                 'department_id' => $deptId,
-                'position_id' => $iotPosId,
+                'position_id' => $positionMap['IoT Engineer'] ?? null,
                 'title' => 'IoT Engineer',
                 'description' => 'Pengalaman dengan ESP32 dan Arduino.',
                 'employment_type' => 'Contract',
@@ -121,26 +132,38 @@ class DatabaseSeeder extends Seeder
                 'quota' => 1,
                 'deadline' => Carbon::now()->addDays(15),
                 'status' => 'Open'
-            ]
-        ]);
+            ]);
+        }
 
         // 5. Seed Degrees & Majors
-        DB::table('degrees')->insert([
-            ['name' => 'SMA/SMK', 'rank' => 1, 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'D3', 'rank' => 2, 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'D4/S1', 'rank' => 3, 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'S2', 'rank' => 4, 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'S3', 'rank' => 5, 'created_at' => now(), 'updated_at' => now()],
-        ]);
+        $degrees = [
+            ['name' => 'SMA/SMK', 'rank' => 1],
+            ['name' => 'D3', 'rank' => 2],
+            ['name' => 'D4/S1', 'rank' => 3],
+            ['name' => 'S2', 'rank' => 4],
+            ['name' => 'S3', 'rank' => 5],
+        ];
+        foreach ($degrees as $degree) {
+            if (!DB::table('degrees')->where('name', $degree['name'])->exists()) {
+                DB::table('degrees')->insert([
+                    'name' => $degree['name'],
+                    'rank' => $degree['rank'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
 
-        DB::table('majors')->insert([
-            ['name' => 'Teknik Informatika', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Sistem Informasi', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Teknik Komputer', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Teknik Elektro', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Manajemen', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Akuntansi', 'created_at' => now(), 'updated_at' => now()],
-        ]);
+        $majors = ['Teknik Informatika', 'Sistem Informasi', 'Teknik Komputer', 'Teknik Elektro', 'Manajemen', 'Akuntansi'];
+        foreach ($majors as $majorName) {
+            if (!DB::table('majors')->where('name', $majorName)->exists()) {
+                DB::table('majors')->insert([
+                    'name' => $majorName,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
 
         // 6. Seed DISC Master Data & Questions
         $this->call(DiscMasterSeeder::class);
