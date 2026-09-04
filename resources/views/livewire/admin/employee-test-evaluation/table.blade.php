@@ -5,7 +5,8 @@
     activePdfUrl: null,
     activePdfName: null,
 
-    openGradeModal(attempt) {
+    openGradeModal(attempt, isDisc = false) {
+        attempt.is_disc = isDisc;
         this.selectedAttempt = attempt;
         this.showGradeModal = true;
         this.showPdfViewer = false;
@@ -208,7 +209,12 @@
                         @php
                             $emp = $attempt->user?->employeeProfile;
                             $discResult = $attempt->discTestResult;
-                            $isDisc = $discResult || str_contains(strtolower($attempt->test?->title ?? ''), 'disc');
+                            $isDisc = $discResult || (
+                                str_contains(strtolower($attempt->test?->title ?? ''), 'disc') ||
+                                str_contains(strtolower($attempt->test?->title ?? ''), 'personality') ||
+                                str_contains(strtolower($attempt->test?->category?->name ?? ''), 'disc') ||
+                                str_contains(strtolower($attempt->test?->category?->name ?? ''), 'kepribadian')
+                            );
                         @endphp
                         <tr class="hover:bg-gray-50/80 dark:hover:bg-slate-700/30 transition duration-150">
                             <td class="py-4 px-6 text-center font-medium text-gray-400 dark:text-slate-500">
@@ -324,7 +330,7 @@
                             <td class="py-4 px-6 text-right">
                                 <div class="flex items-center justify-end">
                                     <!-- Tombol Evaluasi / Lihat Riwayat Jawaban -->
-                                    <button @click="openGradeModal({{ \Illuminate\Support\Js::from($attempt) }})"
+                                    <button @click="openGradeModal({{ \Illuminate\Support\Js::from($attempt) }}, {{ $isDisc ? 'true' : 'false' }})"
                                         class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-semibold text-xs rounded-xl shadow-sm transition flex items-center gap-1.5">
                                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
                                             stroke="currentColor">
@@ -333,7 +339,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                         </svg>
-                                        <span>{{ $isDisc ? 'Riwayat Jawaban' : 'Riwayat Jawaban' }}</span>
+                                        <span>{{ $isDisc ? 'Riwayat Jawaban & Profil' : 'Riwayat Jawaban & Nilai' }}</span>
                                     </button>
                                 </div>
                             </td>
@@ -389,7 +395,7 @@
                 <div
                     class="flex items-center justify-between pb-4 mb-4 border-b border-gray-100 dark:border-slate-700">
                     <div>
-                        <h3 class="text-lg font-bold text-gray-800 dark:text-slate-100">
+                        <h3 class="text-lg font-bold text-gray-800 dark:text-slate-100" x-text="selectedAttempt?.is_disc ? 'Riwayat Jawaban & Profil Asesmen Karyawan' : 'Riwayat Jawaban & Evaluasi Asesmen Karyawan'">
                             Riwayat Jawaban & Evaluasi Asesmen Karyawan
                         </h3>
                         <p class="text-xs text-gray-400 mt-0.5">
@@ -751,8 +757,23 @@
                             </div>
                         </template>
 
+                        <!-- Banner jika DISC tapi belum ada profil -->
+                        <template x-if="selectedAttempt.is_disc && !selectedAttempt.disc_test_result">
+                            <div class="mb-5 p-4 rounded-xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/80 text-amber-800 dark:text-amber-300 text-xs flex items-start gap-3">
+                                <svg class="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                <div>
+                                    <p class="font-bold text-amber-900 dark:text-amber-200">Hasil Analisis Profil Belum Terbentuk</p>
+                                    <p class="mt-0.5 text-amber-700 dark:text-amber-300">
+                                        Asesmen ini merupakan Tes Kepribadian (DISC) tanpa penilaian skor/angka. Hasil profil kepribadian belum terbentuk karena butir jawaban soal tidak lengkap atau tidak tersimpan pada sesi asesmen ini.
+                                    </p>
+                                </div>
+                            </div>
+                        </template>
+
                         <!-- Score Summary Header Cards (Untuk Tes Non-DISC) -->
-                        <template x-if="!selectedAttempt.disc_test_result">
+                        <template x-if="!selectedAttempt.disc_test_result && !selectedAttempt.is_disc">
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
                                 <div
                                     class="p-3.5 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800">

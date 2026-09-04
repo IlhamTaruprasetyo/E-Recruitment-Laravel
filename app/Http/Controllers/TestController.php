@@ -145,17 +145,34 @@ class TestController extends Controller
         }
     }
 
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
         try {
             $test = Test::findOrFail($id);
+
+            // Proteksi: Cegah hapus jika sudah ada peserta yang mengerjakan/memiliki riwayat evaluasi kecuali dikonfirmasi paksa
+            $attemptCount = $test->attempts()->count();
+            if ($attemptCount > 0 && !$request->boolean('force_delete')) {
+                return redirect()->route('admin.test')
+                    ->with('error', "Paket Ujian tidak dapat dihapus karena memiliki {$attemptCount} riwayat pengerjaan/evaluasi peserta. Centang konfirmasi hapus paksa jika ingin tetap menghapus.");
+            }
+
+            DB::beginTransaction();
+
             $test->jobs()->detach();
             $test->questions()->detach();
             $test->delete();
 
+            DB::commit();
+
+            $successMsg = $attemptCount > 0
+                ? "Paket Ujian beserta {$attemptCount} riwayat pengerjaan peserta berhasil dihapus."
+                : "Paket Ujian berhasil dihapus.";
+
             return redirect()->route('admin.test')
-                ->with('delete', 'Paket Ujian berhasil dihapus.');
+                ->with('delete', $successMsg);
         } catch (\Exception $e) {
+            DB::rollBack();
             return redirect()->route('admin.test')
                 ->with('error', 'Paket Ujian gagal dihapus: ' . $e->getMessage());
         }

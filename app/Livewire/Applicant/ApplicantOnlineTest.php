@@ -182,6 +182,14 @@ class ApplicantOnlineTest extends Component
                 ->whereDoesntHave('answers')
                 ->delete();
 
+            $this->loadQuestionsAndAnswers();
+
+            if (empty($this->questions)) {
+                DB::rollBack();
+                session()->flash('error', 'Paket ujian belum memiliki butir soal yang tersedia. Silakan hubungi tim rekruter.');
+                return;
+            }
+
             $attempt = TestAttempt::create([
                 'job_application_id' => $this->application->id,
                 'test_id' => $this->test->id,
@@ -192,8 +200,6 @@ class ApplicantOnlineTest extends Component
             $this->attempt = $attempt;
             $this->attemptId = $attempt->id;
             $this->timeRemainingSeconds = ($this->test->duration_minutes ?: 60) * 60;
-
-            $this->loadQuestionsAndAnswers();
             $this->testState = 'taking';
 
             DB::commit();

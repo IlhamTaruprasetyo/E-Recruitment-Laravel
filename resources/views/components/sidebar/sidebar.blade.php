@@ -92,11 +92,11 @@
                                 </a>
                                 <a href="{{ route('admin.department') }}"
                                     class="block px-3 py-2 text-xs font-medium {{ request()->routeIs('admin.department*') ? 'text-indigo-600 dark:text-indigo-400 font-semibold bg-indigo-50/50 dark:bg-indigo-950/30' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/60' }} rounded-lg transition-colors">
-                                    Departemen / Divisi
+                                    Departemen
                                 </a>
                                 <a href="{{ route('admin.position') }}"
                                     class="block px-3 py-2 text-xs font-medium {{ request()->routeIs('admin.position*') ? 'text-indigo-600 dark:text-indigo-400 font-semibold bg-indigo-50/50 dark:bg-indigo-950/30' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/60' }} rounded-lg transition-colors">
-                                    Jabatan / Posisi
+                                    Posisi
                                 </a>
                             </x-sidebar.nested-nav-link>
                         </div>

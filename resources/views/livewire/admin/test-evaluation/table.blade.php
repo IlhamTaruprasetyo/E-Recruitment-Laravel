@@ -19,7 +19,7 @@
         answers: []
     },
 
-    openGradingModal(att) {
+    openGradingModal(att, isDisc = false) {
         let name = 'Pelamar';
         if (att.job_application && att.job_application.applicant_profile) {
             name = att.job_application.applicant_profile.full_name || 'Pelamar';
@@ -38,7 +38,8 @@
             application_status: att.job_application ? att.job_application.status : 'Reviewed',
             application_notes: att.job_application ? (att.job_application.notes || '') : '',
             answers: att.answers || [],
-            disc_result: att.disc_test_result || null
+            disc_result: att.disc_test_result || null,
+            is_disc: isDisc
         };
         this.showGradingModal = true;
     },
@@ -381,12 +382,12 @@
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end">
-                                    <button @click="openGradingModal({{ \Illuminate\Support\Js::from($att) }})" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center justify-center gap-1.5">
+                                    <button @click="openGradingModal({{ \Illuminate\Support\Js::from($att) }}, {{ $isDisc ? 'true' : 'false' }})" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center justify-center gap-1.5">
                                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                         </svg>
-                                        <span>{{ ($isDisc && $att->discTestResult) ? 'Riwayat Jawaban & Profil' : 'Riwayat Jawaban & Nilai' }}</span>
+                                        <span>{{ $isDisc ? 'Riwayat Jawaban & Profil' : 'Riwayat Jawaban & Nilai' }}</span>
                                     </button>
                                 </div>
                             </td>
@@ -441,7 +442,7 @@
                     <!-- Modal Header -->
                     <div class="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-slate-800">
                         <div>
-                            <h3 class="text-base font-bold text-gray-900 dark:text-white">
+                            <h3 class="text-base font-bold text-gray-900 dark:text-white" x-text="gradingData.is_disc ? 'Riwayat Jawaban & Profil Kepribadian Pelamar' : 'Evaluasi & Penilaian Jawaban Pelamar'">
                                 Evaluasi & Penilaian Jawaban Pelamar
                             </h3>
                             <p class="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
@@ -675,8 +676,23 @@
                         </div>
                     </template>
 
-                    <!-- Score Card Header (Untuk Tes Objektif / Essay) -->
-                    <template x-if="!gradingData.disc_result">
+                    <!-- Banner jika DISC tapi belum ada profil -->
+                    <template x-if="gradingData.is_disc && !gradingData.disc_result">
+                        <div class="my-4 p-4 rounded-xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/80 text-amber-800 dark:text-amber-300 text-xs flex items-start gap-3">
+                            <svg class="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            <div>
+                                <p class="font-bold text-amber-900 dark:text-amber-200">Hasil Analisis Profil Belum Terbentuk</p>
+                                <p class="mt-0.5 text-amber-700 dark:text-amber-300">
+                                    Tes ini merupakan Tes Kepribadian (DISC) tanpa penilaian skor/angka. Hasil profil kepribadian belum terbentuk karena butir jawaban soal tidak lengkap atau tidak tersimpan pada sesi ujian ini.
+                                </p>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Score Card Header (Untuk Tes Objektif / Essay Non-DISC) -->
+                    <template x-if="!gradingData.disc_result && !gradingData.is_disc">
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 my-4">
                             <div class="p-3 rounded-xl bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800">
                                 <span class="block text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase">Skor Pilihan Ganda</span>
@@ -703,6 +719,15 @@
                         @method('PUT')
 
                         <div class="max-h-96 overflow-y-auto space-y-4 pr-1">
+                            <template x-if="getGroupedQuestions().length === 0">
+                                <div class="py-10 text-center text-gray-400 dark:text-slate-500 bg-gray-50/50 dark:bg-slate-800/30 rounded-2xl border border-dashed border-gray-200 dark:border-slate-700/60">
+                                    <svg class="w-8 h-8 mx-auto text-gray-300 dark:text-slate-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    <p class="text-xs font-medium text-gray-600 dark:text-slate-400">Tidak ada data jawaban yang tersimpan untuk sesi pengerjaan ujian ini.</p>
+                                    <p class="text-[11px] text-gray-400 dark:text-slate-500 mt-0.5">Kandidat mungkin menyelesaikan ujian sebelum butir soal diisi atau durasi waktu habis.</p>
+                                </div>
+                            </template>
                             <template x-for="(item, index) in getGroupedQuestions()" :key="item.question_id || index">
                                 <div class="p-4 rounded-xl border transition" :class="item.question_type === 'essay' ? 'bg-amber-50/30 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800/60' : (item.question_type === 'disc' || item.most_answer || item.least_answer ? 'bg-purple-50/40 dark:bg-purple-950/20 border-purple-200 dark:border-purple-800/60' : 'bg-gray-50/50 dark:bg-slate-800/40 border-gray-200 dark:border-slate-700')">
                                     

@@ -191,6 +191,14 @@ class EmployeeOnlineTest extends Component
                 ->whereDoesntHave('answers')
                 ->delete();
 
+            $this->loadQuestionsAndAnswers();
+
+            if (empty($this->questions)) {
+                DB::rollBack();
+                session()->flash('error', 'Paket ujian belum memiliki butir soal yang tersedia. Silakan hubungi tim admin / HR.');
+                return;
+            }
+
             $attempt = TestAttempt::create([
                 'user_id'            => $user->id,
                 'attempt_type'       => 'employee',
@@ -206,8 +214,6 @@ class EmployeeOnlineTest extends Component
             $this->attempt = $attempt;
             $this->attemptId = $attempt->id;
             $this->timeRemainingSeconds = ($this->test->duration_minutes ?: 60) * 60;
-
-            $this->loadQuestionsAndAnswers();
             $this->testState = 'taking';
 
             DB::commit();

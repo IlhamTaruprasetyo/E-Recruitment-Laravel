@@ -25,8 +25,10 @@
 
     deleteData: {
         id: '',
-        title: ''
+        title: '',
+        attempts_count: 0
     },
+    forceDeleteConfirmed: false,
 
     detailData: {
         id: '',
@@ -80,8 +82,10 @@
     openDeleteModal(test) {
         this.deleteData = {
             id: test.id,
-            title: test.title
+            title: test.title,
+            attempts_count: Number(test.attempts_count) || 0
         };
+        this.forceDeleteConfirmed = false;
         this.showDeleteModal = true;
     },
 
@@ -1040,19 +1044,43 @@
             <div x-show="showDeleteModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="inline-block align-bottom bg-white dark:bg-slate-900 rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md w-full border border-gray-200 dark:border-slate-800">
                 
                 <div class="p-6">
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-full bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-full bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 mt-0.5">
                             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                             </svg>
                         </div>
-                        <div>
+                        <div class="flex-1">
                             <h3 class="text-base font-bold text-gray-900 dark:text-white">
                                 Hapus Paket Asesmen
                             </h3>
-                            <p class="text-xs text-gray-500 dark:text-slate-400 mt-1 line-clamp-3">
+                            <p class="text-xs text-gray-500 dark:text-slate-400 mt-1">
                                 Apakah Anda yakin ingin menghapus paket asesmen "<span class="font-bold text-gray-800 dark:text-gray-200" x-text="deleteData.title"></span>"? Tindakan ini tidak dapat dibatalkan.
                             </p>
+
+                            <!-- Warning jika ada riwayat pengerjaan karyawan -->
+                            <template x-if="deleteData.attempts_count > 0">
+                                <div class="mt-4 p-3.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 rounded-xl space-y-3">
+                                    <div class="flex items-start gap-2.5">
+                                        <svg class="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                        </svg>
+                                        <div class="text-xs text-rose-800 dark:text-rose-300">
+                                            <p class="font-bold">Perhatian: Paket Memiliki Riwayat Pengerjaan Karyawan</p>
+                                            <p class="mt-1 text-[11px] leading-relaxed text-rose-700 dark:text-rose-400">
+                                                Terdapat <span class="font-bold underline" x-text="deleteData.attempts_count"></span> percobaan asesmen pada paket ini. Menghapus paket ini akan <span class="font-bold underline">menghapus permanen seluruh riwayat evaluasi, nilai, dan jawaban karyawan</span> yang bersangkutan.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <label class="flex items-start gap-2.5 p-2 bg-white/60 dark:bg-slate-900/60 border border-rose-200/80 dark:border-rose-800/50 rounded-lg cursor-pointer select-none">
+                                        <input type="checkbox" x-model="forceDeleteConfirmed" class="mt-0.5 rounded border-rose-300 text-rose-600 focus:ring-rose-500">
+                                        <span class="text-[11px] font-semibold text-rose-900 dark:text-rose-200 leading-tight">
+                                            Saya memahami risikonya dan setuju untuk menghapus paksa paket ini beserta seluruh riwayat asesmen karyawan.
+                                        </span>
+                                    </label>
+                                </div>
+                            </template>
                         </div>
                     </div>
 
@@ -1060,11 +1088,18 @@
                         @csrf
                         @method('DELETE')
 
+                        <template x-if="deleteData.attempts_count > 0 && forceDeleteConfirmed">
+                            <input type="hidden" name="force_delete" value="1">
+                        </template>
+
                         <button type="button" @click="showDeleteModal = false" class="px-4 py-2 text-xs font-semibold text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition">
                             Batal
                         </button>
-                        <button type="submit" class="px-4 py-2 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-500 rounded-xl shadow-md shadow-rose-500/20 transition">
-                            Hapus Data
+                        <button type="submit" 
+                                :disabled="deleteData.attempts_count > 0 && !forceDeleteConfirmed"
+                                :class="(deleteData.attempts_count > 0 && !forceDeleteConfirmed) ? 'opacity-50 cursor-not-allowed bg-gray-400 dark:bg-gray-600' : 'bg-rose-600 hover:bg-rose-500 shadow-md shadow-rose-500/20'"
+                                class="px-4 py-2 text-xs font-semibold text-white rounded-xl transition">
+                            <span x-text="deleteData.attempts_count > 0 ? 'Hapus Paksa Paket' : 'Hapus Data'"></span>
                         </button>
                     </form>
                 </div>
