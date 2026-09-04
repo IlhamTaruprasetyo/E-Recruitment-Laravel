@@ -108,7 +108,7 @@
                 </svg>
                 <span class="text-xs font-semibold">{{ session('error') }}</span>
             </div>
-            <button @click="show = false" class="text-rose-500- hover:text-rose-700 dark:hover:text-rose-200">
+            <button @click="show = false" class="text-rose-500 hover:text-rose-700 dark:hover:text-rose-200">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -208,7 +208,12 @@
                         @php
                             $emp = $attempt->user?->employeeProfile;
                             $discResult = $attempt->discTestResult;
-                            $isDisc = $discResult || str_contains(strtolower($attempt->test?->title ?? ''), 'disc');
+                            $isDisc = $discResult || 
+                                      str_contains(strtolower($attempt->test?->title ?? ''), 'disc') ||
+                                      str_contains(strtolower($attempt->test?->category?->name ?? ''), 'disc');
+                            $passingScore = (float) ($attempt->test?->passing_score ?? 0);
+                            $totalScore = (float) ($attempt->total_score ?? 0);
+                            $isPassed = $attempt->status === 'passed' || (!$isDisc && $totalScore >= $passingScore && $passingScore > 0) || ($passingScore == 0 && $attempt->status === 'passed');
                         @endphp
                         <tr class="hover:bg-gray-50/80 dark:hover:bg-slate-700/30 transition duration-150">
                             <td class="py-4 px-6 text-center font-medium text-gray-400 dark:text-slate-500">
@@ -276,27 +281,26 @@
                                 @endif
                             </td>
                             <td class="py-4 px-6 text-center">
-                                @if ($isDisc && $discResult)
+                                @if ($isDisc)
                                     <div class="inline-flex flex-col items-center">
                                         <span
                                             class="px-2.5 py-1 rounded-lg bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 font-bold text-xs border border-purple-200 dark:border-purple-800/60">
-                                            {{ $discResult->discProfile?->pattern_name ?? ($discResult->primary_trait ?? 'DISC Profil') }}
+                                            {{ $discResult?->discProfile?->pattern_name ?? ($discResult?->primary_trait ?? 'DISC Profil') }}
                                         </span>
                                     </div>
                                 @else
                                     <div
-                                        class="font-bold text-base {{ $attempt->status === 'passed' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}">
-                                        {{ (float) ($attempt->total_score ?? 0) }}
+                                        class="font-bold text-base {{ $isPassed ? 'text-emerald-500 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}">
+                                        {{ $totalScore }}
                                     </div>
                                     <div class="text-[10px] text-gray-400">Standar:
-                                        {{ (float) ($attempt->test?->passing_score ?? 0) }}</div>
+                                        {{ $passingScore }}</div>
                                 @endif
                             </td>
                             <td class="py-4 px-6 text-center">
                                 @if ($attempt->status === 'in_progress')
                                     <span
                                         class="inline-flex items-center justify-center gap-1.5 whitespace-nowrap px-2.5 py-1 rounded-full bg-sky-100 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-semibold text-[11px] border border-sky-200 dark:border-sky-800">
-                                        {{-- <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-ping shrink-0"></span> --}}
                                         Sedang Mengerjakan
                                     </span>
                                 @elseif ($isDisc)
@@ -304,7 +308,7 @@
                                         class="inline-flex items-center justify-center whitespace-nowrap px-2.5 py-1 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-semibold text-[11px]">
                                         Selesai
                                     </span>
-                                @elseif ($attempt->status === 'passed')
+                                @elseif ($isPassed)
                                     <span
                                         class="inline-flex items-center justify-center whitespace-nowrap px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 font-semibold text-[11px]">
                                         Lolos Standar
