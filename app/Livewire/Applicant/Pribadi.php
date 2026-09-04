@@ -191,8 +191,15 @@ class Pribadi extends Component
 
         $profile->update($validatedData);
 
+        $userUpdates = [];
         if ($user->name !== $this->full_name) {
-            $user->update(['name' => $this->full_name]);
+            $userUpdates['name'] = $this->full_name;
+        }
+        if (! empty($this->nik) && $user->nik !== $this->nik) {
+            $userUpdates['nik'] = $this->nik;
+        }
+        if (! empty($userUpdates)) {
+            $user->update($userUpdates);
         }
 
         session()->flash('message', 'Data pribadi berhasil diperbarui.');
