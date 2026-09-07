@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AboutController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CvController;
 use App\Http\Controllers\DegreeController;
@@ -24,6 +25,7 @@ use App\Livewire\Employee\EmployeeOnlineTest;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('tentang-kami', [AboutController::class, 'index'])->name('about');
 Route::get('lowongan', [FrontendJobController::class, 'index'])->name('jobs.index');
 Route::get('lowongan/{id}', [FrontendJobController::class, 'show'])->name('jobs.show');
 Route::post('lowongan/{id}/apply', [JobApplicationController::class, 'store'])->middleware(['auth'])->name('jobs.apply');

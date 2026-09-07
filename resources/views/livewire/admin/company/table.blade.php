@@ -1,18 +1,32 @@
 <div class="space-y-6" x-data="{ 
-    showCreateModal: {{ $errors->any() && !old('is_edit') ? 'true' : 'false' }},
-    showEditModal: {{ $errors->any() && old('is_edit') ? 'true' : 'false' }},
+    showCreateModal: {{ (isset($errors) && $errors->any() && !old('is_edit')) ? 'true' : 'false' }},
+    showEditModal: {{ (isset($errors) && $errors->any() && old('is_edit')) ? 'true' : 'false' }},
     showDeleteModal: false,
     isSubmittingCreate: false,
     isSubmitting: false,
     isSubmittingDelete: false,
+    activeEditTab: 'general',
     editData: {
         id: '{{ old('id', '') }}',
         role_id: '{{ old('role_id', '') }}',
         name: '{{ old('name', '') }}',
+        tagline: '{{ old('tagline', '') }}',
         website: '{{ old('website', '') }}',
+        phone: '{{ old('phone', '') }}',
+        email: '{{ old('email', '') }}',
         city: '{{ old('city', '') }}',
         province: '{{ old('province', '') }}',
+        postal_code: '{{ old('postal_code', '') }}',
         address: '{{ old('address', '') }}',
+        about: '{{ old('about', '') }}',
+        vision: '{{ old('vision', '') }}',
+        missions: ['', '', ''],
+        core_values: [
+            { code: 'M', title: 'Menghargai', subtitle: 'Respect', description: '' },
+            { code: 'I', title: 'Integritas', subtitle: 'Integrity', description: '' },
+            { code: 'K', title: 'Komitmen', subtitle: 'Commitment', description: '' },
+            { code: 'A', title: 'Akuntabel', subtitle: 'Accountable', description: '' }
+        ],
         logo_url: ''
     },
     deleteData: {
@@ -20,17 +34,60 @@
         name: ''
     },
     openEditModal(company) {
+        let missions = Array.isArray(company.missions) && company.missions.length > 0 ? company.missions : ['', '', ''];
+        let coreValues = Array.isArray(company.core_values) && company.core_values.length > 0 ? company.core_values : [
+            { code: 'M', title: 'Menghargai', subtitle: 'Respect', description: '' },
+            { code: 'I', title: 'Integritas', subtitle: 'Integrity', description: '' },
+            { code: 'K', title: 'Komitmen', subtitle: 'Commitment', description: '' },
+            { code: 'A', title: 'Akuntabel', subtitle: 'Accountable', description: '' }
+        ];
+
         this.editData = {
             id: company.id,
             role_id: company.role_id || '',
             name: company.name || '',
+            tagline: company.tagline || '',
             website: company.website || '',
+            phone: company.phone || '',
+            email: company.email || '',
             city: company.city || '',
             province: company.province || '',
+            postal_code: company.postal_code || '',
             address: company.address || '',
+            about: company.about || '',
+            vision: company.vision || '',
+            missions: missions,
+            core_values: coreValues,
             logo_url: company.logo || ''
         };
+        this.activeEditTab = 'general';
         this.showEditModal = true;
+    },
+    addMission() {
+        this.editData.missions.push('');
+    },
+    removeMission(index) {
+        if (this.editData.missions.length > 1) {
+            this.editData.missions.splice(index, 1);
+        } else {
+            this.editData.missions[0] = '';
+        }
+    },
+    applyMikaTemplate() {
+        this.editData.tagline = 'The Best Choice for Your Business Partner';
+        this.editData.about = 'PT Mitra Karya Analitika (MIKA) adalah perusahaan terkemuka yang bergerak di bidang distribusi dan penyediaan instrumen laboratorium presisi, peralatan keselamatan dan kesehatan kerja (Health, Safety & Environment / HSE), serta instrumen pemantauan lingkungan (Environmental Monitoring). Berdiri sejak tahun 2014 dan berpusat di Semarang, Jawa Tengah, MIKA telah dipercaya oleh ratusan industri manufaktur, instansi riset, universitas, dan laboratorium pengujian di seluruh penjuru Indonesia sebagai mitra andalan.';
+        this.editData.vision = 'Menjadi mitra bisnis terdepan, terpercaya, dan menjadi pilihan utama di Indonesia dalam penyediaan solusi komprehensif peralatan laboratorium, perlindungan keselamatan kerja, dan teknologi pemantauan lingkungan.';
+        this.editData.missions = [
+            'Menyediakan instrumen laboratorium, alat pelindung keselamatan kerja (HSE), dan sistem monitoring lingkungan berkualitas tinggi berstandar internasional.',
+            'Memberikan layanan purna jual, kalibrasi, konsultasi teknis terpadu, dan dukungan profesional yang responsif demi kepuasan mitra bisnis.',
+            'Membangun ekosistem kemitraan strategis yang berkelanjutan bersama industri manufaktur, institusi riset, akademisi, dan instansi pemerintah di seluruh Indonesia.'
+        ];
+        this.editData.core_values = [
+            { code: 'M', title: 'Menghargai', subtitle: 'Respect', description: 'Menjunjung tinggi rasa hormat, menghargai keberagaman pandangan, serta membina komunikasi kerja yang inklusif dan harmonis bagi seluruh insan perusahaan dan mitra.' },
+            { code: 'I', title: 'Integritas', subtitle: 'Integrity', description: 'Berpikir, berkata, dan bertindak secara jujur, adil, transparan, serta berpegang teguh pada prinsip moral dan kode etik bisnis profesional tanpa kompromi.' },
+            { code: 'K', title: 'Komitmen', subtitle: 'Commitment', description: 'Berdedikasi tinggi untuk memberikan pelayanan berkualitas terbaik, menepati janji kesepakatan, dan terus berinovasi menjawab kebutuhan industri secara berkesinambungan.' },
+            { code: 'A', title: 'Akuntabel', subtitle: 'Accountable', description: 'Bertanggung jawab penuh atas setiap keputusan, tindakan, dan hasil kerja demi menjaga kepercayaan mitra serta pemangku kepentingan secara transparan.' }
+        ];
     },
     openDeleteModal(company) {
         this.deleteData = {
@@ -43,6 +100,8 @@
         e.preventDefault();
         let form = e.target;
         let formData = new FormData(form);
+        formData.set('missions', JSON.stringify(this.editData.missions.filter(m => m && m.trim() !== '')));
+        formData.set('core_values', JSON.stringify(this.editData.core_values));
         this.isSubmitting = true;
         fetch('/admin/companies/' + this.editData.id, {
             method: 'POST',
@@ -242,18 +301,33 @@
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
+                                    <a href="{{ route('about') }}" target="_blank"
+                                        class="p-1.5 rounded-lg text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-colors"
+                                        title="Lihat Halaman Publik (Tentang Kami)">
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                        </svg>
+                                    </a>
                                     <button @click="openEditModal({{ json_encode([
                                         'id' => $company->id,
                                         'role_id' => $company->role_id,
                                         'name' => $company->name,
+                                        'tagline' => $company->tagline,
                                         'website' => $company->website,
+                                        'phone' => $company->phone,
+                                        'email' => $company->email,
                                         'city' => $company->city,
                                         'province' => $company->province,
+                                        'postal_code' => $company->postal_code,
                                         'address' => $company->address,
+                                        'about' => $company->about,
+                                        'vision' => $company->vision,
+                                        'missions' => $company->missions ?? [],
+                                        'core_values' => $company->core_values ?? [],
                                         'logo' => $company->logo ? (\Illuminate\Support\Str::startsWith($company->logo, 'http') ? $company->logo : asset('storage/' . $company->logo)) : null
                                     ]) }})"
                                         class="p-1.5 rounded-lg text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
-                                        title="Edit">
+                                        title="Edit Profil Lengkap">
                                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -368,6 +442,17 @@
                             @enderror
                         </div>
 
+                        <!-- Tagline -->
+                        <div>
+                            <label for="tagline" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                Tagline / Slogan Perusahaan
+                            </label>
+                            <input type="text" name="tagline" id="tagline" value="{{ old('tagline') }}" placeholder="The Best Choice for Your Business Partner" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                            @error('tagline')
+                                <p class="mt-1 text-[11px] text-rose-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+
                         <!-- Logo File Upload -->
                         <div>
                             <label for="logo" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
@@ -379,24 +464,44 @@
                             @enderror
                         </div>
 
-                        <!-- Website -->
-                        <div>
-                            <label for="website" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                Website
-                            </label>
-                            <input type="url" name="website" id="website" value="{{ old('website') }}" placeholder="https://example.com" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                            @error('website')
-                                <p class="mt-1 text-[11px] text-rose-500">{{ $message }}</p>
-                            @enderror
+                        <!-- Website, Email, Phone Row -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div>
+                                <label for="website" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                    Website
+                                </label>
+                                <input type="url" name="website" id="website" value="{{ old('website') }}" placeholder="https://example.com" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                @error('website')
+                                    <p class="mt-1 text-[11px] text-rose-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div>
+                                <label for="email" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                    Email
+                                </label>
+                                <input type="email" name="email" id="email" value="{{ old('email') }}" placeholder="info@example.com" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                @error('email')
+                                    <p class="mt-1 text-[11px] text-rose-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div>
+                                <label for="phone" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                    Telepon / WA
+                                </label>
+                                <input type="text" name="phone" id="phone" value="{{ old('phone') }}" placeholder="0812..." class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                @error('phone')
+                                    <p class="mt-1 text-[11px] text-rose-500">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
 
-                        <!-- City & Province Row -->
-                        <div class="grid grid-cols-2 gap-3">
+                        <!-- City, Province, Postal Code Row -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div>
                                 <label for="city" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
                                     Kota
                                 </label>
-                                <input type="text" name="city" id="city" value="{{ old('city') }}" placeholder="Contoh: Jakarta" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                <input type="text" name="city" id="city" value="{{ old('city') }}" placeholder="Contoh: Semarang" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
                                 @error('city')
                                     <p class="mt-1 text-[11px] text-rose-500">{{ $message }}</p>
                                 @enderror
@@ -405,8 +510,17 @@
                                 <label for="province" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
                                     Provinsi
                                 </label>
-                                <input type="text" name="province" id="province" value="{{ old('province') }}" placeholder="Contoh: DKI Jakarta" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                <input type="text" name="province" id="province" value="{{ old('province') }}" placeholder="Contoh: Jawa Tengah" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
                                 @error('province')
+                                    <p class="mt-1 text-[11px] text-rose-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div>
+                                <label for="postal_code" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                    Kode Pos
+                                </label>
+                                <input type="text" name="postal_code" id="postal_code" value="{{ old('postal_code') }}" placeholder="50272" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                @error('postal_code')
                                     <p class="mt-1 text-[11px] text-rose-500">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -451,105 +565,256 @@
 
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
-            <!-- Modal Card -->
-            <div x-show="showEditModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="inline-block align-bottom bg-white dark:bg-slate-900 rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full border border-gray-200 dark:border-slate-800">
+            <!-- Modal Card (Spacious Multi-tab Editor for Company Profile) -->
+            <div x-show="showEditModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="inline-block align-bottom bg-white dark:bg-slate-900 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl w-full border border-gray-200 dark:border-slate-800">
                 
                 <div class="p-6">
-                    <div class="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-slate-800">
-                        <h3 class="text-base font-bold text-gray-900 dark:text-white" id="modal-title-edit">
-                            Edit Perusahaan
-                        </h3>
-                        <button @click="showEditModal = false" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
+                    <!-- Modal Header -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-gray-100 dark:border-slate-800 gap-3">
+                        <div>
+                            <h3 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2" id="modal-title-edit">
+                                <span>Kelola Profil & Halaman Tentang Kami</span>
+                                <span class="text-xs px-2.5 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-semibold" x-text="editData.name"></span>
+                            </h3>
+                            <p class="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Kelola identitas perusahaan, visi misi, dan nilai budaya MIKA secara dinamis.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button type="button" @click="applyMikaTemplate()" class="px-3 py-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-xl hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition flex items-center gap-1.5" title="Muat draf standar profil PT Mitra Karya Analitika">
+                                <svg class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                                </svg>
+                                <span>Isi Template MIKA</span>
+                            </button>
+                            <button @click="showEditModal = false" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 p-1 rounded-lg">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Tabs -->
+                    <div class="mt-4 flex flex-wrap gap-2 border-b border-gray-100 dark:border-slate-800 pb-3">
+                        <button type="button" @click="activeEditTab = 'general'" :class="activeEditTab === 'general' ? 'bg-indigo-600 text-white shadow-sm' : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700'" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                            <span>1. Info & Kontak</span>
+                        </button>
+                        <button type="button" @click="activeEditTab = 'profile'" :class="activeEditTab === 'profile' ? 'bg-indigo-600 text-white shadow-sm' : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700'" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            <span>2. Profil & Tagline</span>
+                        </button>
+                        <button type="button" @click="activeEditTab = 'vision'" :class="activeEditTab === 'vision' ? 'bg-indigo-600 text-white shadow-sm' : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700'" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            <span>3. Visi & Misi</span>
+                        </button>
+                        <button type="button" @click="activeEditTab = 'values'" :class="activeEditTab === 'values' ? 'bg-indigo-600 text-white shadow-sm' : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700'" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                            <span>4. Nilai Budaya (MIKA)</span>
                         </button>
                     </div>
 
-                    <form @submit="submitEdit($event)" class="mt-4 space-y-4">
+                    <form @submit="submitEdit($event)" class="mt-4">
                         <input type="hidden" name="_method" value="PUT">
                         <input type="hidden" name="is_edit" value="1">
                         <input type="hidden" name="id" x-model="editData.id">
 
-                        <!-- Role Selection -->
-                        <div>
-                            <label for="edit_role_id" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                Role Hak Akses
-                            </label>
-                            <select name="role_id" id="edit_role_id" x-model="editData.role_id" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                                <option value="">-- Pilih Role --</option>
-                                @foreach ($roles as $role)
-                                    <option value="{{ $role->id }}">
-                                        {{ $role->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                        <!-- TAB 1: INFORMASI UMUM & KONTAK -->
+                        <div x-show="activeEditTab === 'general'" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Role Selection -->
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                        Role Hak Akses
+                                    </label>
+                                    <select name="role_id" x-model="editData.role_id" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                        <option value="">-- Pilih Role --</option>
+                                        @foreach ($roles as $role)
+                                            <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
 
-                        <!-- Name -->
-                        <div>
-                            <label for="edit_name" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                Nama Perusahaan
-                            </label>
-                            <input type="text" name="name" id="edit_name" x-model="editData.name" placeholder="Nama Perusahaan" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                        </div>
-
-                        <!-- Logo File Upload -->
-                        <div>
-                            <label for="edit_logo" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                Logo Perusahaan (Opsional, upload untuk mengganti)
-                            </label>
-                            <div class="flex items-center gap-3 mb-2" x-show="editData.logo_url">
-                                <img :src="editData.logo_url" class="w-8 h-8 rounded-lg object-cover border border-gray-200 dark:border-slate-700 shadow-sm">
-                                <span class="text-[11px] text-gray-400">Logo saat ini</span>
+                                <!-- Name -->
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                        Nama Perusahaan <span class="text-rose-500">*</span>
+                                    </label>
+                                    <input type="text" name="name" x-model="editData.name" required placeholder="PT Mitra Karya Analitika" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                </div>
                             </div>
-                            <input type="file" name="logo" id="edit_logo" accept="image/png,image/jpeg,image/jpg" class="w-full px-3 py-1.5 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none file:mr-3 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition">
-                        </div>
 
-                        <!-- Website -->
-                        <div>
-                            <label for="edit_website" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                Website
-                            </label>
-                            <input type="url" name="website" id="edit_website" x-model="editData.website" placeholder="https://example.com" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                        </div>
-
-                        <!-- City & Province Row -->
-                        <div class="grid grid-cols-2 gap-3">
+                            <!-- Logo File Upload -->
                             <div>
-                                <label for="edit_city" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                    Kota
+                                <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                    Logo Perusahaan
                                 </label>
-                                <input type="text" name="city" id="edit_city" x-model="editData.city" placeholder="Kota" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                <div class="flex items-center gap-3 mb-2" x-show="editData.logo_url">
+                                    <img :src="editData.logo_url" class="w-10 h-10 rounded-xl object-contain border border-gray-200 dark:border-slate-700 shadow-sm p-1 bg-white">
+                                    <span class="text-[11px] text-gray-400">Logo saat ini aktif</span>
+                                </div>
+                                <input type="file" name="logo" accept="image/png,image/jpeg,image/jpg" class="w-full px-3 py-1.5 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none file:mr-3 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition">
                             </div>
+
+                            <!-- Website, Email, Phone Row -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                        Website Resmi
+                                    </label>
+                                    <input type="url" name="website" x-model="editData.website" placeholder="https://mikacares.co.id" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                        Email Resmi
+                                    </label>
+                                    <input type="email" name="email" x-model="editData.email" placeholder="info@mikacares.co.id" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                        Nomor Telepon / WhatsApp
+                                    </label>
+                                    <input type="text" name="phone" x-model="editData.phone" placeholder="081225588888" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                </div>
+                            </div>
+
+                            <!-- City, Province, Postal Code -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                        Kota
+                                    </label>
+                                    <input type="text" name="city" x-model="editData.city" placeholder="Semarang" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                        Provinsi
+                                    </label>
+                                    <input type="text" name="province" x-model="editData.province" placeholder="Jawa Tengah" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                        Kode Pos
+                                    </label>
+                                    <input type="text" name="postal_code" x-model="editData.postal_code" placeholder="50272" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                </div>
+                            </div>
+
+                            <!-- Address -->
                             <div>
-                                <label for="edit_province" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                    Provinsi
+                                <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                    Alamat Lengkap Kantor
                                 </label>
-                                <input type="text" name="province" id="edit_province" x-model="editData.province" placeholder="Provinsi" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                <textarea name="address" rows="2" x-model="editData.address" placeholder="Jl. Klipang Ruko Amsterdam No.9D, Sendangmulyo..." class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"></textarea>
                             </div>
                         </div>
 
-                        <!-- Address -->
-                        <div>
-                            <label for="edit_address" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                Alamat Lengkap
-                            </label>
-                            <textarea name="address" id="edit_address" rows="2" x-model="editData.address" placeholder="Alamat kantor..." class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"></textarea>
+                        <!-- TAB 2: PROFIL & TAGLINE -->
+                        <div x-show="activeEditTab === 'profile'" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                    Tagline Slogan Perusahaan
+                                </label>
+                                <input type="text" name="tagline" x-model="editData.tagline" placeholder="The Best Choice for Your Business Partner" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                <p class="text-[11px] text-gray-400 mt-1">Ditampilkan pada bagian Hero & Header halaman Tentang Kami.</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                    Deskripsi Profil / Tentang Perusahaan
+                                </label>
+                                <textarea name="about" rows="6" x-model="editData.about" placeholder="Ceritakan sejarah pendirian, fokus bidang usaha (alat lab, HSE, environmental), dan komitmen mutu perusahaan..." class="w-full px-3 py-2.5 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition leading-relaxed"></textarea>
+                                <p class="text-[11px] text-gray-400 mt-1">Narasi utama pada section Profil Singkat halaman Tentang Kami.</p>
+                            </div>
+                        </div>
+
+                        <!-- TAB 3: VISI & MISI -->
+                        <div x-show="activeEditTab === 'vision'" class="space-y-5 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                            <!-- Vision -->
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                    Pernyataan Visi Utama
+                                </label>
+                                <textarea name="vision" rows="3" x-model="editData.vision" placeholder="Menjadi mitra bisnis terdepan, terpercaya, dan menjadi pilihan utama di Indonesia..." class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"></textarea>
+                            </div>
+
+                            <!-- Missions Dynamic List -->
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300">
+                                        Daftar Butir Misi Berkelanjutan
+                                    </label>
+                                    <button type="button" @click="addMission()" class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                        <span>Tambah Butir Misi</span>
+                                    </button>
+                                </div>
+
+                                <div class="space-y-2.5">
+                                    <template x-for="(mission, index) in editData.missions" :key="index">
+                                        <div class="flex items-start gap-2">
+                                            <span class="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 font-bold text-xs flex items-center justify-center shrink-0 mt-1" x-text="index + 1"></span>
+                                            <textarea rows="2" x-model="editData.missions[index]" placeholder="Tuliskan butir misi..." class="flex-1 px-3 py-1.5 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"></textarea>
+                                            <button type="button" @click="removeMission(index)" class="p-1.5 text-rose-500 hover:text-rose-700 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/30 transition mt-1" title="Hapus butir">
+                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                            </button>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB 4: NILAI PERUSAHAAN (CORE VALUES MIKA) -->
+                        <div x-show="activeEditTab === 'values'" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                            <p class="text-xs text-gray-500 dark:text-slate-400">
+                                Kelola 4 pilar budaya kerja MIKA (Menghargai, Integritas, Komitmen, Akuntabel).
+                            </p>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <template x-for="(val, idx) in editData.core_values" :key="idx">
+                                    <div class="p-4 rounded-2xl bg-gray-50 dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700 space-y-3">
+                                        <div class="flex items-center justify-between pb-2 border-b border-gray-200 dark:border-slate-700">
+                                            <div class="flex items-center gap-2">
+                                                <span class="w-8 h-8 rounded-xl bg-indigo-600 text-white font-black text-sm flex items-center justify-center shrink-0" x-text="val.code || ('P' + (idx+1))"></span>
+                                                <span class="text-xs font-bold text-gray-900 dark:text-white" x-text="'Pilar ' + (idx + 1)"></span>
+                                            </div>
+                                            <input type="text" x-model="val.code" placeholder="Huruf" class="w-16 px-2 py-1 text-center text-xs font-black uppercase rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200">
+                                        </div>
+
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <div>
+                                                <label class="block text-[11px] font-semibold text-gray-600 dark:text-slate-400 mb-0.5">Judul (Indonesia)</label>
+                                                <input type="text" x-model="val.title" placeholder="Contoh: Menghargai" class="w-full px-2.5 py-1.5 text-xs rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[11px] font-semibold text-gray-600 dark:text-slate-400 mb-0.5">Subtitle (English)</label>
+                                                <input type="text" x-model="val.subtitle" placeholder="Contoh: Respect" class="w-full px-2.5 py-1.5 text-xs rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200">
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-[11px] font-semibold text-gray-600 dark:text-slate-400 mb-0.5">Deskripsi Penjelasan</label>
+                                            <textarea rows="3" x-model="val.description" placeholder="Penjelasan makna dan penerapan pilar..." class="w-full px-2.5 py-1.5 text-xs rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200"></textarea>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
                         </div>
 
                         <!-- Modal Actions -->
-                        <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 dark:border-slate-800">
-                            <button type="button" @click="showEditModal = false" class="px-4 py-2 text-xs font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition">
-                                Batal
-                            </button>
-                            <button type="submit" :disabled="isSubmitting" class="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-md shadow-indigo-500/20 transition flex items-center gap-2">
-                                <svg x-show="isSubmitting" class="animate-spin w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                <span x-text="isSubmitting ? 'Menyimpan...' : 'Perbarui Perusahaan'"></span>
-                            </button>
+                        <div class="flex items-center justify-between pt-5 mt-4 border-t border-gray-100 dark:border-slate-800">
+                            <span class="text-[11px] text-gray-400">Pastikan data yang diisi telah sesuai sebelum menyimpan.</span>
+                            <div class="flex items-center gap-2">
+                                <button type="button" @click="showEditModal = false" class="px-4 py-2 text-xs font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition">
+                                    Batal
+                                </button>
+                                <button type="submit" :disabled="isSubmitting" class="px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-md shadow-indigo-500/20 transition flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+                                    <svg x-show="isSubmitting" class="animate-spin w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span x-text="isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'"></span>
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>

@@ -40,6 +40,14 @@ new class extends Component
 
         $user->save();
 
+        // Also synchronize applicant profile and employee profile if exist to avoid desync
+        if ($user->applicantProfile) {
+            $user->applicantProfile->update(['full_name' => $user->name]);
+        }
+        if ($user->employeeProfile) {
+            $user->employeeProfile->update(['full_name' => $user->name]);
+        }
+
         $this->dispatch('profile-updated', name: $user->name);
     }
 

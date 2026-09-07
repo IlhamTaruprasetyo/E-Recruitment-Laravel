@@ -741,7 +741,7 @@
                                     class="absolute -right-1 sm:-right-3 bottom-2 z-30 transform hover:scale-105 transition-transform">
                                     <div
                                         class="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl bg-[#061806]/85 border border-[#93F514]/50 shadow-lg shadow-black/60 backdrop-blur-md flex items-center gap-2.5">
-                                        <div class="w-2 h-2 rounded-full bg-[#93F514] animate-ping"></div>
+                                        {{-- <div class="w-2 h-2 rounded-full bg-[#93F514] animate-ping"></div> --}}
                                         <div>
                                             <div class="text-[11px] sm:text-xs font-bold tracking-wider text-[#93F514] leading-none"
                                                 x-text="slide.badgeTitle">CAREER.</div>

@@ -32,11 +32,14 @@
                 class="{{ request()->routeIs('home') ? 'text-[#93F514] font-bold drop-shadow-[0_0_12px_rgba(147, 245, 20,0.5)]' : 'text-gray-300 hover:text-[#93F514]' }} transition-all duration-200 py-1">
                 Beranda
             </a>
+            <a href="{{ route('about') }}"
+                class="{{ request()->routeIs('about') ? 'text-[#93F514] font-bold drop-shadow-[0_0_12px_rgba(147, 245, 20,0.5)]' : 'text-gray-300 hover:text-[#93F514]' }} transition-all duration-200 py-1">
+                Tentang Kami
+            </a>
             <a href="{{ route('jobs.index') }}"
                 class="{{ request()->routeIs('jobs.*') ? 'text-[#93F514] font-bold drop-shadow-[0_0_12px_rgba(147, 245, 20,0.5)]' : 'text-gray-300 hover:text-[#93F514]' }} transition-all duration-200 py-1">
                 Lowongan
             </a>
-
         </nav>
 
         <!-- Authentication Actions & Theme Toggle -->
@@ -123,6 +126,10 @@
             <a @click="mobileMenuOpen = false" href="{{ route('home') }}"
                 class="px-4 py-2.5 rounded-2xl {{ request()->routeIs('home') ? 'bg-[#93F514]/20 text-[#93F514] font-bold border border-[#93F514]/40' : 'text-gray-300 hover:bg-[#EEEEEE]/5 hover:text-[#93F514]' }}">
                 Beranda
+            </a>
+            <a @click="mobileMenuOpen = false" href="{{ route('about') }}"
+                class="px-4 py-2.5 rounded-2xl {{ request()->routeIs('about') ? 'bg-[#93F514]/20 text-[#93F514] font-bold border border-[#93F514]/40' : 'text-gray-300 hover:bg-[#EEEEEE]/5 hover:text-[#93F514]' }}">
+                Tentang Kami
             </a>
             <a @click="mobileMenuOpen = false" href="{{ route('jobs.index') }}"
                 class="px-4 py-2.5 rounded-2xl {{ request()->routeIs('jobs.*') ? 'bg-[#93F514]/20 text-[#93F514] font-bold border border-[#93F514]/40' : 'text-gray-300 hover:bg-[#EEEEEE]/5 hover:text-[#93F514]' }}">
