@@ -22,4 +22,14 @@ class Degree extends Model
     {
         return $this->hasMany(Education::class, 'degree_id');
     }
+
+    /**
+     * Get cached list of all degrees ordered by rank.
+     */
+    public static function cachedAll()
+    {
+        return \Illuminate\Support\Facades\Cache::remember('master_degrees_ordered', 86400, function () {
+            return static::orderBy('rank', 'asc')->get();
+        });
+    }
 }

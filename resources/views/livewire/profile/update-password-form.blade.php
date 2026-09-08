@@ -12,23 +12,38 @@ new class extends Component
     public string $password = '';
     public string $password_confirmation = '';
 
+    public function with(): array
+    {
+        return [
+            'hasCurrentPassword' => ! empty(Auth::user()->password),
+        ];
+    }
+
     /**
      * Update the password for the currently authenticated user.
      */
     public function updatePassword(): void
     {
+        $user = Auth::user();
+        $hasCurrentPassword = ! empty($user->password);
+
+        $rules = [
+            'password' => ['required', 'string', Password::defaults(), 'confirmed'],
+        ];
+
+        if ($hasCurrentPassword) {
+            $rules['current_password'] = ['required', 'string', 'current_password'];
+        }
+
         try {
-            $validated = $this->validate([
-                'current_password' => ['required', 'string', 'current_password'],
-                'password' => ['required', 'string', Password::defaults(), 'confirmed'],
-            ]);
+            $validated = $this->validate($rules);
         } catch (ValidationException $e) {
             $this->reset('current_password', 'password', 'password_confirmation');
 
             throw $e;
         }
 
-        Auth::user()->update([
+        $user->update([
             'password' => Hash::make($validated['password']),
         ]);
 
@@ -48,52 +63,75 @@ new class extends Component
     get hasMixed() { return /[a-z]/.test(this.newPass || '') && /[A-Z]/.test(this.newPass || ''); }
 }">
     <header class="flex items-start gap-4 pb-5 border-b border-gray-100 dark:border-gray-700/80">
-        <div class="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-900/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0 shadow-xs">
-            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
+        <div class="w-12 h-12 rounded-2xl {{ $hasCurrentPassword ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-100 dark:border-indigo-900/60 text-indigo-600 dark:text-indigo-400' : 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-100 dark:border-emerald-900/60 text-emerald-600 dark:text-emerald-400' }} border flex items-center justify-center shrink-0 shadow-xs">
+            @if ($hasCurrentPassword)
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+            @else
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                </svg>
+            @endif
         </div>
         <div>
             <h2 class="text-lg font-bold text-gray-900 dark:text-white tracking-tight">
-                Perbarui Kata Sandi
+                {{ $hasCurrentPassword ? 'Perbarui Kata Sandi' : 'Buat Kata Sandi Akun' }}
             </h2>
             <p class="mt-1 text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-                Amankan akun Anda dengan menggunakan kombinasi kata sandi yang kuat dan unik.
+                {{ $hasCurrentPassword 
+                    ? 'Amankan akun Anda dengan menggunakan kombinasi kata sandi yang kuat dan unik.' 
+                    : 'Akun Anda saat ini masuk melalui Google dan belum memiliki kata sandi lokal. Buat kata sandi agar Anda juga dapat masuk dengan email dan kata sandi biasa.' }}
             </p>
         </div>
     </header>
 
-    <form wire:submit="updatePassword" class="mt-6 space-y-5">
-        <!-- Current Password -->
-        <div>
-            <label for="update_password_current_password" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">
-                Kata Sandi Saat Ini <span class="text-rose-500">*</span>
-            </label>
-            <div class="relative rounded-xl shadow-xs">
-                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                    </svg>
-                </div>
-                <input wire:model="current_password" 
-                       id="update_password_current_password" 
-                       name="current_password" 
-                       :type="showCurrent ? 'text' : 'password'" 
-                       class="w-full pl-10 pr-10 py-2.5 bg-gray-50/70 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition duration-150" 
-                       placeholder="Masukkan kata sandi lama Anda"
-                       autocomplete="current-password" />
-                <button type="button" @click="showCurrent = !showCurrent" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition">
-                    <svg x-show="!showCurrent" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                    <svg x-show="showCurrent" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" x-cloak><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
-                </button>
+    @if (! $hasCurrentPassword)
+        <!-- Google Account Notification Callout -->
+        <div class="mt-5 p-4 rounded-xl bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-900/60 flex items-start gap-3">
+            <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div class="text-xs text-indigo-900 dark:text-indigo-200 leading-relaxed">
+                <span class="font-bold block text-indigo-950 dark:text-indigo-100 mb-0.5">Akun Anda Terhubung Melalui Google</span>
+                Email akun Anda terhubung dengan Google (<strong>{{ auth()->user()->email }}</strong>). Saat ini akun belum memiliki kata sandi lokal. Setelah membuat kata sandi baru di bawah ini, Anda memiliki fleksibilitas untuk masuk dengan <strong>tombol Google</strong> ataupun dengan <strong>email & kata sandi biasa</strong>.
             </div>
-            <x-input-error :messages="$errors->get('current_password')" class="mt-1.5" />
         </div>
+    @endif
+
+    <form wire:submit="updatePassword" class="mt-6 space-y-5">
+        @if ($hasCurrentPassword)
+            <!-- Current Password -->
+            <div>
+                <label for="update_password_current_password" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">
+                    Kata Sandi Saat Ini <span class="text-rose-500">*</span>
+                </label>
+                <div class="relative rounded-xl shadow-xs">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <input wire:model="current_password" 
+                           id="update_password_current_password" 
+                           name="current_password" 
+                           :type="showCurrent ? 'text' : 'password'" 
+                           class="w-full pl-10 pr-10 py-2.5 bg-gray-50/70 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:bg-white dark:focus:bg-gray-900 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition duration-150" 
+                           placeholder="Masukkan kata sandi lama Anda"
+                           autocomplete="current-password" />
+                    <button type="button" @click="showCurrent = !showCurrent" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition">
+                        <svg x-show="!showCurrent" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        <svg x-show="showCurrent" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" x-cloak><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
+                    </button>
+                </div>
+                <x-input-error :messages="$errors->get('current_password')" class="mt-1.5" />
+            </div>
+        @endif
 
         <!-- New Password -->
         <div>
             <label for="update_password_password" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">
-                Kata Sandi Baru <span class="text-rose-500">*</span>
+                {{ $hasCurrentPassword ? 'Kata Sandi Baru' : 'Kata Sandi' }} <span class="text-rose-500">*</span>
             </label>
             <div class="relative rounded-xl shadow-xs">
                 <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
@@ -168,11 +206,11 @@ new class extends Component
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                <span>Simpan Perubahan</span>
+                <span>{{ $hasCurrentPassword ? 'Simpan Perubahan' : 'Simpan & Buat Kata Sandi' }}</span>
             </button>
 
             <x-action-message class="text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-3 py-1.5 rounded-lg border border-emerald-200 dark:border-emerald-800" on="password-updated">
-                ✓ Kata sandi berhasil diperbarui!
+                {{ $hasCurrentPassword ? '✓ Kata sandi berhasil diperbarui!' : '✓ Kata sandi baru berhasil dibuat!' }}
             </x-action-message>
         </div>
     </form>

@@ -21,4 +21,14 @@ class Major extends Model
     {
         return $this->hasMany(Education::class, 'major_id');
     }
+
+    /**
+     * Get cached list of all majors ordered by name.
+     */
+    public static function cachedAll()
+    {
+        return \Illuminate\Support\Facades\Cache::remember('master_majors_ordered', 86400, function () {
+            return static::orderBy('name', 'asc')->get();
+        });
+    }
 }

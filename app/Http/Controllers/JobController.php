@@ -101,6 +101,13 @@ class JobController extends Controller
     {
         $data = Job::findOrFail($id);
 
+        // Proteksi: Cegah hapus jika lowongan sudah memiliki pelamar terdaftar
+        $applicationCount = $data->jobApplications()->count();
+        if ($applicationCount > 0) {
+            return redirect()->route('admin.job')
+                ->with('error', "Lowongan pekerjaan tidak dapat dihapus karena sudah memiliki {$applicationCount} pelamar terdaftar beserta riwayat evaluasinya.");
+        }
+
         if (!$data->delete()) {
             return redirect()->route('admin.job')->with('error', 'Lowongan pekerjaan gagal dihapus');
         }

@@ -6,6 +6,7 @@ use App\Models\Job;
 use App\Models\Company;
 use App\Models\Department;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class HomeController extends Controller
 {
@@ -17,33 +18,49 @@ class HomeController extends Controller
         $search = $request->query('search');
         $location = $request->query('location');
 
-        $jobsQuery = Job::active()->with(['company', 'department', 'degrees', 'majors']);
+        $hasFilter = !empty($search) || !empty($location);
 
-        if ($search) {
-            $jobsQuery->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhereHas('company', function ($cq) use ($search) {
-                      $cq->where('name', 'like', "%{$search}%");
-                  });
+        if ($hasFilter) {
+            $jobsQuery = Job::active()->with(['company', 'department', 'degrees', 'majors']);
+
+            if ($search) {
+                $jobsQuery->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                      ->orWhere('description', 'like', "%{$search}%")
+                      ->orWhereHas('company', function ($cq) use ($search) {
+                          $cq->where('name', 'like', "%{$search}%");
+                      });
+                });
+            }
+
+            if ($location) {
+                $jobsQuery->where('location', 'like', "%{$location}%");
+            }
+
+            $featuredJobs = $jobsQuery->latest('id')->take(6)->get();
+        } else {
+            $featuredJobs = Cache::remember('home_featured_jobs', 3600, function () {
+                return Job::active()
+                    ->with(['company', 'department', 'degrees', 'majors'])
+                    ->latest('id')
+                    ->take(6)
+                    ->get();
             });
         }
 
-        if ($location) {
-            $jobsQuery->where('location', 'like', "%{$location}%");
-        }
-
-        // 6 Featured Jobs for Home
-        $featuredJobs = (clone $jobsQuery)->latest('id')->take(6)->get();
-        $totalJobsCount = Job::active()->count();
-        $companiesCount = Company::count();
-        $departmentsCount = Department::count();
-        $totalQuotaCount = Job::active()->sum('quota');
+        // Cached home statistics & master catalogs
+        $totalJobsCount = Cache::remember('home_total_jobs_count', 3600, fn() => Job::active()->count());
+        $companiesCount = Cache::remember('home_companies_count', 86400, fn() => Company::count());
+        $departmentsCount = Cache::remember('home_departments_count', 86400, fn() => Department::count());
+        $totalQuotaCount = Cache::remember('home_total_quota_count', 3600, fn() => Job::active()->sum('quota'));
         
-        $departments = Department::withCount(['jobs' => function ($q) {
-            $q->active();
-        }])->get();
-        $companies = Company::all();
+        $departments = Cache::remember('home_departments_with_jobs', 3600, function () {
+            return Department::withCount(['jobs' => function ($q) {
+                $q->active();
+            }])->get();
+        });
+
+        $companies = Cache::remember('master_companies_all', 86400, fn() => Company::all());
 
         return view('frontend.home.index', compact(
             'featuredJobs',

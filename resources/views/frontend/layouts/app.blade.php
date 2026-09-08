@@ -924,10 +924,34 @@
             background-color: rgba(0, 0, 0, 0.05) !important;
         }
 
-        /* Floating glass badge in carousel */
-        html.light-mode .bg-\[\#061806\]\/85 {
-            background-color: rgba(255, 255, 255, 0.95) !important;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+        /* Floating glass badge in carousel & hero collage */
+        html.light-mode .bg-\[\#061806\]\/85,
+        html.light-mode .bg-\[\#061806\]\/90,
+        html.light-mode .about-hero-badge {
+            background-color: #FFFFFF !important;
+            border-color: rgba(45, 107, 0, 0.25) !important;
+            box-shadow: 0 8px 24px -2px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+            backdrop-filter: none !important;
+        }
+
+        html.light-mode .bg-\[\#061806\]\/85 .text-\[\#93F514\],
+        html.light-mode .bg-\[\#061806\]\/90 .text-\[\#93F514\],
+        html.light-mode .about-hero-badge .about-hero-badge-title,
+        html.light-mode .about-hero-badge .text-\[\#93F514\] {
+            color: #2D6B00 !important;
+            font-weight: 800 !important;
+        }
+
+        html.light-mode .bg-\[\#061806\]\/85 .text-gray-300,
+        html.light-mode .bg-\[\#061806\]\/90 .text-gray-300,
+        html.light-mode .about-hero-badge .about-hero-badge-sub,
+        html.light-mode .about-hero-badge .text-gray-300 {
+            color: #4B5563 !important;
+            font-weight: 600 !important;
+        }
+
+        html.light-mode .bg-\[\#061806\]\/85 .bg-\[\#93F514\] {
+            background-color: #2D6B00 !important;
         }
 
         /* Carousel nav buttons */
@@ -1247,6 +1271,376 @@
 
         html.light-mode h2 span.text-\[\#93F514\] {
             color: #2D6B00 !important;
+        }
+
+        /* Headings Gradient Span in Light Mode (Visi Misi, MIKA, Grup Perusahaan, dll) */
+        html.light-mode h1 span.bg-gradient-to-r.from-\[\#93F514\],
+        html.light-mode h2 span.bg-gradient-to-r.from-\[\#93F514\] {
+            background: linear-gradient(135deg, #1E5200 0%, #2D6B00 50%, #3D7A00 100%) !important;
+            -webkit-background-clip: text !important;
+            background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            filter: none !important;
+            text-shadow: none !important;
+        }
+
+        /* Ambient Glow & Section Borders in Light Mode */
+        html.light-mode .blur-\[140px\] {
+            opacity: 0.15 !important;
+        }
+
+        html.light-mode section.border-t.border-\[\#93F514\]\/20 {
+            border-color: rgba(45, 107, 0, 0.15) !important;
+        }
+
+        /* =====================================================
+           TENTANG KAMI: HERO SECTION (LIGHT MODE)
+        ===================================================== */
+        html.light-mode .about-hero-badge {
+            background-color: #FFFFFF !important;
+            border-color: rgba(45, 107, 0, 0.25) !important;
+            box-shadow: 0 8px 24px -2px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+            backdrop-filter: none !important;
+        }
+
+        html.light-mode .about-hero-badge .about-hero-badge-title {
+            color: #2D6B00 !important;
+            font-weight: 800 !important;
+        }
+
+        html.light-mode .about-hero-badge .about-hero-badge-sub {
+            color: #4B5563 !important;
+            font-weight: 600 !important;
+        }
+
+        html.light-mode a[href="#meet-the-group"] {
+            background-color: #FFFFFF !important;
+            color: #111827 !important;
+            border-color: rgba(45, 107, 0, 0.35) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        html.light-mode a[href="#meet-the-group"]:hover {
+            background-color: #EAF8DA !important;
+            color: #2D6B00 !important;
+            border-color: #2D6B00 !important;
+        }
+
+        /* =====================================================
+           TENTANG KAMI: VISI & MISI KAMI (LIGHT MODE)
+        ===================================================== */
+        /* Main Executive Visi Card */
+        html.light-mode .visi-card {
+            background: #FFFFFF !important;
+            background-image: none !important;
+            border-color: rgba(45, 107, 0, 0.20) !important;
+            box-shadow: 0 10px 35px -5px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0, 0, 0, 0.03) !important;
+        }
+
+        html.light-mode .visi-card:hover {
+            border-color: rgba(45, 107, 0, 0.45) !important;
+            box-shadow: 0 16px 40px -6px rgba(45, 107, 0, 0.12), 0 4px 10px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        /* Hide dark mode glow blob inside Visi Card */
+        html.light-mode .visi-card .blur-3xl {
+            opacity: 0 !important;
+        }
+
+        /* Watermark quote in Visi Card */
+        html.light-mode .visi-card span.font-serif {
+            color: rgba(45, 107, 0, 0.05) !important;
+        }
+
+        /* Visi Perusahaan Badge */
+        html.light-mode .visi-card .visi-badge,
+        html.light-mode .visi-card .rounded-full.bg-\[\#93F514\]\/15 {
+            background-color: #EAF8DA !important;
+            border-color: rgba(45, 107, 0, 0.30) !important;
+            color: #2D6B00 !important;
+            box-shadow: 0 1px 3px rgba(45, 107, 0, 0.08) !important;
+        }
+
+        /* Visi Quote Statement & Left Accent Border */
+        html.light-mode .visi-card blockquote {
+            border-left-color: #2D6B00 !important;
+        }
+
+        html.light-mode .visi-card blockquote p {
+            color: #111827 !important;
+        }
+
+        /* 3 Strategic Focus Pillars inside Visi Card */
+        html.light-mode .visi-pillar-card {
+            background-color: #F8FAF7 !important;
+            border-color: rgba(45, 107, 0, 0.16) !important;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03) !important;
+        }
+
+        html.light-mode .visi-pillar-card:hover {
+            background-color: #FFFFFF !important;
+            border-color: rgba(45, 107, 0, 0.45) !important;
+            box-shadow: 0 4px 16px rgba(45, 107, 0, 0.08) !important;
+        }
+
+        html.light-mode .visi-pillar-card .w-10.h-10 {
+            background-color: #EAF8DA !important;
+            border-color: rgba(45, 107, 0, 0.30) !important;
+            color: #2D6B00 !important;
+        }
+
+        html.light-mode .visi-pillar-card h5 {
+            color: #111827 !important;
+        }
+
+        html.light-mode .visi-pillar-card p {
+            color: #4B5563 !important;
+        }
+
+        /* Misi Cards (3 Items Grid) */
+        html.light-mode .misi-card {
+            background: #FFFFFF !important;
+            background-image: none !important;
+            border-color: rgba(45, 107, 0, 0.20) !important;
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 1px 4px rgba(0, 0, 0, 0.03) !important;
+        }
+
+        html.light-mode .misi-card:hover {
+            border-color: rgba(45, 107, 0, 0.50) !important;
+            box-shadow: 0 12px 30px -4px rgba(45, 107, 0, 0.12), 0 4px 10px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        /* Number 01, 02, 03 - Deep Contrast Emerald */
+        html.light-mode .misi-card span.text-3xl {
+            color: #2D6B00 !important;
+        }
+
+        /* Misi Icon Box */
+        html.light-mode .misi-card .w-10.h-10 {
+            background-color: #EAF8DA !important;
+            border-color: rgba(45, 107, 0, 0.28) !important;
+            color: #2D6B00 !important;
+        }
+
+        /* Misi Description Text */
+        html.light-mode .misi-card p {
+            color: #374151 !important;
+        }
+
+        /* Misi Card Footer */
+        html.light-mode .misi-card .border-t {
+            border-color: rgba(45, 107, 0, 0.15) !important;
+        }
+
+        html.light-mode .misi-card .border-t span {
+            color: #2D6B00 !important;
+            font-weight: 700 !important;
+        }
+
+        /* =====================================================
+           TENTANG KAMI: NILAI PERUSAHAAN (MIKA) LIGHT MODE
+        ===================================================== */
+        html.light-mode .mika-card {
+            background: #FFFFFF !important;
+            background-image: none !important;
+            border-color: rgba(45, 107, 0, 0.20) !important;
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 1px 4px rgba(0, 0, 0, 0.03) !important;
+        }
+
+        html.light-mode .mika-card:hover {
+            border-color: #2D6B00 !important;
+            box-shadow: 0 14px 35px -4px rgba(45, 107, 0, 0.14), 0 4px 10px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        /* Giant background watermark letter */
+        html.light-mode .mika-card .mika-watermark {
+            color: rgba(45, 107, 0, 0.06) !important;
+        }
+
+        html.light-mode .mika-card:hover .mika-watermark {
+            color: rgba(45, 107, 0, 0.14) !important;
+        }
+
+        /* Monogram Letter Box (M, I, K, A) */
+        html.light-mode .mika-card .mika-letter-box {
+            background-color: #EAF8DA !important;
+            border-color: rgba(45, 107, 0, 0.35) !important;
+            color: #2D6B00 !important;
+            box-shadow: 0 2px 8px rgba(45, 107, 0, 0.10) !important;
+        }
+
+        html.light-mode .mika-card:hover .mika-letter-box {
+            background-color: #93F514 !important;
+            border-color: #93F514 !important;
+            color: #000000 !important;
+            box-shadow: 0 4px 16px rgba(147, 245, 20, 0.40) !important;
+        }
+
+        /* "Pilar 1", "Pilar 2", etc. */
+        html.light-mode .mika-card span.tracking-widest {
+            color: #6B7280 !important;
+        }
+
+        html.light-mode .mika-card:hover span.tracking-widest {
+            color: #2D6B00 !important;
+        }
+
+        /* Title e.g. Menghargai, Integritas */
+        html.light-mode .mika-card h3 {
+            color: #111827 !important;
+        }
+
+        html.light-mode .mika-card:hover h3 {
+            color: #2D6B00 !important;
+        }
+
+        /* English Subtitle e.g. Respect, Integrity */
+        html.light-mode .mika-card .mika-subtitle {
+            color: #2D6B00 !important;
+            font-weight: 700 !important;
+        }
+
+        /* Description text */
+        html.light-mode .mika-card p {
+            color: #4B5563 !important;
+        }
+
+        /* Card footer */
+        html.light-mode .mika-card .border-t {
+            border-color: rgba(45, 107, 0, 0.15) !important;
+        }
+
+        html.light-mode .mika-card .border-t span {
+            color: #6B7280 !important;
+        }
+
+        /* =====================================================
+           TENTANG KAMI / COMPONENT: GRUP PERUSAHAAN (LIGHT MODE)
+        ===================================================== */
+        html.light-mode .group-company-card {
+            background: #FFFFFF !important;
+            background-image: none !important;
+            border-color: rgba(45, 107, 0, 0.20) !important;
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 1px 4px rgba(0, 0, 0, 0.03) !important;
+        }
+
+        html.light-mode .group-company-card:hover {
+            border-color: rgba(45, 107, 0, 0.50) !important;
+            box-shadow: 0 14px 35px -4px rgba(45, 107, 0, 0.14), 0 4px 10px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        /* Corner ambient light blob - hide in light mode */
+        html.light-mode .group-company-card .blur-2xl {
+            opacity: 0 !important;
+        }
+
+        /* Initial Avatar Fallback */
+        html.light-mode .group-company-card .group-initial-avatar {
+            background: #EAF8DA !important;
+            border-color: rgba(45, 107, 0, 0.35) !important;
+            color: #2D6B00 !important;
+        }
+
+        html.light-mode .group-company-card:hover .group-initial-avatar {
+            background: #93F514 !important;
+            border-color: #93F514 !important;
+            color: #000000 !important;
+            box-shadow: 0 4px 16px rgba(147, 245, 20, 0.35) !important;
+        }
+
+        /* Tagline pill badge */
+        html.light-mode .group-company-card .group-tagline-badge {
+            background-color: #EAF8DA !important;
+            border-color: rgba(45, 107, 0, 0.25) !important;
+            color: #2D6B00 !important;
+        }
+
+        /* Company Name */
+        html.light-mode .group-company-card h3 {
+            color: #111827 !important;
+        }
+
+        html.light-mode .group-company-card:hover h3 {
+            color: #2D6B00 !important;
+        }
+
+        /* Company Description */
+        html.light-mode .group-company-card p {
+            color: #4B5563 !important;
+        }
+
+        /* Footer border */
+        html.light-mode .group-company-card .border-t {
+            border-color: rgba(45, 107, 0, 0.15) !important;
+        }
+
+        /* City location text & icon */
+        html.light-mode .group-company-card .border-t .text-gray-400 {
+            color: #6B7280 !important;
+        }
+
+        html.light-mode .group-company-card .border-t svg.text-\[\#93F514\] {
+            color: #2D6B00 !important;
+        }
+
+        /* Kunjungi Website Button */
+        html.light-mode .group-company-card .group-website-btn {
+            background-color: #EAF8DA !important;
+            border-color: rgba(45, 107, 0, 0.35) !important;
+            color: #2D6B00 !important;
+        }
+
+        html.light-mode .group-company-card .group-website-btn:hover {
+            background-color: #93F514 !important;
+            border-color: #93F514 !important;
+            color: #000000 !important;
+            box-shadow: 0 4px 14px rgba(147, 245, 20, 0.40) !important;
+        }
+
+        /* Sinergi Grup badge fallback */
+        html.light-mode .group-company-card .group-sinergi-badge {
+            background-color: #F3F4F6 !important;
+            border-color: #E5E7EB !important;
+            color: #6B7280 !important;
+        }
+
+        /* =====================================================
+           FOOTER: OFFICIAL WEBSITE BUTTON (LIGHT MODE)
+        ===================================================== */
+        html.light-mode footer .footer-official-btn,
+        html.light-mode footer a[title="Kunjungi Website Perusahaan"] {
+            background-color: #EAF8DA !important;
+            border-color: rgba(45, 107, 0, 0.45) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+        }
+
+        html.light-mode footer .footer-official-btn span,
+        html.light-mode footer a[title="Kunjungi Website Perusahaan"] span,
+        html.light-mode footer a.footer-official-btn span {
+            color: #111827 !important;
+            font-weight: 700 !important;
+        }
+
+        html.light-mode footer .footer-official-btn svg,
+        html.light-mode footer a[title="Kunjungi Website Perusahaan"] svg {
+            color: #2D6B00 !important;
+        }
+
+        html.light-mode footer .footer-official-btn:hover,
+        html.light-mode footer a[title="Kunjungi Website Perusahaan"]:hover {
+            background-color: #93F514 !important;
+            border-color: #93F514 !important;
+            box-shadow: 0 4px 16px rgba(147, 245, 20, 0.45) !important;
+        }
+
+        html.light-mode footer .footer-official-btn:hover span,
+        html.light-mode footer a[title="Kunjungi Website Perusahaan"]:hover span {
+            color: #000000 !important;
+        }
+
+        html.light-mode footer .footer-official-btn:hover svg,
+        html.light-mode footer a[title="Kunjungi Website Perusahaan"]:hover svg {
+            color: #000000 !important;
         }
 
         /* =====================================================

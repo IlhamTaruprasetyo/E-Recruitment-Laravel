@@ -28,4 +28,14 @@ class Position extends Model
     {
         return $this->hasMany(EmployeeProfile::class);
     }
+
+    /**
+     * Get cached list of all positions with department.
+     */
+    public static function cachedAll()
+    {
+        return \Illuminate\Support\Facades\Cache::remember('master_positions_all', 86400, function () {
+            return static::with('department.company')->orderBy('name', 'asc')->get();
+        });
+    }
 }

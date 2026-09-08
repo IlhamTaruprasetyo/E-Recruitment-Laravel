@@ -24,7 +24,7 @@ new class extends Component
 }; ?>
 
 @php
-    $user = auth()->user();
+    $user = auth()->user()?->fresh();
     $roleName = strtolower($user?->role?->name ?? '');
     $roleId = $user?->role_id;
     
@@ -32,7 +32,11 @@ new class extends Component
     $isRecruiter = $roleId == 2 || $roleName === 'recruiter';
     $isEmployee = $roleId == 4 || $roleName === 'employee';
     
-    $profile = $isEmployee ? $user?->employeeProfile : $user?->applicantProfile;
+    $profile = match(true) {
+        $isEmployee => $user?->employeeProfile,
+        $isAdmin || $isRecruiter => null,
+        default => $user?->applicantProfile,
+    };
 
     $roleLabel = match(true) {
         $isAdmin => 'Admin',
@@ -53,8 +57,20 @@ new class extends Component
         default => route('profile'),
     };
     
-    $photoUrl = $profile && ! empty($profile->photo) ? asset('storage/' . $profile->photo) : null;
-    $displayName = $profile && !empty($profile->full_name) ? $profile->full_name : ($user->name ?? 'User');
+    $photoUrl = null;
+    if (!empty($user->avatar)) {
+        $photoUrl = \Illuminate\Support\Str::startsWith($user->avatar, ['http://', 'https://']) ? $user->avatar : asset('storage/' . $user->avatar);
+    } elseif ($profile && !empty($profile->photo)) {
+        $photoUrl = asset('storage/' . $profile->photo);
+    } elseif ($user?->applicantProfile && !empty($user->applicantProfile->photo)) {
+        $photoUrl = asset('storage/' . $user->applicantProfile->photo);
+    }
+
+    $displayName = match(true) {
+        $isAdmin || $isRecruiter => $user->name ?? 'Admin',
+        $isEmployee => $profile && !empty($profile->full_name) ? $profile->full_name : ($user->name ?? 'Karyawan'),
+        default => $profile && !empty($profile->full_name) ? $profile->full_name : ($user->name ?? 'User'),
+    };
     $userInitial = strtoupper(substr($displayName, 0, 1));
 @endphp
 

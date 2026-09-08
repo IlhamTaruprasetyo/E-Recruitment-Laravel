@@ -150,17 +150,34 @@ class EmployeeTestController extends Controller
         }
     }
 
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
         try {
             $test = Test::where('test_type', 'employee')->findOrFail($id);
+
+            // Proteksi: Cegah hapus jika sudah ada karyawan yang mengerjakan/memiliki riwayat evaluasi kecuali dikonfirmasi paksa
+            $attemptCount = $test->attempts()->count();
+            if ($attemptCount > 0 && !$request->boolean('force_delete')) {
+                return redirect()->route('admin.employee_test')
+                    ->with('error', "Paket Asesmen Karyawan tidak dapat dihapus karena memiliki {$attemptCount} riwayat pengerjaan/evaluasi karyawan. Centang konfirmasi hapus paksa jika ingin tetap menghapus.");
+            }
+
+            DB::beginTransaction();
+
             $test->departments()->detach();
             $test->questions()->detach();
             $test->delete();
 
+            DB::commit();
+
+            $successMsg = $attemptCount > 0
+                ? "Paket Asesmen Karyawan beserta {$attemptCount} riwayat pengerjaan karyawan berhasil dihapus."
+                : "Paket Asesmen Karyawan berhasil dihapus.";
+
             return redirect()->route('admin.employee_test')
-                ->with('delete', 'Paket Asesmen Karyawan berhasil dihapus.');
+                ->with('delete', $successMsg);
         } catch (\Exception $e) {
+            DB::rollBack();
             return redirect()->route('admin.employee_test')
                 ->with('error', 'Gagal menghapus paket asesmen: ' . $e->getMessage());
         }
