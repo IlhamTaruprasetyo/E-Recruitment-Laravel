@@ -816,13 +816,13 @@
                                 <!-- Logo Perusahaan -->
                                 @if ($comp->logo_url)
                                     <div
-                                        class="w-14 h-14 rounded-xl bg-[#051205] border border-[#93F514]/30 p-2 flex items-center justify-center shrink-0 overflow-hidden shadow-sm group-hover:border-[#93F514] transition-colors">
+                                        class="w-14 h-14 rounded-xl bg-white border border-[#93F514]/30 p-2 flex items-center justify-center shrink-0 overflow-hidden shadow-sm group-hover:border-[#93F514] transition-colors">
                                         <img src="{{ $comp->logo_url }}" alt="{{ $comp->name }}"
                                             class="w-full h-full object-contain">
                                     </div>
                                 @else
                                     <div
-                                        class="w-14 h-14 rounded-xl bg-[#93F514]/15 border border-[#93F514]/40 flex items-center justify-center text-[#93F514] font-extrabold text-lg shrink-0 group-hover:bg-[#93F514]/25 transition-colors">
+                                        class="w-14 h-14 rounded-xl bg-white border border-[#93F514]/40 flex items-center justify-center text-gray-900 font-extrabold text-lg shrink-0 group-hover:bg-gray-100 transition-colors">
                                         {{ strtoupper(substr($comp->name, 0, 2)) }}
                                     </div>
                                 @endif

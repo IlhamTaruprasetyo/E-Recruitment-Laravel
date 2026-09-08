@@ -27,25 +27,36 @@
             { code: 'K', title: 'Komitmen', subtitle: 'Commitment', description: '' },
             { code: 'A', title: 'Akuntabel', subtitle: 'Accountable', description: '' }
         ],
-        logo_url: ''
+        logo_url: '',
+        is_mika: false
     },
     deleteData: {
         id: '',
         name: ''
     },
+    isMikaCompany() {
+        let name = (this.editData.name || '').toLowerCase().trim();
+        return Boolean(this.editData.is_mika || name.includes('mitra karya analitika') || /\bmika\b/i.test(name));
+    },
     openEditModal(company) {
+        let name = company.name || '';
+        let isMika = Boolean(company.is_mika || name.toLowerCase().includes('mitra karya analitika') || /\bmika\b/i.test(name));
         let missions = Array.isArray(company.missions) && company.missions.length > 0 ? company.missions : ['', '', ''];
-        let coreValues = Array.isArray(company.core_values) && company.core_values.length > 0 ? company.core_values : [
+        let defaultMikaValues = [
             { code: 'M', title: 'Menghargai', subtitle: 'Respect', description: '' },
             { code: 'I', title: 'Integritas', subtitle: 'Integrity', description: '' },
             { code: 'K', title: 'Komitmen', subtitle: 'Commitment', description: '' },
             { code: 'A', title: 'Akuntabel', subtitle: 'Accountable', description: '' }
         ];
+        let coreValues = isMika 
+            ? (Array.isArray(company.core_values) && company.core_values.length > 0 ? company.core_values : defaultMikaValues)
+            : [];
 
         this.editData = {
             id: company.id,
             role_id: company.role_id || '',
-            name: company.name || '',
+            name: name,
+            is_mika: isMika,
             tagline: company.tagline || '',
             website: company.website || '',
             phone: company.phone || '',
@@ -101,7 +112,11 @@
         let form = e.target;
         let formData = new FormData(form);
         formData.set('missions', JSON.stringify(this.editData.missions.filter(m => m && m.trim() !== '')));
-        formData.set('core_values', JSON.stringify(this.editData.core_values));
+        if (this.isMikaCompany()) {
+            formData.set('core_values', JSON.stringify(this.editData.core_values));
+        } else {
+            formData.set('core_values', JSON.stringify([]));
+        }
         this.isSubmitting = true;
         fetch('/admin/companies/' + this.editData.id, {
             method: 'POST',
@@ -312,6 +327,7 @@
                                         'id' => $company->id,
                                         'role_id' => $company->role_id,
                                         'name' => $company->name,
+                                        'is_mika' => str_contains(strtolower($company->name), 'mitra karya analitika') || preg_match('/\bmika\b/i', $company->name) === 1,
                                         'tagline' => $company->tagline,
                                         'website' => $company->website,
                                         'phone' => $company->phone,
@@ -576,10 +592,10 @@
                                 <span>Kelola Profil & Halaman Tentang Kami</span>
                                 <span class="text-xs px-2.5 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-semibold" x-text="editData.name"></span>
                             </h3>
-                            <p class="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Kelola identitas perusahaan, visi misi, dan nilai budaya MIKA secara dinamis.</p>
+                            <p class="text-xs text-gray-500 dark:text-slate-400 mt-0.5" x-text="isMikaCompany() ? 'Kelola identitas perusahaan, visi misi, dan nilai budaya MIKA secara dinamis.' : 'Kelola identitas perusahaan serta visi misi secara dinamis.'"></p>
                         </div>
                         <div class="flex items-center gap-2">
-                            <button type="button" @click="applyMikaTemplate()" class="px-3 py-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-xl hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition flex items-center gap-1.5" title="Muat draf standar profil PT Mitra Karya Analitika">
+                            <button type="button" x-show="isMikaCompany()" @click="applyMikaTemplate()" class="px-3 py-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-xl hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition flex items-center gap-1.5" title="Muat draf standar profil PT Mitra Karya Analitika">
                                 <svg class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                                 </svg>
@@ -607,7 +623,7 @@
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                             <span>3. Visi & Misi</span>
                         </button>
-                        <button type="button" @click="activeEditTab = 'values'" :class="activeEditTab === 'values' ? 'bg-indigo-600 text-white shadow-sm' : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700'" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
+                        <button type="button" x-show="isMikaCompany()" @click="activeEditTab = 'values'" :class="activeEditTab === 'values' ? 'bg-indigo-600 text-white shadow-sm' : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700'" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
                             <span>4. Nilai Budaya (MIKA)</span>
                         </button>
@@ -764,7 +780,7 @@
                         </div>
 
                         <!-- TAB 4: NILAI PERUSAHAAN (CORE VALUES MIKA) -->
-                        <div x-show="activeEditTab === 'values'" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                        <div x-show="activeEditTab === 'values' && isMikaCompany()" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
                             <p class="text-xs text-gray-500 dark:text-slate-400">
                                 Kelola 4 pilar budaya kerja MIKA (Menghargai, Integritas, Komitmen, Akuntabel).
                             </p>

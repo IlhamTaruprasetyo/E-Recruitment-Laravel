@@ -814,7 +814,7 @@
             </div> --}}
                 <h2 class="text-3xl sm:text-4xl font-extrabold text-[#EEEEEE]">Alur Pendaftaran & Seleksi</h2>
                 <p class="mt-3 text-sm sm:text-base text-gray-300 leading-relaxed">
-                    Ikuti 4 tahapan sistematis untuk bergabung menjadi bagian dari talenta terbaik kami.
+                    Ikuti 6 tahapan sistematis dan transparan untuk bergabung menjadi bagian dari talenta terbaik PT Mitra Karya Analitika (MIKA).
                 </p>
 
                 <!-- Dynamic Tab Step Switchers -->
@@ -824,29 +824,43 @@
                         :class="activeStep === 1 ?
                             'bg-gradient-to-r from-[#93F514] to-[#5ef558] text-black font-extrabold shadow-md shadow-[#93F514]/30' :
                             'text-gray-400 hover:text-[#EEEEEE]'"
-                        class="px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm transition-all duration-200 cursor-pointer">
+                        class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm transition-all duration-200 cursor-pointer">
                         1. Registrasi Akun
                     </button>
                     <button @click="activeStep = 2"
                         :class="activeStep === 2 ?
                             'bg-gradient-to-r from-[#93F514] to-[#5ef558] text-black font-extrabold shadow-md shadow-[#93F514]/30' :
                             'text-gray-400 hover:text-[#EEEEEE]'"
-                        class="px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm transition-all duration-200 cursor-pointer">
-                        2. Lengkapi Data & CV
+                        class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm transition-all duration-200 cursor-pointer">
+                        2. Profil & CV Digital
                     </button>
                     <button @click="activeStep = 3"
                         :class="activeStep === 3 ?
                             'bg-gradient-to-r from-[#93F514] to-[#5ef558] text-black font-extrabold shadow-md shadow-[#93F514]/30' :
                             'text-gray-400 hover:text-[#EEEEEE]'"
-                        class="px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm transition-all duration-200 cursor-pointer">
-                        3. Tes & Seleksi Online
+                        class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm transition-all duration-200 cursor-pointer">
+                        3. Lamar & Seleksi Berkas
                     </button>
                     <button @click="activeStep = 4"
                         :class="activeStep === 4 ?
                             'bg-gradient-to-r from-[#93F514] to-[#5ef558] text-black font-extrabold shadow-md shadow-[#93F514]/30' :
                             'text-gray-400 hover:text-[#EEEEEE]'"
-                        class="px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm transition-all duration-200 cursor-pointer">
-                        4. Hasil & Penawaran
+                        class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm transition-all duration-200 cursor-pointer">
+                        4. Asesmen Online (CBT)
+                    </button>
+                    <button @click="activeStep = 5"
+                        :class="activeStep === 5 ?
+                            'bg-gradient-to-r from-[#93F514] to-[#5ef558] text-black font-extrabold shadow-md shadow-[#93F514]/30' :
+                            'text-gray-400 hover:text-[#EEEEEE]'"
+                        class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm transition-all duration-200 cursor-pointer">
+                        5. Sesi Wawancara
+                    </button>
+                    <button @click="activeStep = 6"
+                        :class="activeStep === 6 ?
+                            'bg-gradient-to-r from-[#93F514] to-[#5ef558] text-black font-extrabold shadow-md shadow-[#93F514]/30' :
+                            'text-gray-400 hover:text-[#EEEEEE]'"
+                        class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm transition-all duration-200 cursor-pointer">
+                        6. Hasil & Penawaran
                     </button>
                 </div>
             </div>
@@ -858,7 +872,7 @@
                     class="absolute -top-24 -right-24 w-72 h-72 bg-[#93F514]/15 rounded-full blur-3xl pointer-events-none">
                 </div>
 
-                <!-- Step 1 Content -->
+                <!-- Step 1 Content: Registrasi Akun -->
                 <div x-show="activeStep === 1" x-transition:enter="transition ease-out duration-300"
                     x-transition:enter-start="opacity-0 translate-y-3" x-transition:enter-end="opacity-100 translate-y-0"
                     class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
@@ -867,24 +881,28 @@
                             class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] text-xs font-bold">
                             Tahap 01 - Registrasi Pengguna
                         </div>
-                        <h3 class="text-2xl sm:text-3xl font-extrabold text-[#EEEEEE]">Buat Akun Pelamar dengan Mudah</h3>
+                        <h3 class="text-2xl sm:text-3xl font-extrabold text-[#EEEEEE]">Buat Akun Pelamar dengan Cepat & Aman</h3>
                         <p class="text-sm sm:text-base text-gray-300 leading-relaxed">
-                            Lakukan registrasi menggunakan Nama, NIK valid, dan Email aktif Anda. Akun ini akan menjadi
-                            pusat seluruh aktivitas pelamaran, ujian seleksi, hingga penerimaan kerja.
+                            Lakukan registrasi menggunakan Google Authentication atau Form Manual (Nama Lengkap, NIK KTP valid, dan Email aktif). Akun ini menjadi pusat portal seluruh aktivitas pelamaran, verifikasi dokumen, ujian seleksi, hingga penawaran kerja.
                         </p>
                         <ul class="space-y-2.5 text-xs sm:text-sm text-gray-300 pt-2">
                             <li class="flex items-center gap-2.5">
                                 <span
                                     class="w-5 h-5 rounded-full bg-[#93F514]/20 text-[#93F514] flex items-center justify-center font-bold text-xs">&check;</span>
-                                <span>Verifikasi data diri yang cepat dan aman</span>
+                                <span>Autentikasi instan melalui Google atau registrasi NIK valid</span>
                             </li>
                             <li class="flex items-center gap-2.5">
                                 <span
                                     class="w-5 h-5 rounded-full bg-[#93F514]/20 text-[#93F514] flex items-center justify-center font-bold text-xs">&check;</span>
-                                <span>Dapat diakses kapan saja melalui smartphone atau desktop</span>
+                                <span>Dapat diakses 24/7 secara fleksibel melalui smartphone maupun desktop</span>
+                            </li>
+                            <li class="flex items-center gap-2.5">
+                                <span
+                                    class="w-5 h-5 rounded-full bg-[#93F514]/20 text-[#93F514] flex items-center justify-center font-bold text-xs">&check;</span>
+                                <span>Pemberitahuan status seleksi terkirim langsung ke akun Anda</span>
                             </li>
                         </ul>
-                        <div class="pt-4">
+                        <div class="pt-4 flex flex-wrap items-center gap-3">
                             @auth
                                 @php
                                     $isAdminOrRecruiter =
@@ -904,14 +922,21 @@
                                 @endphp
                                 <a href="{{ $dashRoute }}"
                                     class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-lg shadow-[#93F514]/30">
-                                    {{ $isAdminOrRecruiter ? 'Buka Dashboard Admin' : 'Buka Profil Saya' }}
+                                    {{ $isAdminOrRecruiter ? 'Buka Dashboard Manajemen' : 'Buka Profil Saya' }}
                                 </a>
                             @else
                                 <a href="{{ route('register') }}"
                                     class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-lg shadow-[#93F514]/30">
-                                    Daftar Akun Sekarang &rarr;
+                                    Daftar Akun Sekarang
                                 </a>
                             @endauth
+                            <button type="button" @click="activeStep = 2"
+                                class="inline-flex items-center gap-1.5 px-4 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-[#EEEEEE] font-semibold text-xs sm:text-sm border border-white/15 transition cursor-pointer">
+                                <span>Tahap 2: Profil & CV</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                                </svg>
+                            </button>
                         </div>
                     </div>
                     <div class="lg:col-span-5 flex justify-center">
@@ -924,41 +949,64 @@
                                         d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                                 </svg>
                             </div>
-                            <h4 class="font-bold text-[#EEEEEE] text-base">Tips Registrasi</h4>
+                            <h4 class="font-bold text-[#EEEEEE] text-base">Tips Registrasi Akun</h4>
                             <p class="text-xs text-gray-400 leading-relaxed">
-                                Pastikan nomor NIK dan Email yang didaftarkan aktif untuk menerima notifikasi status
-                                kelulusan berkas dan jadwal ujian.
+                                Pastikan nomor NIK KTP dan alamat email yang didaftarkan aktif dan valid untuk memastikan kelancaran verifikasi identitas serta notifikasi status seleksi.
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Step 2 Content -->
+                <!-- Step 2 Content: Kelengkapan Profil & CV -->
                 <div x-show="activeStep === 2" x-cloak x-transition:enter="transition ease-out duration-300"
                     x-transition:enter-start="opacity-0 translate-y-3" x-transition:enter-end="opacity-100 translate-y-0"
                     class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                     <div class="lg:col-span-7 space-y-4">
                         <div
                             class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] text-xs font-bold">
-                            Tahap 02 - Kelengkapan Profil
+                            Tahap 02 - Kelengkapan Profil & CV
                         </div>
-                        <h3 class="text-2xl sm:text-3xl font-extrabold text-[#EEEEEE]">Lengkapi Biodata, Riwayat & CV</h3>
+                        <h3 class="text-2xl sm:text-3xl font-extrabold text-[#EEEEEE]">Lengkapi Biodata, Riwayat & CV Digital</h3>
                         <p class="text-sm sm:text-base text-gray-300 leading-relaxed">
-                            Isi form riwayat pendidikan, pengalaman kerja, keahlian khusus, kontak sosial media, dan unggah
-                            berkas pendukung (KTP, Ijazah, Transkrip, Sertifikat).
+                            Lengkapi profil Anda secara menyeluruh: Biodata Pribadi, Kontak Keluarga, Riwayat Pendidikan, Pengalaman Kerja, Organisasi, Prestasi, hingga Keahlian/Sertifikasi. Sistem secara otomatis menyusun data Anda menjadi format CV profesional.
                         </p>
                         <ul class="space-y-2.5 text-xs sm:text-sm text-gray-300 pt-2">
                             <li class="flex items-center gap-2.5">
                                 <span
                                     class="w-5 h-5 rounded-full bg-[#93F514]/20 text-[#93F514] flex items-center justify-center font-bold text-xs">&check;</span>
-                                <span>Fitur Generate & Preview CV otomatis</span>
+                                <span>Fitur Generate & Preview CV ATS-friendly terstandar otomatis</span>
                             </li>
                             <li class="flex items-center gap-2.5">
                                 <span
                                     class="w-5 h-5 rounded-full bg-[#93F514]/20 text-[#93F514] flex items-center justify-center font-bold text-xs">&check;</span>
-                                <span>Pembaruan profil fleksibel setiap saat</span>
+                                <span>Pembaruan data profil dapat dilakukan secara berkala dan fleksibel</span>
+                            </li>
+                            <li class="flex items-center gap-2.5">
+                                <span
+                                    class="w-5 h-5 rounded-full bg-[#93F514]/20 text-[#93F514] flex items-center justify-center font-bold text-xs">&check;</span>
+                                <span>Dukungan unggah berkas pendukung (Ijazah, Transkrip, Sertifikat)</span>
                             </li>
                         </ul>
+                        <div class="pt-4 flex flex-wrap items-center gap-3">
+                            @auth
+                                <a href="{{ route('profile') }}"
+                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-lg shadow-[#93F514]/30">
+                                    Lengkapi Profil Sekarang
+                                </a>
+                            @else
+                                <a href="{{ route('login') }}"
+                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-lg shadow-[#93F514]/30">
+                                    Masuk untuk Lengkapi Profil
+                                </a>
+                            @endauth
+                            <button type="button" @click="activeStep = 3"
+                                class="inline-flex items-center gap-1.5 px-4 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-[#EEEEEE] font-semibold text-xs sm:text-sm border border-white/15 transition cursor-pointer">
+                                <span>Tahap 3: Lamar & Seleksi</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                     <div class="lg:col-span-5 flex justify-center">
                         <div
@@ -970,41 +1018,126 @@
                                         d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
                             </div>
-                            <h4 class="font-bold text-[#EEEEEE] text-base">Kelengkapan Berkas</h4>
+                            <h4 class="font-bold text-[#EEEEEE] text-base">Kelengkapan Profil</h4>
                             <p class="text-xs text-gray-400 leading-relaxed">
-                                Profil yang terisi 100% lengkap memiliki peluang 3x lebih cepat untuk lolos tahap seleksi
-                                administrasi oleh tim HRD.
+                                Profil pelamar dengan persentase kelengkapan data tinggi memiliki prioritas lebih tinggi dalam peninjauan administrasi oleh tim HRD.
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Step 3 Content -->
+                <!-- Step 3 Content: Lamar Posisi & Seleksi Berkas -->
                 <div x-show="activeStep === 3" x-cloak x-transition:enter="transition ease-out duration-300"
                     x-transition:enter-start="opacity-0 translate-y-3" x-transition:enter-end="opacity-100 translate-y-0"
                     class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                     <div class="lg:col-span-7 space-y-4">
                         <div
                             class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] text-xs font-bold">
-                            Tahap 03 - Asesmen Online
+                            Tahap 03 - Lamar Posisi & Seleksi Berkas
                         </div>
-                        <h3 class="text-2xl sm:text-3xl font-extrabold text-[#EEEEEE]">Ikuti Ujian CBT Terintegrasi</h3>
+                        <h3 class="text-2xl sm:text-3xl font-extrabold text-[#EEEEEE]">Eksplorasi Lowongan & Seleksi Berkas</h3>
                         <p class="text-sm sm:text-base text-gray-300 leading-relaxed">
-                            Setelah berkas disetujui, Anda dapat langsung mengerjakan ujian tes online (Pilihan Ganda &
-                            Essay) sesuai paket uji bidang keahlian dari rekruter.
+                            Temukan posisi karir yang sesuai dengan kompetensi Anda di PT Mitra Karya Analitika (MIKA) atau grup bisnis kami. Ajukan lamaran dalam satu klik, lalu tim HRD & Rekruter akan meninjau kualifikasi dan kesesuaian berkas Anda secara transparan.
                         </p>
                         <ul class="space-y-2.5 text-xs sm:text-sm text-gray-300 pt-2">
                             <li class="flex items-center gap-2.5">
                                 <span
                                     class="w-5 h-5 rounded-full bg-[#93F514]/20 text-[#93F514] flex items-center justify-center font-bold text-xs">&check;</span>
-                                <span>Timer pengerjaan real-time dan penilaian transparan</span>
+                                <span>Pengajuan lamaran praktis dengan data profil yang terintegrasi</span>
                             </li>
                             <li class="flex items-center gap-2.5">
                                 <span
                                     class="w-5 h-5 rounded-full bg-[#93F514]/20 text-[#93F514] flex items-center justify-center font-bold text-xs">&check;</span>
-                                <span>Kategori soal disesuaikan dengan posisi lamaran</span>
+                                <span>Pelacakan status berkas real-time (Terkirim Lolos Berkas / Reviewed)</span>
+                            </li>
+                            <li class="flex items-center gap-2.5">
+                                <span
+                                    class="w-5 h-5 rounded-full bg-[#93F514]/20 text-[#93F514] flex items-center justify-center font-bold text-xs">&check;</span>
+                                <span>Notifikasi kelulusan seleksi administrasi sebelum melaju ke tahap ujian</span>
                             </li>
                         </ul>
+                        <div class="pt-4 flex flex-wrap items-center gap-3">
+                            <a href="{{ route('jobs.index') }}"
+                                class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-lg shadow-[#93F514]/30">
+                                Jelajahi Lowongan Tersedia
+                            </a>
+                            <button type="button" @click="activeStep = 4"
+                                class="inline-flex items-center gap-1.5 px-4 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-[#EEEEEE] font-semibold text-xs sm:text-sm border border-white/15 transition cursor-pointer">
+                                <span>Tahap 4: Asesmen CBT</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-5 flex justify-center">
+                        <div
+                            class="w-full max-w-sm p-6 rounded-2xl bg-[#050e05] border border-[#93F514]/30 shadow-xl space-y-4">
+                            <div
+                                class="w-12 h-12 rounded-xl bg-[#93F514]/15 border border-[#93F514]/40 flex items-center justify-center text-[#93F514]">
+                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <h4 class="font-bold text-[#EEEEEE] text-base">Seleksi Berkas (Screening)</h4>
+                            <p class="text-xs text-gray-400 leading-relaxed">
+                                Tim Rekruter akan mencocokkan latar belakang pendidikan, kompetensi, dan pengalaman kerja Anda dengan kualifikasi posisi yang dibutuhkan.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4 Content: Ujian Asesmen Online (CBT & DISC) -->
+                <div x-show="activeStep === 4" x-cloak x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 translate-y-3" x-transition:enter-end="opacity-100 translate-y-0"
+                    class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    <div class="lg:col-span-7 space-y-4">
+                        <div
+                            class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] text-xs font-bold">
+                            Tahap 04 - Ujian Asesmen Online
+                        </div>
+                        <h3 class="text-2xl sm:text-3xl font-extrabold text-[#EEEEEE]">Ikuti Ujian CBT & Tes Kepribadian DISC</h3>
+                        <p class="text-sm sm:text-base text-gray-300 leading-relaxed">
+                            Setelah dinyatakan lolos berkas administrasi, Anda dapat langsung mengakses sistem Ujian Online terintegrasi. Ujian meliputi Tes Kepribadian DISC (24 kuadran Most/Least) serta Tes Kompetensi Teknis (Pilihan Ganda & Soal Essay + Lampiran Berkas).
+                        </p>
+                        <ul class="space-y-2.5 text-xs sm:text-sm text-gray-300 pt-2">
+                            <li class="flex items-center gap-2.5">
+                                <span
+                                    class="w-5 h-5 rounded-full bg-[#93F514]/20 text-[#93F514] flex items-center justify-center font-bold text-xs">&check;</span>
+                                <span>Sistem Computer-Based Test (CBT) dengan timer pengerjaan real-time</span>
+                            </li>
+                            <li class="flex items-center gap-2.5">
+                                <span
+                                    class="w-5 h-5 rounded-full bg-[#93F514]/20 text-[#93F514] flex items-center justify-center font-bold text-xs">&check;</span>
+                                <span>Kalkulasi otomatis profil kepribadian DISC dan evaluasi essay terstandar</span>
+                            </li>
+                            <li class="flex items-center gap-2.5">
+                                <span
+                                    class="w-5 h-5 rounded-full bg-[#93F514]/20 text-[#93F514] flex items-center justify-center font-bold text-xs">&check;</span>
+                                <span>Penyimpanan jawaban otomatis yang aman selama pengerjaan berlangsung</span>
+                            </li>
+                        </ul>
+                        <div class="pt-4 flex flex-wrap items-center gap-3">
+                            @auth
+                                <a href="{{ route('profile', ['tab' => 'riwayat']) }}"
+                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-lg shadow-[#93F514]/30">
+                                    Cek Status Ujian di Riwayat
+                                </a>
+                            @else
+                                <a href="{{ route('login') }}"
+                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-lg shadow-[#93F514]/30">
+                                    Masuk ke Portal Ujian
+                                </a>
+                            @endauth
+                            <button type="button" @click="activeStep = 5"
+                                class="inline-flex items-center gap-1.5 px-4 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-[#EEEEEE] font-semibold text-xs sm:text-sm border border-white/15 transition cursor-pointer">
+                                <span>Tahap 5: Wawancara</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                     <div class="lg:col-span-5 flex justify-center">
                         <div
@@ -1016,41 +1149,126 @@
                                         d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                                 </svg>
                             </div>
-                            <h4 class="font-bold text-[#EEEEEE] text-base">Sistem Ujian Online</h4>
+                            <h4 class="font-bold text-[#EEEEEE] text-base">Sistem CBT Terpadu</h4>
                             <p class="text-xs text-gray-400 leading-relaxed">
-                                Kerjakan soal dengan cermat dan stabilkan koneksi internet Anda selama proses ujian
-                                berlangsung.
+                                Gunakan perangkat komputer/laptop dengan koneksi internet yang stabil untuk pengalaman optimal saat menyelesaikan tes DISC dan ujian teknis.
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Step 4 Content -->
-                <div x-show="activeStep === 4" x-cloak x-transition:enter="transition ease-out duration-300"
+                <!-- Step 5 Content: Sesi Wawancara Terjadwal -->
+                <div x-show="activeStep === 5" x-cloak x-transition:enter="transition ease-out duration-300"
                     x-transition:enter-start="opacity-0 translate-y-3" x-transition:enter-end="opacity-100 translate-y-0"
                     class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                     <div class="lg:col-span-7 space-y-4">
                         <div
                             class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] text-xs font-bold">
-                            Tahap 04 - Hasil & Penawaran
+                            Tahap 05 - Wawancara Terjadwal
                         </div>
-                        <h3 class="text-2xl sm:text-3xl font-extrabold text-[#EEEEEE]">Pengumuman & Penawaran Karir</h3>
+                        <h3 class="text-2xl sm:text-3xl font-extrabold text-[#EEEEEE]">Sesi Interview Daring atau Tatap Muka</h3>
                         <p class="text-sm sm:text-base text-gray-300 leading-relaxed">
-                            Pantau status kelulusan secara transparan di dashboard Anda. Kandidat terpilih akan langsung
-                            menerima instruksi tahap penawaran kerja (*Offering Letter*).
+                            Kandidat yang lolos tahap ujian asesmen (Shortlisted) akan dijadwalkan untuk sesi wawancara mendalam bersama tim HRD dan User. Informasi jadwal, pewawancara, serta tautan video conference (Google Meet) atau lokasi kantor ditampilkan langsung pada dashboard Anda.
                         </p>
                         <ul class="space-y-2.5 text-xs sm:text-sm text-gray-300 pt-2">
                             <li class="flex items-center gap-2.5">
                                 <span
                                     class="w-5 h-5 rounded-full bg-[#93F514]/20 text-[#93F514] flex items-center justify-center font-bold text-xs">&check;</span>
-                                <span>Notifikasi hasil evaluasi langsung ke akun Anda</span>
+                                <span>Undangan jadwal terintegrasi lengkap dengan nama pewawancara dan waktu (WIB)</span>
                             </li>
                             <li class="flex items-center gap-2.5">
                                 <span
                                     class="w-5 h-5 rounded-full bg-[#93F514]/20 text-[#93F514] flex items-center justify-center font-bold text-xs">&check;</span>
-                                <span>Proses terstruktur tanpa biaya pendaftaran (Gratis)</span>
+                                <span>Akses tautan video meeting online langsung dari kartu riwayat lamaran</span>
+                            </li>
+                            <li class="flex items-center gap-2.5">
+                                <span
+                                    class="w-5 h-5 rounded-full bg-[#93F514]/20 text-[#93F514] flex items-center justify-center font-bold text-xs">&check;</span>
+                                <span>Pengingat jadwal otomatis pada dashboard Anda agar tidak terlewatkan</span>
                             </li>
                         </ul>
+                        <div class="pt-4 flex flex-wrap items-center gap-3">
+                            @auth
+                                <a href="{{ route('profile', ['tab' => 'riwayat']) }}"
+                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-lg shadow-[#93F514]/30">
+                                    Pantau Jadwal Wawancara
+                                </a>
+                            @else
+                                <a href="{{ route('jobs.index') }}"
+                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-lg shadow-[#93F514]/30">
+                                    Lihat Peluang Karir
+                                </a>
+                            @endauth
+                            <button type="button" @click="activeStep = 6"
+                                class="inline-flex items-center gap-1.5 px-4 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-[#EEEEEE] font-semibold text-xs sm:text-sm border border-white/15 transition cursor-pointer">
+                                <span>Tahap 6: Hasil Akhir</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-5 flex justify-center">
+                        <div
+                            class="w-full max-w-sm p-6 rounded-2xl bg-[#050e05] border border-[#93F514]/30 shadow-xl space-y-4">
+                            <div
+                                class="w-12 h-12 rounded-xl bg-[#93F514]/15 border border-[#93F514]/40 flex items-center justify-center text-[#93F514]">
+                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <h4 class="font-bold text-[#EEEEEE] text-base">Persiapan Wawancara</h4>
+                            <p class="text-xs text-gray-400 leading-relaxed">
+                                Pelajari profil dan nilai inti MIKA (Menghargai, Integritas, Komitmen, Akuntabel), kenali tanggung jawab posisi, dan siapkan perangkat kamera/audio jika sesi berlangsung secara daring.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 6 Content: Hasil Akhir & Penawaran Karir -->
+                <div x-show="activeStep === 6" x-cloak x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 translate-y-3" x-transition:enter-end="opacity-100 translate-y-0"
+                    class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    <div class="lg:col-span-7 space-y-4">
+                        <div
+                            class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] text-xs font-bold">
+                            Tahap 06 - Hasil Akhir & Penawaran Karir
+                        </div>
+                        <h3 class="text-2xl sm:text-3xl font-extrabold text-[#EEEEEE]">Pengumuman Kelulusan & Penawaran Kerja</h3>
+                        <p class="text-sm sm:text-base text-gray-300 leading-relaxed">
+                            Kandidat terbaik yang terpilih akan menerima pemberitahuan kelulusan resmi dengan status Diterima (Accepted). Tim MIKA akan menerbitkan surat penawaran kerja (*Offering Letter*) resmi beserta panduan onboarding kerja.
+                        </p>
+                        <ul class="space-y-2.5 text-xs sm:text-sm text-gray-300 pt-2">
+                            <li class="flex items-center gap-2.5">
+                                <span
+                                    class="w-5 h-5 rounded-full bg-[#93F514]/20 text-[#93F514] flex items-center justify-center font-bold text-xs">&check;</span>
+                                <span>Pengumuman status kelulusan secara transparan dan real-time di akun Anda</span>
+                            </li>
+                            <li class="flex items-center gap-2.5">
+                                <span
+                                    class="w-5 h-5 rounded-full bg-[#93F514]/20 text-[#93F514] flex items-center justify-center font-bold text-xs">&check;</span>
+                                <span>Penerbitan surat penawaran kerja (Offering Letter) resmi perusahaan</span>
+                            </li>
+                            <li class="flex items-center gap-2.5">
+                                <span
+                                    class="w-5 h-5 rounded-full bg-[#93F514]/20 text-[#93F514] flex items-center justify-center font-bold text-xs">&check;</span>
+                                <span>Seluruh tahapan seleksi rekrutmen 100% bebas biaya pendaftaran (Gratis)</span>
+                            </li>
+                        </ul>
+                        <div class="pt-4 flex flex-wrap items-center gap-3">
+                            @auth
+                                <a href="{{ route('profile', ['tab' => 'riwayat']) }}"
+                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-lg shadow-[#93F514]/30">
+                                    Lihat Riwayat & Status Saya
+                                </a>
+                            @else
+                                <a href="{{ route('register') }}"
+                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-lg shadow-[#93F514]/30">
+                                    Daftar & Raih Karir Impian
+                                </a>
+                            @endauth
+                        </div>
                     </div>
                     <div class="lg:col-span-5 flex justify-center">
                         <div
@@ -1064,13 +1282,11 @@
                             </div>
                             <h4 class="font-bold text-[#EEEEEE] text-base">Selamat Bergabung!</h4>
                             <p class="text-xs text-gray-400 leading-relaxed">
-                                Siapkan diri Anda untuk melangkah ke babak baru perjalanan karir profesional masa depan
-                                bersama MAKNA.
+                                Siapkan diri Anda untuk melangkah ke babak baru perjalanan karir profesional masa depan bersama PT Mitra Karya Analitika (MIKA).
                             </p>
                         </div>
                     </div>
                 </div>
-
             </div>
         </section>
 
