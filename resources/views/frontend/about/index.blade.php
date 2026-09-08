@@ -759,7 +759,7 @@
                         </p>
                     </div>
                     <div class="mt-6 pt-3 border-t border-[#93F514]/15">
-                        <a href="{{ $company->whatsapp_url ?? 'https://wa.me/6281225588888' }}" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-[#93F514] hover:underline inline-flex items-center gap-1 group">
+                        <a href="{{ $company->whatsapp_url ?? 'https://wa.me/6281807701210' }}" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-[#93F514] hover:underline inline-flex items-center gap-1 group">
                             <span>Chat WhatsApp</span>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />

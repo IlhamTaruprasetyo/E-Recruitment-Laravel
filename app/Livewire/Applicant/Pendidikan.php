@@ -8,6 +8,7 @@ use App\Models\Education;
 use App\Models\Major;
 use App\Models\Skill;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -356,8 +357,12 @@ class Pendidikan extends Component
         $educations = $profile ? Education::where('profile_id', $profile->id)->orderBy('start_year', 'desc')->get() : collect();
         $skills = $profile ? Skill::where('profile_id', $profile->id)->get() : collect();
 
-        $degrees = Degree::orderBy('rank', 'asc')->get();
-        $majors = Major::orderBy('name', 'asc')->get();
+        $degrees = Cache::remember('master_degrees_ordered', 86400, function () {
+            return Degree::orderBy('rank', 'asc')->get();
+        });
+        $majors = Cache::remember('master_majors_ordered', 86400, function () {
+            return Major::orderBy('name', 'asc')->get();
+        });
 
         return view('livewire.applicant.pendidikan', [
             'educations' => $educations,

@@ -8,6 +8,7 @@ use App\Models\Department;
 use App\Models\JobApplication;
 use App\Models\ApplicantProfile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class FrontendJobController extends Controller
 {
@@ -71,8 +72,12 @@ class FrontendJobController extends Controller
         }
 
         $jobs = $jobsQuery->latest('id')->paginate(6)->withQueryString();
-        $departments = Department::withCount(['jobs' => fn($q) => $q->active()])->get();
-        $companies = Company::withCount(['jobs' => fn($q) => $q->active()])->get();
+        $departments = Cache::remember('home_departments_with_jobs', 3600, function () {
+            return Department::withCount(['jobs' => fn($q) => $q->active()])->get();
+        });
+        $companies = Cache::remember('companies_with_jobs', 3600, function () {
+            return Company::withCount(['jobs' => fn($q) => $q->active()])->get();
+        });
         $employmentTypes = [
             'Magang' => 'Magang / Internship',
             'Full Time' => 'Full Time',

@@ -21,4 +21,14 @@ class TestCategory extends Model
     {
         return $this->hasMany(Test::class, 'category_id');
     }
+
+    /**
+     * Get cached list of all test categories.
+     */
+    public static function cachedAll()
+    {
+        return \Illuminate\Support\Facades\Cache::remember('master_test_categories_all', 86400, function () {
+            return static::orderBy('name', 'asc')->get();
+        });
+    }
 }

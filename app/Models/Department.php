@@ -30,4 +30,14 @@ class Department extends Model
     {
         return $this->hasMany(Position::class);
     }
+
+    /**
+     * Get cached list of all departments.
+     */
+    public static function cachedAll()
+    {
+        return \Illuminate\Support\Facades\Cache::remember('master_departments_all', 86400, function () {
+            return static::with('company')->orderBy('name', 'asc')->get();
+        });
+    }
 }
