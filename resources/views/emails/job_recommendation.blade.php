@@ -135,7 +135,7 @@
 
         <div class="footer">
             Email ini dikirim secara otomatis oleh Sistem E-Rekrutmen.<br>
-            © {{ date('Y') }} E-Rekrutmen. All rights reserved.
+            © {{ date('Y') }} MIKA CAREER. All rights reserved.
         </div>
     </div>
 </body>

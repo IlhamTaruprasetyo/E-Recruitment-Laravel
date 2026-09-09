@@ -67,7 +67,7 @@ class CompanyProfileSeeder extends Seeder
         $company->city = 'Semarang';
         $company->province = 'Jawa Tengah';
         $company->postal_code = '50272';
-        $company->phone = '081225588888';
+        $company->phone = '081770555554';
         $company->email = 'info@mikacares.co.id';
         if (empty($company->website)) {
             $company->website = 'https://mikacares.co.id/';

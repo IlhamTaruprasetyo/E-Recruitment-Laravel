@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\JobApplication;
 use App\Models\ApplicationStatusHistory;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+use App\Mail\ApplicationStatusUpdatedMail;
 
 class JobApplicationController extends Controller
 {
@@ -112,7 +115,7 @@ class JobApplicationController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $application = JobApplication::with('job')->findOrFail($id);
+        $application = JobApplication::with(['job.company', 'job.department', 'applicantProfile.user'])->findOrFail($id);
 
         $user = auth()->user();
         $isRecruiter = $user && ($user->role_id == 2 || strtolower($user->role?->name ?? '') === 'recruiter');
@@ -161,7 +164,35 @@ class JobApplicationController extends Controller
             'changed_at'          => now(),
         ]);
 
+        // Kirim email notifikasi ke pelamar jika diaktifkan (default: true)
+        $shouldSendEmail = $request->has('send_email')
+            ? $request->boolean('send_email')
+            : true;
+
+        $emailSent = false;
+        $applicantEmail = $application->applicantProfile?->user?->email;
+
+        if ($shouldSendEmail && $applicantEmail) {
+            try {
+                Mail::to($applicantEmail)->send(
+                    new ApplicationStatusUpdatedMail($application, $newStatus, $notes)
+                );
+                $emailSent = true;
+            } catch (\Throwable $e) {
+                Log::error('Gagal mengirim email notifikasi status lamaran: ' . $e->getMessage(), [
+                    'application_id' => $application->id,
+                    'recipient'      => $applicantEmail,
+                    'status'         => $newStatus,
+                ]);
+            }
+        }
+
+        $successMsg = 'Status lamaran berhasil diperbarui dan dicatat ke riwayat status.';
+        if ($emailSent) {
+            $successMsg .= ' Notifikasi email otomatis telah berhasil dikirim ke ' . $applicantEmail . '.';
+        }
+
         return redirect()->route($redirectRoute)
-            ->with('update', 'Status lamaran berhasil diperbarui dan dicatat ke riwayat status.');
+            ->with('update', $successMsg);
     }
 }

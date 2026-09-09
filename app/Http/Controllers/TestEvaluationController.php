@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\TestAttempt;
 use App\Models\TestAnswer;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+use App\Mail\ApplicationStatusUpdatedMail;
 
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\DiscTrait;
@@ -140,7 +143,13 @@ class TestEvaluationController extends Controller
 
     public function updateGrade(Request $request, string $id)
     {
-        $attempt = TestAttempt::with(['answers.question', 'test', 'jobApplication'])->findOrFail($id);
+        $attempt = TestAttempt::with([
+            'answers.question', 
+            'test', 
+            'jobApplication.applicantProfile.user',
+            'jobApplication.job.company',
+            'jobApplication.job.department'
+        ])->findOrFail($id);
 
         $request->validate([
             'essay_scores' => 'nullable|array',
@@ -149,6 +158,7 @@ class TestEvaluationController extends Controller
             'scores.*' => 'nullable|numeric|min:0',
             'application_status' => 'nullable|string|in:Submitted,Reviewed,Shortlisted,Interview,Accepted,Rejected',
             'application_notes' => 'nullable|string|max:1000',
+            'send_email' => 'nullable',
         ]);
 
         $isEmployeeAttempt = ($attempt->attempt_type === 'employee') || empty($attempt->job_application_id);
@@ -214,43 +224,77 @@ class TestEvaluationController extends Controller
                 'status' => $status,
             ]);
 
+            $emailSent = false;
+            $applicantEmail = null;
+
             // Update status lamaran (khusus pelamar): prioritaskan pilihan manual HR jika dipilih, jika tidak dan lulus KKM otomatis Shortlisted
             if ($attempt->jobApplication) {
                 $app = $attempt->jobApplication;
                 $newStatus = $request->input('application_status');
                 $customNotes = $request->input('application_notes');
+                $updatedStatus = null;
+                $notes = null;
 
                 if (!empty($newStatus)) {
+                    $updatedStatus = $newStatus;
                     $notes = !empty($customNotes) 
                         ? $customNotes 
                         : 'Status lamaran diperbarui oleh HR melalui evaluasi ujian (Total Nilai: ' . number_format($totalScore, 1) . ').';
 
                     $app->update([
-                        'status' => $newStatus,
+                        'status' => $updatedStatus,
                         'notes'  => $notes,
                     ]);
 
                     \App\Models\ApplicationStatusHistory::create([
                         'job_applications_id' => $app->id,
-                        'status'              => $newStatus,
+                        'status'              => $updatedStatus,
                         'notes'               => $notes,
                         'changed_by'          => $reviewerId ?? 1,
                         'changed_at'          => now(),
                     ]);
                 } elseif ($status === 'passed' && in_array(strtolower($app->status), ['submitted', 'reviewed', 'pending'])) {
                     // Fallback otomatis jika lulus KKM
+                    $updatedStatus = 'Shortlisted';
+                    $notes = !empty($customNotes)
+                        ? $customNotes
+                        : 'Lolos Ujian Seleksi Online (Nilai: ' . number_format($totalScore, 1) . ' / KKM: ' . number_format($passingScore, 0) . '). Siap untuk dijadwalkan wawancara.';
+
                     $app->update([
-                        'status' => 'Shortlisted',
-                        'notes'  => 'Lolos Ujian Seleksi Online (Nilai: ' . number_format($totalScore, 1) . ' / KKM: ' . number_format($passingScore, 0) . '). Siap untuk dijadwalkan wawancara.',
+                        'status' => $updatedStatus,
+                        'notes'  => $notes,
                     ]);
 
                     \App\Models\ApplicationStatusHistory::create([
                         'job_applications_id' => $app->id,
-                        'status'              => 'Shortlisted',
-                        'notes'               => 'Lolos Ujian Seleksi Online (Nilai: ' . number_format($totalScore, 1) . ' / KKM: ' . number_format($passingScore, 0) . ').',
+                        'status'              => $updatedStatus,
+                        'notes'               => $notes,
                         'changed_by'          => $reviewerId ?? 1,
                         'changed_at'          => now(),
                     ]);
+                }
+
+                // Kirim email notifikasi ke pelamar jika status berubah dan opsi aktif
+                $shouldSendEmail = $request->has('send_email')
+                    ? $request->boolean('send_email')
+                    : true;
+
+                $applicantEmail = $app->applicantProfile?->user?->email;
+
+                if ($updatedStatus && $shouldSendEmail && $applicantEmail) {
+                    try {
+                        Mail::to($applicantEmail)->send(
+                            new ApplicationStatusUpdatedMail($app, $updatedStatus, $notes)
+                        );
+                        $emailSent = true;
+                    } catch (\Throwable $e) {
+                        Log::error('Gagal mengirim email evaluasi pelamar: ' . $e->getMessage(), [
+                            'attempt_id'     => $attempt->id,
+                            'application_id' => $app->id,
+                            'recipient'      => $applicantEmail,
+                            'status'         => $updatedStatus,
+                        ]);
+                    }
                 }
             }
 
@@ -259,6 +303,10 @@ class TestEvaluationController extends Controller
             $successMsg = $isEmployeeAttempt
                 ? 'Penilaian essay karyawan berhasil disimpan dan total skor telah diperbarui.'
                 : 'Penilaian essay pelamar berhasil disimpan dan total skor telah diperbarui.';
+
+            if ($emailSent && !empty($applicantEmail)) {
+                $successMsg .= ' Notifikasi email status telah berhasil dikirim ke ' . $applicantEmail . '.';
+            }
 
             return redirect()->route($redirectRoute)
                 ->with('grade_success', $successMsg)

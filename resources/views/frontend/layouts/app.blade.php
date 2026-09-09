@@ -16,6 +16,24 @@
 
     <title>@yield('title', 'Mika Career | Temukan Karir Impian Masa Depanmu')</title>
 
+    <!-- Meta / SEO / OpenGraph Tags -->
+    @if(View::hasSection('meta'))
+        @yield('meta')
+    @else
+        <meta name="description" content="Platform rekrutmen digital terintegrasi untuk menemukan karir terbaik di PT Mitra Karya Analitika.">
+        <meta property="og:type" content="website">
+        <meta property="og:site_name" content="Mika Career">
+        <meta property="og:title" content="Mika Career | Temukan Karir Impian Masa Depanmu">
+        <meta property="og:description" content="Platform rekrutmen digital terintegrasi untuk menemukan karir terbaik di PT Mitra Karya Analitika.">
+        <meta property="og:image" content="{{ asset('images/mikaaaa.png') }}">
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="Mika Career | Temukan Karir Impian Masa Depanmu">
+        <meta name="twitter:description" content="Platform rekrutmen digital terintegrasi untuk menemukan karir terbaik di PT Mitra Karya Analitika.">
+        <meta name="twitter:image" content="{{ asset('images/mikaaaa.png') }}">
+    @endif
+    @stack('meta')
+
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('images/mikaaaa.png') }}">
 
