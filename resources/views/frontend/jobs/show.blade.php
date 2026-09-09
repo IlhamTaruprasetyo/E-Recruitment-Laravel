@@ -1,8 +1,51 @@
 @extends('frontend.layouts.app')
 
-@section('title', $job->title . ' - ' . ($job->company?->name ?? 'Perusahaan') . ' | MAKNA E-Recruitment')
+@section('title', $job->title . ' - ' . ($job->company?->name ?? 'Perusahaan') . ' | Mika Career')
+
+@section('meta')
+    @php
+        $metaPlainDesc = Str::limit(strip_tags($job->description ?? 'Lowongan kerja ' . $job->title . ' di ' . ($job->company?->name ?? 'PT Mitra Karya Analitika')), 160);
+        $metaShareUrl = url()->current();
+        $metaShareImage = $job->company?->logo_url 
+            ? (Str::startsWith($job->company->logo_url, ['http://', 'https://']) ? $job->company->logo_url : url($job->company->logo_url)) 
+            : asset('images/mikaaaa.png');
+    @endphp
+    <meta name="description" content="{{ $metaPlainDesc }}">
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="Mika Career">
+    <meta property="og:title" content="{{ $job->title }} - {{ $job->company?->name ?? 'PT Mitra Karya Analitika' }}">
+    <meta property="og:description" content="{{ $metaPlainDesc }}">
+    <meta property="og:image" content="{{ $metaShareImage }}">
+    <meta property="og:image:secure_url" content="{{ $metaShareImage }}">
+    <meta property="og:url" content="{{ $metaShareUrl }}">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $job->title }} - {{ $job->company?->name ?? 'PT Mitra Karya Analitika' }}">
+    <meta name="twitter:description" content="{{ $metaPlainDesc }}">
+    <meta name="twitter:image" content="{{ $metaShareImage }}">
+@endsection
 
 @section('content')
+@php
+    $companyName = $job->company?->name ?? 'PT Mitra Karya Analitika';
+    $currentShareUrl = url()->current();
+    $deadlineText = $job->deadline ? \Carbon\Carbon::parse($job->deadline)->format('d F Y') : 'Hingga kuota terpenuhi';
+    
+    // Pesan template WhatsApp resmi dan profesional tanpa emoji
+    $waMessage = "*INFORMASI LOWONGAN PEKERJAAN*\n\n" .
+                 "*Perusahaan*: " . $companyName . "\n" .
+                 "*Posisi*: " . $job->title . "\n" .
+                 ($job->department ? "*Departemen*: " . $job->department->name . "\n" : "") .
+                 "*Lokasi*: " . ($job->location ?? 'Indonesia') . "\n" .
+                 "*Tipe Pekerjaan*: " . ($job->employment_type ?? 'Full Time') . "\n" .
+                 "*Batas Akhir Pendaftaran*: " . $deadlineText . "\n\n" .
+                 "Informasi kualifikasi, deskripsi pekerjaan, dan pendaftaran dapat diakses melalui tautan resmi berikut:\n" .
+                 $currentShareUrl;
+                 
+    $waShareUrl = "https://api.whatsapp.com/send?text=" . rawurlencode($waMessage);
+    $linkedInShareUrl = "https://www.linkedin.com/sharing/share-offsite/?url=" . rawurlencode($currentShareUrl);
+@endphp
+
 <div class="relative py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
      x-data="{
          showConfirmModal: false,
@@ -11,12 +54,56 @@
          isMandatoryComplete: {{ ($isMandatoryComplete ?? false) ? 'true' : 'false' }},
          hasApplied: {{ ($hasApplied ?? false) ? 'true' : 'false' }},
          missingSections: {{ json_encode($missingMandatorySections ?? []) }},
+         shareCopied: false,
+         shareUrl: '{{ $currentShareUrl }}',
+         shareTitle: '{{ addslashes($job->title) }}',
          handleApplyClick() {
              if (this.hasApplied) return;
              if (!this.isMandatoryComplete) {
                  this.showIncompleteModal = true;
              } else {
                  this.showConfirmModal = true;
+             }
+         },
+         copyShareLink() {
+             const url = this.shareUrl;
+             if (navigator.clipboard && window.isSecureContext) {
+                 navigator.clipboard.writeText(url).then(() => {
+                     this.shareCopied = true;
+                     setTimeout(() => this.shareCopied = false, 2500);
+                 }).catch(() => {
+                     this.fallbackCopy(url);
+                 });
+             } else {
+                 this.fallbackCopy(url);
+             }
+         },
+         fallbackCopy(text) {
+             const textArea = document.createElement('textarea');
+             textArea.value = text;
+             textArea.style.position = 'fixed';
+             textArea.style.left = '-999999px';
+             document.body.appendChild(textArea);
+             textArea.focus();
+             textArea.select();
+             try {
+                 document.execCommand('copy');
+                 this.shareCopied = true;
+                 setTimeout(() => this.shareCopied = false, 2500);
+             } catch (e) {
+                 console.error('Copy failed', e);
+             }
+             document.body.removeChild(textArea);
+         },
+         shareNative() {
+             if (navigator.share) {
+                 navigator.share({
+                     title: this.shareTitle,
+                     text: 'Lowongan Kerja ' + this.shareTitle + ' di {{ addslashes($companyName) }}',
+                     url: this.shareUrl
+                 }).catch(() => {});
+             } else {
+                 this.copyShareLink();
              }
          }
      }">
@@ -135,8 +222,8 @@
             <!-- Job Header Card -->
             <div
                 class="reveal-on-scroll rounded-3xl bg-gradient-to-b from-[#061506] to-[#040804] border {{ $job->is_expired || $job->status !== 'Open' ? 'border-rose-500/30' : 'border-[#93F514]/30' }} p-6 sm:p-8 shadow-2xl {{ $job->is_expired || $job->status !== 'Open' ? 'shadow-rose-950/20' : 'shadow-[#93F514]/15' }}">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                    <div class="flex items-start gap-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div class="flex items-start gap-4 min-w-0 flex-1">
                         @if ($job->company?->logo_url)
                             <div
                                 class="w-16 h-16 rounded-2xl bg-[#051205] border border-[#93F514]/40 p-2 flex items-center justify-center shadow-lg shadow-[#93F514]/20 shrink-0 overflow-hidden">
@@ -149,7 +236,7 @@
                                 {{ strtoupper(substr($job->company?->name ?? 'M', 0, 2)) }}
                             </div>
                         @endif
-                        <div>
+                        <div class="min-w-0 flex-1">
                             <div class="flex flex-wrap items-center gap-2">
                                 <span
                                     class="px-3 py-1 rounded-full text-xs font-semibold bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514]">
@@ -169,89 +256,182 @@
                                     </span>
                                 @endif
                             </div>
-                            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#EEEEEE] mt-2">
+                            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#EEEEEE] mt-2 break-words">
                                 {{ $job->title }}
                             </h1>
-                            <p class="text-sm text-[#93F514] font-medium mt-1">
-                                {{ $job->company?->name ?? 'Perusahaan Mitra' }} &bull; <span
-                                    class="text-gray-400">{{ $job->department?->name ?? 'Umum' }}</span>
+                            <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-sm mt-2">
+                                <span class="text-[#93F514] font-semibold flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 text-[#93F514]/80 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                    </svg>
+                                    <span>{{ $job->company?->name ?? 'Perusahaan Mitra' }}</span>
+                                </span>
+
+                                <span class="text-gray-300 font-medium flex items-center gap-1.5">
+                                    <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                                    </svg>
+                                    <span>{{ $job->department?->name ?? 'Umum' }}</span>
+                                </span>
+
                                 @if ($job->position)
-                                    <span class="text-[#93F514]">Posisi: {{ $job->position->name }}</span>
+                                    <span class="inline-flex items-center text-xs px-2.5 py-0.5 rounded-full bg-[#93F514]/10 text-[#93F514] border border-[#93F514]/30 font-medium whitespace-nowrap">
+                                        Posisi: {{ $job->position->name }}
+                                    </span>
                                 @endif
-                            </p>
+                            </div>
                         </div>
                     </div>
 
-                    @if ($job->is_expired || $job->status !== 'Open')
-                        <!-- Status Tombol Ditutup -->
-                        <div class="flex items-center gap-2.5">
-                            <div class="px-5 py-3 rounded-xl bg-gray-900/90 border border-gray-700 text-gray-400 font-bold text-xs flex items-center gap-2 cursor-not-allowed shadow-inner select-none">
+                    <!-- Actions Container: Buttons + Share Dropdown (Rapi & Sejajar) -->
+                    <div class="flex items-center gap-2.5 sm:gap-3 shrink-0 w-full md:w-auto">
+                        @if ($job->is_expired || $job->status !== 'Open')
+                            <!-- Status Tombol Ditutup -->
+                            <div class="flex-1 md:flex-initial h-11 sm:h-12 px-5 rounded-2xl bg-gray-900/90 border border-gray-700 text-gray-400 font-bold text-xs sm:text-sm inline-flex items-center justify-center gap-2 cursor-not-allowed shadow-inner select-none whitespace-nowrap">
                                 <svg class="w-4 h-4 text-rose-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                                 </svg>
                                 <span>Pendaftaran Ditutup</span>
                             </div>
-                        </div>
-                    @else
-                        @auth
-                            @php
-                                $isAdminOrRecruiter =
-                                    auth()->user()->role_id == 1 ||
-                                    auth()->user()->role_id == 2 ||
-                                    in_array(strtolower(auth()->user()->role?->name ?? ''), [
-                                        'admin',
-                                        'superadmin',
-                                        'recruiter',
-                                    ]);
-                            @endphp
+                        @else
+                            @auth
+                                @php
+                                    $isAdminOrRecruiter =
+                                        auth()->user()->role_id == 1 ||
+                                        auth()->user()->role_id == 2 ||
+                                        in_array(strtolower(auth()->user()->role?->name ?? ''), [
+                                            'admin',
+                                            'superadmin',
+                                            'recruiter',
+                                        ]);
+                                @endphp
 
-                            @if ($isAdminOrRecruiter)
-                                <div class="flex flex-col sm:flex-row items-center gap-3">
+                                @if ($isAdminOrRecruiter)
                                     <div
-                                        class="px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold text-center flex items-center gap-2">
+                                        class="h-11 sm:h-12 px-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold inline-flex items-center justify-center gap-2">
                                         <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" viewBox="0 0 24 24"
                                             stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                         </svg>
-                                        <span>Akun {{ auth()->user()->role?->name ?? 'Admin/Staff' }} tidak dapat
-                                            melamar</span>
+                                        <span class="hidden sm:inline">Akun {{ auth()->user()->role?->name ?? 'Staff' }} tidak dapat melamar</span>
+                                        <span class="sm:hidden">Staff</span>
                                     </div>
                                     <a href="{{ auth()->user()->role_id == 2 || strtolower(auth()->user()->role?->name ?? '') === 'recruiter' ? route('recruiter.dashboard') : route('admin.dashboard') }}"
-                                        class="w-full sm:w-auto px-5 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white font-bold text-xs shadow-lg text-center transition">
-                                        Buka Dashboard
+                                        class="h-11 sm:h-12 px-5 rounded-2xl bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white font-bold text-xs sm:text-sm shadow-lg inline-flex items-center justify-center transition whitespace-nowrap">
+                                        Dashboard
                                     </a>
-                                </div>
-                            @elseif($hasApplied)
-                                <div class="flex items-center gap-2.5">
-                                    <div class="px-5 py-3 rounded-xl bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] font-bold text-xs flex items-center gap-2 shadow-lg shadow-[#93F514]/15">
-                                        <svg class="w-4 h-4 text-[#93F514]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                @elseif($hasApplied)
+                                    <div class="flex-1 md:flex-initial h-11 sm:h-12 px-4 sm:px-5 rounded-2xl bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] font-bold text-xs sm:text-sm inline-flex items-center justify-center gap-2 shadow-lg shadow-[#93F514]/10 select-none whitespace-nowrap">
+                                        <svg class="w-4 h-4 text-[#93F514] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                                         </svg>
                                         <span>Sudah Dilamar</span>
                                     </div>
                                     <a href="{{ route('profile', ['tab' => 'riwayat']) }}" 
-                                       class="px-4 py-3 rounded-xl bg-[#051405] hover:bg-[#93F514] border border-[#93F514]/30 text-white hover:text-black text-xs font-semibold shadow-md transition">
+                                       class="h-11 sm:h-12 px-4 sm:px-5 rounded-2xl bg-[#051405] hover:bg-[#93F514] border border-[#93F514]/30 text-white hover:text-black text-xs sm:text-sm font-semibold shadow-md transition inline-flex items-center justify-center whitespace-nowrap">
                                         <span>Pantau Status</span>
                                     </a>
-                                </div>
+                                @else
+                                    <button type="button" 
+                                            @click="handleApplyClick()"
+                                            class="flex-1 md:flex-initial h-11 sm:h-12 px-6 rounded-2xl bg-[#93F514] hover:bg-[#82dc0a] text-black font-extrabold text-sm sm:text-base shadow-lg shadow-[#93F514]/25 transition cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap active:scale-[0.98]">
+                                        <svg class="w-4 h-4 text-black shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                                        </svg>
+                                        <span>Lamar Posisi Ini</span>
+                                    </button>
+                                @endif
                             @else
+                                <a href="{{ route('login') }}"
+                                    class="flex-1 md:flex-initial h-11 sm:h-12 px-6 rounded-2xl bg-[#93F514] hover:bg-[#82dc0a] text-black font-extrabold text-sm sm:text-base shadow-lg shadow-[#93F514]/25 transition inline-flex items-center justify-center gap-2 whitespace-nowrap active:scale-[0.98]">
+                                    <span>Masuk & Lamar</span>
+                                </a>
+                            @endauth
+                        @endif
+
+                        <!-- Dropdown Bagikan (Sejajar dengan Lamar) -->
+                        <div class="relative shrink-0" x-data="{ openShare: false }" @click.outside="openShare = false">
+                            <button type="button" 
+                                    @click="openShare = !openShare"
+                                    class="h-11 sm:h-12 px-4 sm:px-5 rounded-2xl bg-white/5 hover:bg-white/10 border border-[#93F514]/30 hover:border-[#93F514] text-[#EEEEEE] hover:text-[#93F514] font-bold text-xs sm:text-sm transition inline-flex items-center justify-center gap-2 cursor-pointer shadow-sm group whitespace-nowrap active:scale-[0.98]"
+                                    :class="openShare ? 'border-[#93F514] text-[#93F514] bg-white/10 ring-2 ring-[#93F514]/20' : ''"
+                                    title="Bagikan Lowongan Ini">
+                                <svg class="w-4 h-4 text-[#93F514] shrink-0 transition group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                                </svg>
+                                <span>Bagikan</span>
+                                <svg class="w-3.5 h-3.5 text-gray-400 group-hover:text-[#93F514] transition-transform duration-200 shrink-0" :class="openShare ? 'rotate-180 text-[#93F514]' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+
+                            <!-- Dropdown Menu Popover -->
+                            <div x-show="openShare" 
+                                 x-cloak 
+                                 x-transition:enter="transition ease-out duration-150"
+                                 x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                                 x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                                 x-transition:leave="transition ease-in duration-100"
+                                 x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                                 x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
+                                 class="absolute right-0 mt-2 w-52 rounded-2xl bg-[#061506] border border-[#93F514]/30 shadow-2xl shadow-black/90 p-2 z-50 text-left backdrop-blur-xl">
+                                
+                                <div class="px-3 py-1.5 text-xs font-bold text-gray-200">
+                                    Bagikan Lowongan
+                                </div>
+                                <div class="h-px bg-white/10 mx-2 my-1"></div>
+
+                                <!-- Salin Tautan -->
                                 <button type="button" 
-                                        @click="handleApplyClick()"
-                                        class="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#93F514] hover:bg-[#82dc0a] text-black font-extrabold text-sm shadow-lg shadow-[#93F514]/25 text-center transition cursor-pointer flex items-center justify-center gap-2">
-                                    <svg class="w-4 h-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
-                                    </svg>
-                                    <span>Lamar Posisi Ini</span>
+                                        @click="copyShareLink(); setTimeout(() => openShare = false, 1200)"
+                                        class="w-full px-3 py-2.5 rounded-xl hover:bg-white/10 text-xs text-gray-300 hover:text-white flex items-center justify-between transition cursor-pointer group">
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="w-5 h-5 flex items-center justify-center shrink-0">
+                                            <template x-if="!shareCopied">
+                                                <svg class="w-4 h-4 text-gray-400 group-hover:text-[#93F514] transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                                </svg>
+                                            </template>
+                                            <template x-if="shareCopied">
+                                                <svg class="w-4 h-4 text-[#93F514]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </template>
+                                        </div>
+                                        <span class="font-medium" x-text="shareCopied ? 'Tautan disalin!' : 'Salin tautan'" :class="shareCopied ? 'text-[#93F514] font-bold' : ''"></span>
+                                    </div>
+                                    <template x-if="shareCopied">
+                                        <span class="text-[10px] px-1.5 py-0.5 rounded bg-[#93F514]/20 text-[#93F514] font-bold">Tersalin</span>
+                                    </template>
                                 </button>
-                            @endif
-                        @else
-                            <a href="{{ route('login') }}"
-                                class="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#93F514] hover:bg-[#82dc0a] text-black font-extrabold text-sm shadow-lg shadow-[#93F514]/25 text-center transition flex items-center justify-center gap-2">
-                                <span>Masuk & Lamar</span>
-                            </a>
-                        @endauth
-                    @endif
+
+                                <!-- WhatsApp -->
+                                <a href="{{ $waShareUrl }}" target="_blank" rel="noopener noreferrer"
+                                   @click="openShare = false"
+                                   class="w-full px-3 py-2.5 rounded-xl hover:bg-white/10 text-xs text-gray-300 hover:text-white flex items-center gap-2.5 transition group cursor-pointer">
+                                    <div class="w-5 h-5 flex items-center justify-center shrink-0">
+                                        <svg class="w-[16px] h-[16px] text-emerald-400 group-hover:scale-110 transition-transform" viewBox="0 0 16 16" fill="currentColor">
+                                            <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/>
+                                        </svg>
+                                    </div>
+                                    <span class="font-medium">WhatsApp</span>
+                                </a>
+
+                                <!-- LinkedIn -->
+                                <a href="{{ $linkedInShareUrl }}" target="_blank" rel="noopener noreferrer"
+                                   @click="openShare = false"
+                                   class="w-full px-3 py-2.5 rounded-xl hover:bg-white/10 text-xs text-gray-300 hover:text-white flex items-center gap-2.5 transition group cursor-pointer">
+                                    <div class="w-5 h-5 flex items-center justify-center shrink-0">
+                                        <svg class="w-4 h-4 text-[#0a66c2] group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
+                                        </svg>
+                                    </div>
+                                    <span class="font-medium">LinkedIn</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                     <!-- Info Highlights Grid -->
@@ -472,7 +652,7 @@
                                     <h4 class="text-xs font-bold text-[#EEEEEE] hover:text-[#93F514] transition truncate">
                                         {{ $rJob->title }}</h4>
                                     <span class="text-[11px] text-[#93F514]/80 block mt-1">{{ $rJob->company?->name }}
-                                        &bull; {{ $rJob->location }}</span>
+                                        {{ $rJob->location }}</span>
                                 </a>
                             @endforeach
                         </div>

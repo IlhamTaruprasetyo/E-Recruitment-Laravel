@@ -1,58 +1,314 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 💼 E-Recruitment System (Laravel & Livewire)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi web sistem rekrutmen terpadu, seleksi berkas, asesmen psikotes (DISC Test), dan manajemen kandidat berbasis **Laravel 12**, **Livewire 3**, dan **TailwindCSS**.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 📋 Daftar Isi
+- [Fitur Utama](#-fitur-utama)
+- [Teknologi yang Digunakan](#-teknologi-yang-digunakan)
+- [Persyaratan Sistem (Prerequisites)](#-persyaratan-sistem-prerequisites)
+- [Langkah-Langkah Instalasi (Dari Clone Sampai Running)](#-langkah-langkah-instalasi-dari-clone-sampai-running)
+  - [1. Clone Repository](#1-clone-repository)
+  - [2. Install Dependensi PHP (Composer)](#2-install-dependensi-php-composer)
+  - [3. Setup File Environment (.env)](#3-setup-file-environment-env)
+  - [4. Generate Application Key](#4-generate-application-key)
+  - [5. Konfigurasi Database](#5-konfigurasi-database)
+  - [6. Jalankan Migrasi & Database Seeder](#6-jalankan-migrasi--database-seeder)
+  - [7. Buat Storage Symlink](#7-buat-storage-symlink)
+  - [8. Install Dependensi Frontend & Build Asset](#8-install-dependensi-frontend--build-asset)
+  - [9. Menjalankan Aplikasi](#9-menjalankan-aplikasi)
+- [Akun Bawaan (Default Credentials)](#-akun-bawaan-default-credentials)
+- [Integrasi Antrean & Notifikasi (Queue & Mail)](#-integrasi-antrean--notifikasi-queue--mail)
+- [REST API Endpoints](#-rest-api-endpoints)
+- [Troubleshooting & Solusi Masalah Umum](#-troubleshooting--solusi-masalah-umum)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## ✨ Fitur Utama
+1. **Portal Karir Publik**: Menampilkan lowongan pekerjaan aktif, detail posisi, kriteria, dan pengajuan lamaran langsung.
+2. **Multi-Role User Dashboard**:
+   - **Admin / Superadmin**: Manajemen master data (perusahaan, departemen, posisi, jurusan, kategori tes, bank soal), pengguna, dan hak akses.
+   - **Recruiter**: Seleksi CV/berkas pelamar, pengelolaan kandidat, penilaian ujian/esai, generate laporan DISC (PDF), dan penjadwalan wawancara.
+   - **Applicant (Pelamar)**: Melengkapi profil/CV, apply lowongan kerja, melihat status lamaran, dan mengikuti ujian online.
+   - **Employee (Karyawan)**: Mengikuti asesmen & evaluasi berkala karyawan.
+3. **Modul Ujian & Asesmen Online**:
+   - Ujian berbasis waktu, multiple choice & essay.
+   - Bank soal dengan fitur import file Excel (Maatwebsite Excel).
+   - Kalkulasi otomatis hasil tes kepribadian **DISC** beserta download hasil laporan PDF.
+4. **Notifikasi Email**: Pemberitahuan otomatis status lamaran (Diterima, Wawancara, Ditolak) menggunakan antrean background (*queue*).
+5. **RESTful API**: Endpoint publik lowongan pekerjaan untuk integrasi dengan frontend eksternal (Next.js, Nuxt.js, mobile app).
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 🛠 Teknologi yang Digunakan
+- **Backend Framework**: [Laravel 12](https://laravel.com/)
+- **PHP Version**: PHP 8.3+
+- **Reactive UI**: [Laravel Livewire 3](https://livewire.laravel.com/) & [Livewire Volt](https://livewire.laravel.com/docs/volt)
+- **Frontend / Styling**: [TailwindCSS](https://tailwindcss.com/) & [Vite](https://vitejs.dev/)
+- **Authentication**: Laravel Breeze & Laravel Socialite (Google Login)
+- **PDF Generator**: [barryvdh/laravel-dompdf](https://github.com/barryvdh/laravel-dompdf)
+- **Excel Importer**: [maatwebsite/excel](https://maatwebsite.nl/laravel-excel)
+- **Database**: MySQL / MariaDB / SQLite
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## 💻 Persyaratan Sistem (Prerequisites)
+Pastikan komputer/laptop Anda telah terpasang:
+- **PHP**: Versi **8.3** atau lebih baru
+  - Ekstensi PHP wajib: `pdo_mysql`, `mbstring`, `openssl`, `fileinfo`, `gd` (atau `imagick`), `curl`, `xml`, `zip`
+- **Composer**: Versi **2.x** ([Download Composer](https://getcomposer.org/))
+- **Node.js & NPM**: Versi **18.x** atau **20.x+** ([Download Node.js](https://nodejs.org/))
+- **Web Server & Database**: Laragon / XAMPP / MySQL Server lokal
+- **Git**: Untuk cloning repository
 
-## Agentic Development
+---
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## 🚀 Langkah-Langkah Instalasi (Dari Clone Sampai Running)
+
+### 1. Clone Repository
+Buka terminal (PowerShell / Git Bash / Command Prompt), arahkan ke folder web server Anda (misal `c:\laragon\www`), lalu jalankan:
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone https://github.com/IlhamTaruprasetyo/E-Recruitment-Laravel.git
+cd E-Recruitment-Laravel
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+---
 
-## Contributing
+### 2. Install Dependensi PHP (Composer)
+Unduh seluruh package PHP yang dibutuhkan:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+composer install
+```
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 3. Setup File Environment (.env)
+Salin berkas template `.env.example` menjadi `.env`:
 
-## Security Vulnerabilities
+**Untuk Windows (PowerShell / CMD):**
+```powershell
+copy .env.example .env
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+**Untuk Git Bash / Linux / macOS:**
+```bash
+cp .env.example .env
+```
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 4. Generate Application Key
+Buat kunci enkripsi aplikasi:
+
+```bash
+php artisan key:generate
+```
+
+---
+
+### 5. Konfigurasi Database
+Buka file `.env` yang baru dibuat dengan teks editor (VS Code, dsb.) dan sesuaikan konfigurasi database:
+
+#### Opsi A: Menggunakan MySQL (Disarankan untuk Laragon / XAMPP)
+Buat database baru di phpMyAdmin atau HeidiSQL, misalnya bernama `e_recruitment`. Kemudian sesuaikan konfigurasi di `.env`:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=e_recruitment
+DB_USERNAME=root
+DB_PASSWORD=
+```
+*(Catatan: Jika menggunakan Laragon, password default MySQL biasanya kosong `""`)*
+
+#### Opsi B: Menggunakan SQLite
+Jika tidak ingin membuat database MySQL manual, Anda bisa menggunakan SQLite:
+```env
+DB_CONNECTION=sqlite
+```
+Lalu buat file database kosong:
+- Windows PowerShell: `New-Item database\database.sqlite -ItemType File`
+- Git Bash / Linux: `touch database/database.sqlite`
+
+---
+
+### 6. Jalankan Migrasi & Database Seeder
+Jalankan migrasi tabel beserta data awal (roles, default accounts, master data perusahaan, bank data pendidikan, jurusan, dan soal DISC):
+
+```bash
+php artisan migrate --seed
+```
+
+*(Opsional) Jika ingin menyertakan seeder pertanyaan DISC lengkap atau data master profil perusahaan:*
+```bash
+php artisan db:seed --class=DiscQuestionSeeder
+php artisan db:seed --class=CompanyProfileSeeder
+```
+
+---
+
+### 7. Buat Storage Symlink
+Aplikasi memerlukan symbolic link agar berkas berkas yang diunggah (CV dokumen PDF, foto profil, sertifikat) dapat diakses oleh publik:
+
+```bash
+php artisan storage:link
+```
+
+---
+
+### 8. Install Dependensi Frontend & Build Asset
+Install dependensi JavaScript & compile asset TailwindCSS menggunakan Vite:
+
+```bash
+npm install
+npm run build
+```
+
+---
+
+### 9. Menjalankan Aplikasi
+
+Anda dapat menjalankan aplikasi menggunakan salah satu cara berikut:
+
+#### Opsi A: Menjalankan Sekaligus (All-in-One Dev Runner - Direkomendasikan)
+Proyek ini dilengkapi script concurrently untuk menjalankan web server, antrean queue, log, dan Vite compiler sekaligus dalam satu terminal:
+
+```bash
+composer run dev
+```
+
+#### Opsi B: Menjalankan Secara Manual (Multi-Terminal)
+Buka 3 terminal terpisah pada direktori proyek:
+
+- **Terminal 1 (Web Server):**
+  ```bash
+  php artisan serve
+  ```
+  Aplikasi akan berjalan di: `http://localhost:8000`
+
+- **Terminal 2 (Vite Dev Server untuk Hot Reloading):**
+  ```bash
+  npm run dev
+  ```
+
+- **Terminal 3 (Worker Antrean Email & Background Job):**
+  ```bash
+  php artisan queue:listen
+  ```
+  *(Wajib dijalankan agar pengiriman email status seleksi lamaran dapat diproses)*
+
+Akses aplikasi di browser favorit Anda melalui:
+👉 **[http://localhost:8000](http://localhost:8000)** atau domain lokal Laragon Anda (misal: `http://e-recruitment-laravel.test`).
+
+---
+
+## 🔑 Akun Bawaan (Default Credentials)
+
+Setelah menjalankan `php artisan migrate --seed`, akun demo berikut otomatis tersedia untuk pengujian:
+
+| Role / Akses | Email | Password | Keterangan |
+| :--- | :--- | :--- | :--- |
+| **Admin / Superadmin** | `admin@mail.com` | `admin123` | Akses penuh dashboard manajemen, master data, dan user |
+| **Recruiter** | `recruiter@mail.com` | `recruiter123` | Akses seleksi pelamar, evaluasi ujian, DISC report, dan jadwal interview |
+| **Pelamar (Applicant)** | `ilham@gmail.com` | `ilham123` | Akses profil, CV preview, status lamaran, dan ujian online |
+
+> 💡 **Informasi Tambahan Pendaftaran Karyawan (Employee):**
+> Saat mendaftar sebagai Karyawan (Employee), sistem membutuhkan Passkey verifikasi. Nilai default yang diatur pada file `.env` adalah:
+> ```env
+> EMPLOYEE_REGISTRATION_PASSKEY=MIKA2026
+> ```
+
+---
+
+## 📬 Integrasi Antrean & Notifikasi (Queue & Mail)
+
+Aplikasi menggunakan antrean berbasis database untuk pengiriman email notifikasi pembaruan status lamaran (`ApplicationStatusUpdatedMail`).
+
+Pastikan variabel berikut ada pada file `.env`:
+```env
+QUEUE_CONNECTION=database
+```
+
+Untuk pengujian email lokal tanpa mengirim email nyata ke internet, atur:
+```env
+MAIL_MAILER=log
+```
+Setiap email yang dikirim akan dicatat pada file log `storage/logs/laravel.log`.
+
+Jika ingin menguji menggunakan **Mailtrap** atau **SMTP Gmail**:
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=sandbox.smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=your_mailtrap_username
+MAIL_PASSWORD=your_mailtrap_password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS="no-reply@e-recruitment.com"
+MAIL_FROM_NAME="${APP_NAME}"
+```
+
+---
+
+## 🌐 REST API Endpoints
+
+Aplikasi menyediakan endpoint REST API untuk integrasi data lowongan pekerjaan dengan client eksternal (misalnya Next.js / Mobile App):
+
+| Metode | Endpoint | Deskripsi |
+| :--- | :--- | :--- |
+| `GET` | `/api/v1/jobs` atau `/api/jobs` | Mengambil daftar lowongan pekerjaan aktif |
+| `GET` | `/api/v1/jobs/{id}` atau `/api/jobs/{id}` | Mengambil detail spesifik satu lowongan pekerjaan |
+| `GET` | `/api/v1/departments` | Mengambil daftar departemen perusahaan |
+
+---
+
+## 🧪 Menjalankan Pengujian (Testing)
+
+Proyek ini telah dilengkapi dengan unit test dan feature test menggunakan **Pest PHP**:
+
+```bash
+php artisan test
+```
+Atau:
+```bash
+composer test
+```
+
+---
+
+## ❓ Troubleshooting & Solusi Masalah Umum
+
+1. **Error: `Target class [xxx] does not exist` atau Class not found**
+   Jalankan:
+   ```bash
+   composer dump-autoload
+   php artisan optimize:clear
+   ```
+
+2. **File CV atau Foto Tidak Muncul (404 Not Found)**
+   Pastikan symbolic link storage sudah dibuat dengan benar:
+   ```bash
+   php artisan storage:link
+   ```
+   *Jika di Windows mengalami error akses symlink, jalankan terminal/PowerShell dengan mode "Run as Administrator".*
+
+3. **Status Lamaran Berubah tapi Email Tidak Terkirim**
+   Pastikan queue worker sedang aktif di terminal Anda:
+   ```bash
+   php artisan queue:listen
+   ```
+
+4. **Vite Manifest Missing / Tampilan Berantakan**
+   Pastikan asset sudah dibuild:
+   ```bash
+   npm run build
+   ```
+   atau jalankan `npm run dev` selama masa pengembangan.
+
+---
+
+## 📄 Lisensi
+Proyek ini dibuat untuk keperluan rekrutmen internal dan dirilis di bawah lisensi [MIT License](LICENSE).
