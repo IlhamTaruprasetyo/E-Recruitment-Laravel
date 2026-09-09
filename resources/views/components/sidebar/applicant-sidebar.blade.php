@@ -339,9 +339,7 @@
                                     </svg>
                                     @if ($hasUpcomingInterview)
                                         <span
-                                            class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-500 ring-2 ring-white dark:ring-gray-800 animate-ping"></span>
-                                        <span
-                                            class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-500 ring-2 ring-white dark:ring-gray-800"></span>
+                                            class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-500 ring-2 ring-white dark:ring-gray-800"></span>
                                     @endif
                                 </div>
                             </x-slot:icon>
@@ -349,12 +347,12 @@
                             <x-slot:append>
                                 @if ($hasUpcomingInterview)
                                     <span
-                                        class="px-2 py-0.5 text-[9px] font-black rounded-full bg-amber-400 text-gray-950 shadow-xs flex items-center gap-1 animate-pulse">
-                                        <span>Wawancara</span>
+                                        class="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-amber-50 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/80">
+                                        Wawancara
                                     </span>
                                 @elseif (!empty($applicationCount) && $applicationCount > 0)
                                     <span
-                                        class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
+                                        class="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 border border-indigo-200/80 dark:border-indigo-800/80">
                                         {{ $applicationCount }}
                                     </span>
                                 @endif

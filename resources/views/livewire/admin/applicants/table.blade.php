@@ -19,9 +19,11 @@
     statusData: {
         id: '',
         applicant_name: '',
+        applicant_email: '',
         job_title: '',
         status: '',
-        notes: ''
+        notes: '',
+        send_email: true
     },
     openDetailModal(application) {
         this.detailData = application;
@@ -39,9 +41,11 @@
         this.statusData = {
             id: data.id,
             applicant_name: data.applicant_name || (data.applicant_profile ? data.applicant_profile.full_name : 'Pelamar'),
+            applicant_email: data.applicant_email || (data.applicant_profile && data.applicant_profile.user ? data.applicant_profile.user.email : ''),
             job_title: data.job_title || (data.job ? data.job.title : 'Lowongan'),
             status: initialStatus,
-            notes: initialNotes
+            notes: initialNotes,
+            send_email: true
         };
         this.showStatusModal = true;
     },
@@ -497,6 +501,7 @@
                                         <button @click="openStatusModal({{ \Illuminate\Support\Js::from([
                                             'id' => $app->id,
                                             'applicant_name' => $app->applicantProfile->full_name ?? 'Pelamar',
+                                            'applicant_email' => $app->applicantProfile->user->email ?? '',
                                             'job_title' => $app->job->title ?? 'Lowongan',
                                             'status' => $app->status ?? 'Submitted',
                                             'notes' => $app->notes ?? '',
@@ -961,6 +966,7 @@
                         <button type="button" @click="showDetailModal = false; openStatusModal({
                             id: detailData.id,
                             applicant_name: detailData.applicant_profile ? detailData.applicant_profile.full_name : 'Pelamar',
+                            applicant_email: detailData.applicant_profile && detailData.applicant_profile.user ? detailData.applicant_profile.user.email : '',
                             job_title: detailData.job ? detailData.job.title : 'Lowongan',
                             status: detailData.status || 'Submitted',
                             notes: detailData.notes || ''
@@ -1006,8 +1012,18 @@
                         @method('PUT')
 
                         <div class="p-3 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200/60 dark:border-slate-700 text-xs">
-                            <span class="text-gray-400 block text-[11px]">Pelamar & Posisi</span>
-                            <span class="font-bold text-gray-900 dark:text-white block" x-text="statusData.applicant_name"></span>
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-gray-400 block text-[11px]">Pelamar & Posisi</span>
+                                <template x-if="statusData.applicant_email">
+                                    <span class="inline-flex items-center gap-1 text-[11px] text-indigo-600 dark:text-indigo-400 font-medium bg-indigo-50 dark:bg-indigo-950/50 px-2 py-0.5 rounded-md border border-indigo-200/60 dark:border-indigo-800/60 truncate max-w-[220px]" :title="statusData.applicant_email">
+                                        <svg class="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                        </svg>
+                                        <span class="truncate" x-text="statusData.applicant_email"></span>
+                                    </span>
+                                </template>
+                            </div>
+                            <span class="font-bold text-gray-900 dark:text-white block mt-0.5" x-text="statusData.applicant_name"></span>
                             <span class="text-indigo-600 dark:text-indigo-400 block text-[11px]" x-text="statusData.job_title"></span>
                         </div>
 
@@ -1078,6 +1094,25 @@
                                 </svg>
                                 <span>Pesan ini akan langsung dibaca pelamar pada menu <strong>Riwayat Lamaran</strong>.</span>
                             </p>
+                        </div>
+
+                        <!-- Email Notification Option -->
+                        <div class="p-3 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60">
+                            <label class="flex items-start gap-2.5 cursor-pointer select-none">
+                                <input type="hidden" name="send_email" value="0">
+                                <input type="checkbox" name="send_email" value="1" x-model="statusData.send_email" class="w-4 h-4 mt-0.5 text-indigo-600 rounded border-gray-300 dark:border-slate-600 focus:ring-indigo-500 transition">
+                                <div class="space-y-0.5">
+                                    <span class="text-xs font-semibold text-gray-900 dark:text-white flex items-center gap-1.5">
+                                        <svg class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                        </svg>
+                                        <span>Kirim notifikasi email otomatis ke pelamar</span>
+                                    </span>
+                                    <p class="text-[11px] text-gray-500 dark:text-slate-400 leading-tight">
+                                        Pelamar akan menerima email resmi berisi pemberitahuan status, instruksi pengerjaan tes/tahap berikutnya, dan tombol langsung ke sistem.
+                                    </p>
+                                </div>
+                            </label>
                         </div>
 
                         <!-- Modal Actions -->

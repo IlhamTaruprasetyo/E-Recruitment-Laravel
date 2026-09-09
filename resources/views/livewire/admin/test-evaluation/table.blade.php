@@ -6,9 +6,17 @@
 <div class="space-y-6" x-data="{ 
     showGradingModal: false,
     isSubmittingGrading: false,
+    statusTemplates: {
+        'Reviewed': 'Selamat! Anda lolos seleksi berkas administrasi. Silakan lanjut kerjakan ujian online yang tersedia pada menu Riwayat Lamaran.',
+        'Shortlisted': 'Selamat! Anda dinyatakan lolos tahap evaluasi ujian dan masuk ke dalam daftar kandidat terpilih (Shortlisted). Kami akan segera menginformasikan jadwal wawancara.',
+        'Interview': 'Anda diundang untuk mengikuti tahap wawancara kerja. Silakan periksa jadwal dan informasi meeting yang tertera pada akun Anda.',
+        'Accepted': 'Selamat! Anda dinyatakan DITERIMA untuk bergabung bersama kami. Tim HR akan segera menghubungi Anda terkait proses offering dan onboarding.',
+        'Rejected': 'Terima kasih atas partisipasi Anda dalam mengikuti rangkaian ujian seleksi. Saat ini hasil evaluasi belum sesuai dengan kriteria yang kami butuhkan. Tetap semangat dan sukses selalu.'
+    },
     gradingData: {
         id: '',
         applicant_name: '',
+        applicant_email: '',
         job_title: '',
         test_title: '',
         passing_score: 0,
@@ -16,18 +24,34 @@
         essay_score: 0,
         total_score: 0,
         status: '',
+        application_status: 'Reviewed',
+        application_notes: '',
+        send_email: true,
         answers: []
     },
 
     openGradingModal(att, isDisc = false) {
         let name = 'Pelamar';
+        let email = '';
         if (att.job_application && att.job_application.applicant_profile) {
             name = att.job_application.applicant_profile.full_name || 'Pelamar';
+            if (att.job_application.applicant_profile.user) {
+                email = att.job_application.applicant_profile.user.email || '';
+            }
+        }
+
+        const initialStatus = att.job_application ? (att.job_application.status || 'Reviewed') : 'Reviewed';
+        let initialNotes = att.job_application ? (att.job_application.notes || '') : '';
+
+        // Jika catatan masih kosong, gunakan template status default
+        if (!initialNotes && this.statusTemplates[initialStatus]) {
+            initialNotes = this.statusTemplates[initialStatus];
         }
 
         this.gradingData = {
             id: att.id,
             applicant_name: name,
+            applicant_email: email,
             job_title: att.job_application && att.job_application.job ? att.job_application.job.title : '-',
             test_title: att.test ? att.test.title : '-',
             passing_score: att.test ? att.test.passing_score : 0,
@@ -35,13 +59,35 @@
             essay_score: att.essay_score || 0,
             total_score: att.total_score || 0,
             status: att.status || 'in_progress',
-            application_status: att.job_application ? att.job_application.status : 'Reviewed',
-            application_notes: att.job_application ? (att.job_application.notes || '') : '',
+            application_status: initialStatus,
+            application_notes: initialNotes,
+            send_email: true,
             answers: att.answers || [],
             disc_result: att.disc_test_result || null,
             is_disc: isDisc
         };
         this.showGradingModal = true;
+    },
+
+    applyTemplate(statusKey) {
+        if (statusKey) {
+            this.gradingData.application_status = statusKey;
+        }
+        const targetStatus = statusKey || this.gradingData.application_status;
+        if (this.statusTemplates[targetStatus]) {
+            this.gradingData.application_notes = this.statusTemplates[targetStatus];
+        }
+    },
+
+    onStatusChange(newStatus) {
+        const currentNotes = (this.gradingData.application_notes || '').trim();
+        const isExistingTemplate = Object.values(this.statusTemplates).some(t => t.trim() === currentNotes);
+
+        if (!currentNotes || isExistingTemplate) {
+            if (this.statusTemplates[newStatus]) {
+                this.gradingData.application_notes = this.statusTemplates[newStatus];
+            }
+        }
     },
 
     calcY(score) {
@@ -861,18 +907,61 @@
                         </div>
 
                         <!-- KEPUTUSAN STATUS LAMARAN OLEH HR (ONE-STOP DECISION) -->
-                        <div class="mt-6 p-4 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800/60 space-y-3">
-                            <div class="flex items-center gap-2">
-                                <div class="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs font-bold shrink-0">
-                                    ✓
+                        <div class="mt-6 p-4 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800/60 space-y-3.5">
+                            <div class="flex items-center justify-between gap-2 flex-wrap">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs font-bold shrink-0">
+                                        ✓
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xs font-bold text-gray-900 dark:text-white">
+                                            Tindakan & Keputusan Status Lamaran
+                                        </h4>
+                                        <p class="text-[11px] text-gray-500 dark:text-slate-400">
+                                            Perbarui status lamaran kandidat secara langsung setelah evaluasi ujian selesai
+                                        </p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h4 class="text-xs font-bold text-gray-900 dark:text-white">
-                                        Tindakan & Keputusan Status Lamaran
-                                    </h4>
-                                    <p class="text-[11px] text-gray-500 dark:text-slate-400">
-                                        Perbarui status lamaran kandidat secara langsung setelah evaluasi ujian selesai
-                                    </p>
+
+                                <template x-if="gradingData.applicant_email">
+                                    <span class="inline-flex items-center gap-1 text-[11px] text-indigo-600 dark:text-indigo-400 font-medium bg-white dark:bg-slate-900 px-2.5 py-1 rounded-lg border border-indigo-200 dark:border-indigo-800 shadow-2xs">
+                                        <svg class="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                        </svg>
+                                        <span x-text="gradingData.applicant_email"></span>
+                                    </span>
+                                </template>
+                            </div>
+
+                            <!-- Pilihan Cepat / Template Pesan -->
+                            <div class="space-y-1.5 pt-1">
+                                <div class="flex items-center justify-between text-[11px]">
+                                    <span class="font-semibold text-gray-600 dark:text-slate-400 flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                        </svg>
+                                        <span>Pilihan Cepat / Template Keputusan:</span>
+                                    </span>
+                                    <button type="button" @click="gradingData.application_notes = ''" class="text-gray-400 hover:text-rose-500 transition text-[10px]">
+                                        Kosongkan
+                                    </button>
+                                </div>
+                                <div class="flex flex-wrap gap-1.5">
+                                    <button type="button" @click="applyTemplate('Reviewed')" class="px-2 py-1 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-200 dark:border-amber-800/80 rounded-lg text-[10px] font-semibold text-amber-800 dark:text-amber-300 transition flex items-center gap-1">
+                                        <span>Lolos Berkas & Lanjut Tes</span>
+                                    </button>
+                                    <button type="button" @click="applyTemplate('Shortlisted')" class="px-2 py-1 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 border border-indigo-200 dark:border-indigo-800/80 rounded-lg text-[10px] font-semibold text-indigo-700 dark:text-indigo-300 transition flex items-center gap-1">
+                                        <span>Lolos Ujian / Shortlisted</span>
+                                    </button>
+                                    <button type="button" @click="applyTemplate('Interview')" class="px-2 py-1 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800/80 rounded-lg text-[10px] font-semibold text-blue-700 dark:text-blue-300 transition flex items-center gap-1">
+                                        <span>Wawancara</span>
+                                    </button>
+                                    <button type="button" @click="applyTemplate('Accepted')" class="px-2 py-1 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-800/80 rounded-lg text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 transition flex items-center gap-1">
+                                        <span>Diterima</span>
+                                    </button>
+                                    <button type="button" @click="applyTemplate('Rejected')" class="px-2 py-1 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800/80 rounded-lg text-[10px] font-semibold text-rose-700 dark:text-rose-300 transition flex items-center gap-1">
+                                        <span>Ditolak</span>
+                                    </button>
                                 </div>
                             </div>
 
@@ -881,7 +970,7 @@
                                     <label for="eval_app_status" class="block text-[11px] font-bold text-gray-700 dark:text-slate-300 mb-1">
                                         Pilih Status Lamaran:
                                     </label>
-                                    <select name="application_status" id="eval_app_status" x-model="gradingData.application_status" class="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                    <select name="application_status" id="eval_app_status" x-model="gradingData.application_status" @change="onStatusChange($event.target.value)" class="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
                                         <option value="Reviewed">Reviewed (Lolos Berkas / Tahap Tes)</option>
                                         <option value="Shortlisted">Shortlisted (Lolos Ujian / Siap Wawancara)</option>
                                         <option value="Interview">Interview (Wawancara)</option>
@@ -891,11 +980,35 @@
                                 </div>
 
                                 <div>
-                                    <label for="eval_app_notes" class="block text-[11px] font-bold text-gray-700 dark:text-slate-300 mb-1">
-                                        Catatan / Feedback Evaluasi:
-                                    </label>
-                                    <input type="text" name="application_notes" id="eval_app_notes" x-model="gradingData.application_notes" placeholder="Contoh: Jawaban essay sangat analitis, siap dijadwalkan user interview..." class="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <label for="eval_app_notes" class="block text-[11px] font-bold text-gray-700 dark:text-slate-300">
+                                            Catatan / Feedback Evaluasi:
+                                        </label>
+                                        <button type="button" @click="applyTemplate()" class="text-[10px] text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-0.5">
+                                            <span>Terapkan Pesan</span>
+                                        </button>
+                                    </div>
+                                    <textarea name="application_notes" id="eval_app_notes" rows="2" x-model="gradingData.application_notes" placeholder="Tambahkan catatan evaluasi untuk pelamar ini..." class="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition leading-relaxed"></textarea>
                                 </div>
+                            </div>
+
+                            <!-- Opsi Kirim Email Notifikasi Otomatis -->
+                            <div class="p-3 rounded-xl bg-white dark:bg-slate-900 border border-indigo-100 dark:border-indigo-900/60 shadow-2xs">
+                                <label class="flex items-start gap-2.5 cursor-pointer select-none">
+                                    <input type="hidden" name="send_email" value="0">
+                                    <input type="checkbox" name="send_email" value="1" x-model="gradingData.send_email" class="w-4 h-4 mt-0.5 text-indigo-600 rounded border-gray-300 dark:border-slate-600 focus:ring-indigo-500 transition">
+                                    <div class="space-y-0.5">
+                                        <span class="text-xs font-semibold text-gray-900 dark:text-white flex items-center gap-1.5">
+                                            <svg class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                            </svg>
+                                            <span>Kirim notifikasi email otomatis ke pelamar</span>
+                                        </span>
+                                        <p class="text-[11px] text-gray-500 dark:text-slate-400 leading-tight">
+                                            Pelamar akan menerima email resmi berisi pembaruan status hasil evaluasi, pesan catatan di atas, dan langkah berikutnya.
+                                        </p>
+                                    </div>
+                                </label>
                             </div>
                         </div>
 
