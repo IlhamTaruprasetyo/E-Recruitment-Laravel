@@ -206,23 +206,6 @@ Akses aplikasi di browser favorit Anda melalui:
 
 ---
 
-## 🔑 Akun Bawaan (Default Credentials)
-
-Setelah menjalankan `php artisan migrate --seed`, akun demo berikut otomatis tersedia untuk pengujian:
-
-| Role / Akses | Email | Password | Keterangan |
-| :--- | :--- | :--- | :--- |
-| **Admin / Superadmin** | `admin@mail.com` | `admin123` | Akses penuh dashboard manajemen, master data, dan user |
-| **Recruiter** | `recruiter@mail.com` | `recruiter123` | Akses seleksi pelamar, evaluasi ujian, DISC report, dan jadwal interview |
-| **Pelamar (Applicant)** | `ilham@gmail.com` | `ilham123` | Akses profil, CV preview, status lamaran, dan ujian online |
-
-> 💡 **Informasi Tambahan Pendaftaran Karyawan (Employee):**
-> Saat mendaftar sebagai Karyawan (Employee), sistem membutuhkan Passkey verifikasi. Nilai default yang diatur pada file `.env` adalah:
-> ```env
-> EMPLOYEE_REGISTRATION_PASSKEY=MIKA2026
-> ```
-
----
 
 ## 📬 Integrasi Antrean & Notifikasi (Queue & Mail)
 
