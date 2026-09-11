@@ -129,6 +129,36 @@ new #[Layout('layouts.guest')] class extends Component {
 }; ?>
 
 <div class="w-full max-w-5xl mx-auto">
+    <!-- 4-Dot Loading Overlay saat Proses Daftar (Livewire Submission) -->
+    <div wire:loading.flex wire:target="register"
+        class="fixed inset-0 z-[100] bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center select-none transition-all">
+        <!-- 4-Dot Jumping Wave Loader (Sesuai Referensi, Tanpa Shadow) -->
+        <div class="flex items-center gap-3 h-10 px-2">
+            <span class="w-3.5 h-3.5 rounded-full bg-[#93F514] animate-dot-1 inline-block"></span>
+            <span class="w-3.5 h-3.5 rounded-full bg-[#93F514] animate-dot-2 inline-block"></span>
+            <span class="w-3.5 h-3.5 rounded-full bg-[#93F514] animate-dot-3 inline-block"></span>
+            <span class="w-3.5 h-3.5 rounded-full bg-[#93F514] animate-dot-4 inline-block"></span>
+        </div>
+        <p class="mt-2.5 text-xs font-semibold text-white tracking-wide">
+            <span class="text-[#93F514]">Mendaftarkan</span> Akun...
+        </p>
+    </div>
+
+    <!-- 4-Dot Loading Overlay saat Daftar Cepat dengan Google -->
+    <div id="google-auth-loader"
+        class="hidden fixed inset-0 z-[100] bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center select-none transition-all">
+        <!-- 4-Dot Jumping Wave Loader (Sesuai Referensi, Tanpa Shadow) -->
+        <div class="flex items-center gap-3 h-10 px-2">
+            <span class="w-3.5 h-3.5 rounded-full bg-[#93F514] animate-dot-1 inline-block"></span>
+            <span class="w-3.5 h-3.5 rounded-full bg-[#93F514] animate-dot-2 inline-block"></span>
+            <span class="w-3.5 h-3.5 rounded-full bg-[#93F514] animate-dot-3 inline-block"></span>
+            <span class="w-3.5 h-3.5 rounded-full bg-[#93F514] animate-dot-4 inline-block"></span>
+        </div>
+        <p class="mt-2.5 text-xs font-semibold text-white tracking-wide">
+            Memuat Daftar Google...
+        </p>
+    </div>
+
     <!-- Main 2-Column Card Container -->
     <div class="glass-card-main rounded-[2rem] sm:rounded-[2.5rem] p-3 sm:p-4 md:p-6 shadow-2xl relative overflow-hidden">
         
@@ -297,6 +327,7 @@ new #[Layout('layouts.guest')] class extends Component {
                 @if ($account_type === 'applicant')
                     <!-- Google Sign Up Button for Applicant -->
                     <a href="{{ route('auth.google') }}" 
+                       onclick="document.getElementById('google-auth-loader')?.classList.remove('hidden')"
                        class="w-full py-3 px-4 mb-4 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 active:scale-[0.99] text-white font-medium text-sm flex items-center justify-center gap-3 transition shadow-sm hover:border-white/30 group">
                         <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24">
                             <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>

@@ -1,6 +1,7 @@
 @extends('frontend.layouts.app')
 
-@section('title', 'Tentang Kami | ' . ($company->name ?? 'PT Mitra Karya Analitika'))
+{{-- @section('title', 'Tentang Kami | ' . ($company->name ?? 'PT Mitra Karya Analitika')) --}}
+@section('title', 'Tentang Kami | Mika Career')
 
 @section('content')
     <div class="relative overflow-hidden">
@@ -186,10 +187,10 @@
 
                         <!-- Slide Navigation Dots (Controls) -->
                         <div class="reveal-on-scroll pt-4 flex items-center gap-2.5" data-delay="300">
-                            <span class="text-xs text-gray-400 font-semibold mr-1">Dokumentasi:</span>
+                            <span class="text-xs text-gray-400 font-semibold mr-1 about-doc-label">Dokumentasi:</span>
                             <template x-for="(slide, index) in slides" :key="index">
                                 <button @click="goTo(index)"
-                                    :class="currentSlide === index ? 'w-8 bg-[#93F514]' : 'w-2.5 bg-white/20 hover:bg-white/40'"
+                                    :class="currentSlide === index ? 'w-8 bg-[#93F514] shadow-[0_0_12px_rgba(147,245,20,0.6)] about-dot-active' : 'w-2.5 bg-white/25 hover:bg-white/45 border border-white/10 about-dot-inactive'"
                                     class="h-2 rounded-full transition-all duration-300 cursor-pointer"
                                     :aria-label="'Slide ' + (index + 1)">
                                 </button>

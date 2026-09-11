@@ -1344,6 +1344,23 @@
             border-color: #2D6B00 !important;
         }
 
+        /* Slide Navigation Dots (Controls) in Light Mode */
+        html.light-mode .about-doc-label {
+            color: #4B5563 !important;
+        }
+
+        html.light-mode .about-dot-inactive {
+            background-color: rgba(45, 107, 0, 0.20) !important;
+        }
+
+        html.light-mode .about-dot-inactive:hover {
+            background-color: rgba(45, 107, 0, 0.40) !important;
+        }
+
+        html.light-mode .about-dot-active {
+            background-color: #2D6B00 !important;
+        }
+
         /* =====================================================
            TENTANG KAMI: VISI & MISI KAMI (LIGHT MODE)
         ===================================================== */
@@ -1622,6 +1639,145 @@
             color: #6B7280 !important;
         }
 
+        /* Group Detail button in light mode */
+        html.light-mode .group-company-card .group-detail-btn {
+            background-color: #EAF8DA !important;
+            border-color: rgba(45, 107, 0, 0.35) !important;
+            color: #2D6B00 !important;
+        }
+
+        html.light-mode .group-company-card .group-detail-btn:hover {
+            background-color: #93F514 !important;
+            border-color: #93F514 !important;
+            color: #000000 !important;
+            box-shadow: 0 4px 14px rgba(147, 245, 20, 0.40) !important;
+        }
+
+        /* Group Website icon button in light mode */
+        html.light-mode .group-company-card .group-website-icon-btn {
+            background-color: #F3F4F6 !important;
+            border-color: #E5E7EB !important;
+            color: #374151 !important;
+        }
+
+        html.light-mode .group-company-card .group-website-icon-btn:hover {
+            background-color: #EAF8DA !important;
+            border-color: rgba(45, 107, 0, 0.40) !important;
+            color: #2D6B00 !important;
+        }
+
+        /* =====================================================
+           HALAMAN DETAIL PROFIL PERUSAHAAN (LIGHT MODE)
+        ===================================================== */
+        html.light-mode .company-hero-card {
+            background: #FFFFFF !important;
+            background-image: none !important;
+            border-color: rgba(45, 107, 0, 0.20) !important;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(45, 107, 0, 0.04) !important;
+        }
+
+        html.light-mode .company-hero-card .company-name-heading {
+            color: #111827 !important;
+        }
+
+        html.light-mode .company-hero-card svg.text-\[\#93F514\] {
+            color: #2D6B00 !important;
+        }
+
+        html.light-mode .company-hero-card .text-gray-400 {
+            color: #4B5563 !important;
+        }
+
+        html.light-mode .company-hero-card .company-initial-avatar {
+            background: #EAF8DA !important;
+            border-color: rgba(45, 107, 0, 0.35) !important;
+            color: #2D6B00 !important;
+        }
+
+        html.light-mode .company-ecosystem-badge {
+            background-color: #EAF8DA !important;
+            border-color: rgba(45, 107, 0, 0.35) !important;
+            color: #2D6B00 !important;
+        }
+
+        html.light-mode .company-tagline-chip {
+            background-color: #F3F4F6 !important;
+            border-color: #E5E7EB !important;
+            color: #4B5563 !important;
+        }
+
+        html.light-mode .company-detail-card {
+            background: #FFFFFF !important;
+            border-color: rgba(45, 107, 0, 0.18) !important;
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        html.light-mode .company-detail-card h2,
+        html.light-mode .company-detail-card h3 {
+            color: #111827 !important;
+        }
+
+        html.light-mode .company-detail-card .company-about-text {
+            color: #374151 !important;
+            text-align: justify !important;
+        }
+
+        html.light-mode .company-vision-box {
+            background: #F6FCF0 !important;
+            border-color: rgba(45, 107, 0, 0.30) !important;
+        }
+
+        html.light-mode .company-vision-box p {
+            color: #1F2937 !important;
+        }
+
+        html.light-mode .company-mission-item,
+        html.light-mode .company-value-box,
+        html.light-mode .company-other-item {
+            background: #F9FAFB !important;
+            border-color: #E5E7EB !important;
+        }
+
+        html.light-mode .company-mission-item:hover,
+        html.light-mode .company-value-box:hover,
+        html.light-mode .company-other-item:hover {
+            border-color: rgba(45, 107, 0, 0.40) !important;
+            background: #F3F9EE !important;
+        }
+
+        html.light-mode .company-mission-item p,
+        html.light-mode .company-value-box p {
+            color: #4B5563 !important;
+        }
+
+        html.light-mode .company-job-item {
+            background: #FFFFFF !important;
+            border-color: rgba(45, 107, 0, 0.20) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        html.light-mode .company-job-item:hover {
+            border-color: #2D6B00 !important;
+            box-shadow: 0 8px 24px rgba(45, 107, 0, 0.12) !important;
+        }
+
+        html.light-mode .company-job-item h3 a {
+            color: #111827 !important;
+        }
+
+        html.light-mode .company-job-item h3 a:hover {
+            color: #2D6B00 !important;
+        }
+
+        html.light-mode .company-empty-jobs {
+            background: #F9FAFB !important;
+            border-color: #E5E7EB !important;
+        }
+
+        html.light-mode .company-empty-jobs h4 {
+            color: #111827 !important;
+        }
+
         /* =====================================================
            FOOTER: OFFICIAL WEBSITE BUTTON (LIGHT MODE)
         ===================================================== */
@@ -1659,6 +1815,103 @@
         html.light-mode footer .footer-official-btn:hover svg,
         html.light-mode footer a[title="Kunjungi Website Perusahaan"]:hover svg {
             color: #000000 !important;
+        }
+
+        /* =====================================================
+           JOB DETAIL (SHOW PAGE) - LIGHT MODE
+        ===================================================== */
+        /* Ikon Perusahaan di header atas lowongan: ubah jadi grey */
+        html.light-mode .company-icon,
+        html.light-mode .company-badge svg {
+            color: #9CA3AF !important;
+        }
+
+        /* Container Logo Perusahaan di header card */
+        html.light-mode .company-logo-box {
+            background-color: #FFFFFF !important;
+            border-color: #E5E7EB !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+        }
+
+        /* Deskripsi Pekerjaan & Kualifikasi: teks bold & heading jelas dan terbaca tajam */
+        html.light-mode .job-description-prose,
+        html.light-mode .job-description-prose.prose {
+            color: #374151 !important;
+            --tw-prose-body: #374151 !important;
+            --tw-prose-headings: #111827 !important;
+            --tw-prose-bold: #111827 !important;
+            --tw-prose-bullets: #2D6B00 !important;
+        }
+
+        html.light-mode .job-description-prose strong,
+        html.light-mode .job-description-prose b,
+        html.light-mode .prose strong,
+        html.light-mode [class*="[&_strong]:text-[#EEEEEE]"] strong {
+            color: #111827 !important;
+            font-weight: 700 !important;
+        }
+
+        html.light-mode .job-description-prose h1,
+        html.light-mode .job-description-prose h2,
+        html.light-mode .job-description-prose h3,
+        html.light-mode .job-description-prose h4,
+        html.light-mode [class*="[&_h2]:text-[#EEEEEE]"] h2,
+        html.light-mode [class*="[&_h3]:text-[#EEEEEE]"] h3 {
+            color: #111827 !important;
+            font-weight: 800 !important;
+        }
+
+        html.light-mode .job-description-prose p,
+        html.light-mode .job-description-prose li {
+            color: #374151 !important;
+        }
+
+        html.light-mode .job-description-prose ul > li::marker,
+        html.light-mode .job-description-prose ol > li::marker {
+            color: #2D6B00 !important;
+        }
+
+        /* Lowongan Terkait Lainnya: nama perusahaan ubah warna #2D6B00 */
+        html.light-mode .related-company-name {
+            color: #2D6B00 !important;
+            font-weight: 600 !important;
+        }
+
+        /* Admin Mode Banner & Dashboard Button di Light Mode */
+        html.light-mode .admin-preview-banner {
+            background-color: #FFFBEB !important;
+            border-color: rgba(245, 158, 11, 0.40) !important;
+            box-shadow: 0 1px 4px rgba(245, 158, 11, 0.08) !important;
+        }
+
+        html.light-mode .admin-preview-banner .text-amber-300 {
+            color: #92400E !important;
+        }
+
+        html.light-mode .admin-preview-banner .text-gray-300 {
+            color: #78350F !important;
+        }
+
+        html.light-mode .admin-preview-banner .bg-amber-500\/20 {
+            background-color: #FEF3C7 !important;
+            color: #B45309 !important;
+            border-color: rgba(245, 158, 11, 0.35) !important;
+        }
+
+        html.light-mode .admin-preview-banner a {
+            color: #92400E !important;
+        }
+
+        html.light-mode .admin-dashboard-btn {
+            background-color: #111827 !important;
+            border-color: #374151 !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+        }
+
+        html.light-mode .admin-dashboard-btn:hover {
+            background-color: #1F2937 !important;
+            border-color: #93F514 !important;
         }
 
         /* =====================================================
