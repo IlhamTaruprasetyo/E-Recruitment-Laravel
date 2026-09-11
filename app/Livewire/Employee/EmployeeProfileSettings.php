@@ -178,15 +178,22 @@ class EmployeeProfileSettings extends Component
 
         $profile->update($validatedData);
 
-        if ($user->name !== $this->full_name || $user->nik !== $this->nik) {
-            $user->update([
-                'name' => $this->full_name,
-                'nik' => $this->nik,
-            ]);
+        $userUpdates = [];
+        if ($user->name !== $this->full_name) {
+            $userUpdates['name'] = $this->full_name;
+        }
+        if ($user->nik !== $this->nik) {
+            $userUpdates['nik'] = $this->nik;
+        }
+        if (! empty($validatedData['photo'])) {
+            $userUpdates['avatar'] = $validatedData['photo'];
+        }
+        if (! empty($userUpdates)) {
+            $user->update($userUpdates);
         }
 
         session()->flash('employee_profile_message', 'Profil karyawan berhasil diperbarui.');
-        $this->dispatch('profile-updated', name: $this->full_name);
+        $this->dispatch('profile-updated', name: $this->full_name, photo: $this->current_photo_url);
     }
 
     public function render()

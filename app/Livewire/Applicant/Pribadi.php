@@ -198,12 +198,15 @@ class Pribadi extends Component
         if (! empty($this->nik) && $user->nik !== $this->nik) {
             $userUpdates['nik'] = $this->nik;
         }
+        if (! empty($validatedData['photo'])) {
+            $userUpdates['avatar'] = $validatedData['photo'];
+        }
         if (! empty($userUpdates)) {
             $user->update($userUpdates);
         }
 
         session()->flash('message', 'Data pribadi berhasil diperbarui.');
-        $this->dispatch('profile-updated', name: $this->full_name);
+        $this->dispatch('profile-updated', name: $this->full_name, photo: $this->current_photo_url);
     }
 
     public function deleteCv()

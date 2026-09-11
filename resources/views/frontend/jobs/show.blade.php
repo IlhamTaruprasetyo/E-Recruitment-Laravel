@@ -44,6 +44,16 @@
                  
     $waShareUrl = "https://api.whatsapp.com/send?text=" . rawurlencode($waMessage);
     $linkedInShareUrl = "https://www.linkedin.com/sharing/share-offsite/?url=" . rawurlencode($currentShareUrl);
+
+    $isAdminOrRecruiter = auth()->check() && (
+        auth()->user()->role_id == 1 ||
+        auth()->user()->role_id == 2 ||
+        in_array(strtolower(auth()->user()->role?->name ?? ''), [
+            'admin',
+            'superadmin',
+            'recruiter',
+        ])
+    );
 @endphp
 
 <div class="relative py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
@@ -222,11 +232,39 @@
             <!-- Job Header Card -->
             <div
                 class="reveal-on-scroll rounded-3xl bg-gradient-to-b from-[#061506] to-[#040804] border {{ $job->is_expired || $job->status !== 'Open' ? 'border-rose-500/30' : 'border-[#93F514]/30' }} p-6 sm:p-8 shadow-2xl {{ $job->is_expired || $job->status !== 'Open' ? 'shadow-rose-950/20' : 'shadow-[#93F514]/15' }}">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+
+                @if ($isAdminOrRecruiter)
+                    <!-- Notice Banner Khusus Admin / Recruiter -->
+                    <div class="admin-preview-banner mb-6 p-3.5 sm:p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-xs">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                                <svg class="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <span class="font-bold text-amber-300 block text-xs sm:text-sm">Mode Pratinjau ({{ auth()->user()->role?->name ?? 'Admin' }})</span>
+                                <span class="text-gray-300 text-[11px] sm:text-xs">Akun staf/pengelola aktif. Tombol lamaran pekerjaan dinonaktifkan untuk akun ini.</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+                            @if (Route::has('admin.job'))
+                                <a href="{{ route('admin.job') }}" class="px-3.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 font-bold text-xs transition flex items-center gap-1.5 whitespace-nowrap">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                    </svg>
+                                    <span>Kelola di Admin</span>
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                @endif
+
+                <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-6">
                     <div class="flex items-start gap-4 min-w-0 flex-1">
                         @if ($job->company?->logo_url)
                             <div
-                                class="w-16 h-16 rounded-2xl bg-[#051205] border border-[#93F514]/40 p-2 flex items-center justify-center shadow-lg shadow-[#93F514]/20 shrink-0 overflow-hidden">
+                                class="w-16 h-16 rounded-2xl bg-[#051205] border border-[#93F514]/40 p-2 flex items-center justify-center shadow-lg shadow-[#93F514]/20 shrink-0 overflow-hidden company-logo-box">
                                 <img src="{{ $job->company->logo_url }}" alt="{{ $job->company->name }}"
                                     class="w-full h-full object-contain">
                             </div>
@@ -256,12 +294,12 @@
                                     </span>
                                 @endif
                             </div>
-                            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#EEEEEE] mt-2 break-words">
+                            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#EEEEEE] mt-2 break-normal sm:break-words leading-tight">
                                 {{ $job->title }}
                             </h1>
                             <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-sm mt-2">
-                                <span class="text-[#93F514] font-semibold flex items-center gap-1.5">
-                                    <svg class="w-4 h-4 text-[#93F514]/80 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <span class="text-[#93F514] font-semibold flex items-center gap-1.5 company-badge whitespace-nowrap sm:whitespace-normal">
+                                    <svg class="w-4 h-4 text-[#93F514]/80 company-icon shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                     </svg>
                                     <span>{{ $job->company?->name ?? 'Perusahaan Mitra' }}</span>
@@ -284,7 +322,7 @@
                     </div>
 
                     <!-- Actions Container: Buttons + Share Dropdown (Rapi & Sejajar) -->
-                    <div class="flex items-center gap-2.5 sm:gap-3 shrink-0 w-full md:w-auto">
+                    <div class="flex items-center gap-2.5 sm:gap-3 shrink-0 flex-wrap sm:flex-nowrap">
                         @if ($job->is_expired || $job->status !== 'Open')
                             <!-- Status Tombol Ditutup -->
                             <div class="flex-1 md:flex-initial h-11 sm:h-12 px-5 rounded-2xl bg-gray-900/90 border border-gray-700 text-gray-400 font-bold text-xs sm:text-sm inline-flex items-center justify-center gap-2 cursor-not-allowed shadow-inner select-none whitespace-nowrap">
@@ -295,31 +333,13 @@
                             </div>
                         @else
                             @auth
-                                @php
-                                    $isAdminOrRecruiter =
-                                        auth()->user()->role_id == 1 ||
-                                        auth()->user()->role_id == 2 ||
-                                        in_array(strtolower(auth()->user()->role?->name ?? ''), [
-                                            'admin',
-                                            'superadmin',
-                                            'recruiter',
-                                        ]);
-                                @endphp
-
                                 @if ($isAdminOrRecruiter)
-                                    <div
-                                        class="h-11 sm:h-12 px-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold inline-flex items-center justify-center gap-2">
-                                        <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" viewBox="0 0 24 24"
-                                            stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                        </svg>
-                                        <span class="hidden sm:inline">Akun {{ auth()->user()->role?->name ?? 'Staff' }} tidak dapat melamar</span>
-                                        <span class="sm:hidden">Staff</span>
-                                    </div>
                                     <a href="{{ auth()->user()->role_id == 2 || strtolower(auth()->user()->role?->name ?? '') === 'recruiter' ? route('recruiter.dashboard') : route('admin.dashboard') }}"
-                                        class="h-11 sm:h-12 px-5 rounded-2xl bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white font-bold text-xs sm:text-sm shadow-lg inline-flex items-center justify-center transition whitespace-nowrap">
-                                        Dashboard
+                                        class="admin-dashboard-btn h-11 sm:h-12 px-5 rounded-2xl bg-gray-900 hover:bg-gray-800 border border-gray-700 hover:border-[#93F514]/50 text-white font-bold text-xs sm:text-sm shadow-md inline-flex items-center justify-center gap-2 transition whitespace-nowrap">
+                                        <svg class="w-4 h-4 text-[#93F514] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                                        </svg>
+                                        <span>Dashboard</span>
                                     </a>
                                 @elseif($hasApplied)
                                     <div class="flex-1 md:flex-initial h-11 sm:h-12 px-4 sm:px-5 rounded-2xl bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] font-bold text-xs sm:text-sm inline-flex items-center justify-center gap-2 shadow-lg shadow-[#93F514]/10 select-none whitespace-nowrap">
@@ -489,7 +509,7 @@
                     @if ($isHtml)
                         <!-- Rich Text HTML Content (Formatted with typography utilities) -->
                         <div
-                            class="prose prose-invert max-w-none text-sm text-gray-300 leading-relaxed space-y-3 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mt-1 [&_h2]:text-lg [&_h2]:font-extrabold [&_h2]:text-[#EEEEEE] [&_h3]:text-base [&_h3]:font-bold [&_h3]:text-[#EEEEEE] [&_strong]:text-[#EEEEEE] [&_p]:mb-3">
+                            class="prose prose-invert max-w-none text-sm text-gray-300 leading-relaxed space-y-3 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mt-1 [&_h2]:text-lg [&_h2]:font-extrabold [&_h2]:text-[#EEEEEE] [&_h3]:text-base [&_h3]:font-bold [&_h3]:text-[#EEEEEE] [&_strong]:text-[#EEEEEE] [&_p]:mb-3 job-description-prose">
                             {!! $rawDesc !!}
                         </div>
                     @else
@@ -576,6 +596,9 @@
                         Tentang Perusahaan
                     </h3>
                     <div class="flex items-center gap-3">
+                        @if ($job->company_id)
+                            <a href="{{ route('companies.show', $job->company_id) }}" class="shrink-0 transition hover:opacity-90">
+                        @endif
                         @if ($job->company?->logo_url)
                             <div
                                 class="w-12 h-12 rounded-xl bg-[#051205] border border-[#93F514]/40 p-1.5 flex items-center justify-center shrink-0 overflow-hidden shadow-md shadow-[#93F514]/15">
@@ -588,9 +611,19 @@
                                 {{ strtoupper(substr($job->company?->name ?? 'M', 0, 2)) }}
                             </div>
                         @endif
+                        @if ($job->company_id)
+                            </a>
+                        @endif
                         <div class="min-w-0 flex-1">
                             <h4 class="font-bold text-[#EEEEEE] text-sm truncate">
-                                {{ $job->company?->name ?? 'Perusahaan Mitra' }}</h4>
+                                @if ($job->company_id)
+                                    <a href="{{ route('companies.show', $job->company_id) }}" class="hover:text-[#93F514] transition">
+                                        {{ $job->company?->name ?? 'Perusahaan Mitra' }}
+                                    </a>
+                                @else
+                                    {{ $job->company?->name ?? 'Perusahaan Mitra' }}
+                                @endif
+                            </h4>
                             <span class="text-xs text-gray-400 block truncate">
                                 {{ implode(', ', array_filter([$job->company?->city, $job->company?->province])) ?: $job->company?->address ?? 'Indonesia' }}
                             </span>
@@ -611,34 +644,48 @@
                         </div>
                     @endif
 
-                    @if ($job->company?->website)
-                        @php
-                            $webUrl = Str::startsWith($job->company->website, ['http://', 'https://'])
-                                ? $job->company->website
-                                : 'https://' . $job->company->website;
-                            $displayWeb = preg_replace(
-                                '/^https?:\/\/(www\.)?/',
-                                '',
-                                rtrim($job->company->website, '/'),
-                            );
-                        @endphp
-                        <div class="pt-2">
+                    <!-- Tombol Aksi Profil & Website -->
+                    <div class="space-y-2 pt-2">
+                        @if ($job->company_id)
+                            <a href="{{ route('companies.show', $job->company_id) }}"
+                               class="w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-[#93F514]/15 border border-white/10 hover:border-[#93F514]/40 text-gray-200 hover:text-[#93F514] font-bold text-xs transition flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4 text-[#93F514]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                </svg>
+                                <span>Lihat Profil Perusahaan</span>
+                                <svg class="w-3.5 h-3.5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </a>
+                        @endif
+
+                        @if ($job->company?->website)
+                            @php
+                                $webUrl = Str::startsWith($job->company->website, ['http://', 'https://'])
+                                    ? $job->company->website
+                                    : 'https://' . $job->company->website;
+                                $displayWeb = preg_replace(
+                                    '/^https?:\/\/(www\.)?/',
+                                    '',
+                                    rtrim($job->company->website, '/'),
+                                );
+                            @endphp
                             <a href="{{ $webUrl }}" target="_blank" rel="noopener noreferrer"
-                                class="w-full py-2.5 px-4 rounded-xl bg-[#93F514]/10 hover:bg-[#93F514] border border-[#93F514]/40 text-[#93F514] hover:text-black font-bold text-xs transition flex items-center justify-center gap-2 group">
-                                <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none"
+                                class="w-full py-2 px-4 rounded-xl bg-[#93F514]/10 hover:bg-[#93F514] border border-[#93F514]/40 text-[#93F514] hover:text-black font-semibold text-xs transition flex items-center justify-center gap-2 group">
+                                <svg class="w-3.5 h-3.5 transition-transform group-hover:scale-110" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
                                 </svg>
                                 <span class="truncate">{{ $displayWeb }}</span>
-                                <svg class="w-3.5 h-3.5 opacity-70 group-hover:opacity-100" fill="none"
+                                <svg class="w-3 h-3 opacity-70 group-hover:opacity-100" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                 </svg>
                             </a>
-                        </div>
-                    @endif
+                        @endif
+                    </div>
                 </div>
 
                 <!-- Other Open Jobs -->
@@ -651,8 +698,13 @@
                                     class="block p-3.5 rounded-xl bg-[#030803] border border-[#93F514]/15 hover:border-[#93F514]/50 transition">
                                     <h4 class="text-xs font-bold text-[#EEEEEE] hover:text-[#93F514] transition truncate">
                                         {{ $rJob->title }}</h4>
-                                    <span class="text-[11px] text-[#93F514]/80 block mt-1">{{ $rJob->company?->name }}
-                                        {{ $rJob->location }}</span>
+                                    <div class="text-[11px] flex items-center gap-1.5 mt-1">
+                                        <span class="font-medium text-[#93F514]/80 related-company-name">{{ $rJob->company?->name }}</span>
+                                        @if ($rJob->location)
+                                            <span class="text-gray-400">•</span>
+                                            <span class="text-gray-400">{{ $rJob->location }}</span>
+                                        @endif
+                                    </div>
                                 </a>
                             @endforeach
                         </div>

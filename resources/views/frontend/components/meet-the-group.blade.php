@@ -57,16 +57,20 @@
                     <div>
                         <!-- Header Kartu: Logo & Tagline / Badge Kategori -->
                         <div class="flex items-start justify-between gap-3 mb-6 relative z-10">
-                            <!-- Logo / Initial Avatar -->
-                            @if($companyLogoUrl)
-                                <div class="w-14 h-14 rounded-2xl bg-white p-2 flex items-center justify-center border border-[#93F514]/30 shadow-md shrink-0 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-[#93F514]/20 transition-all duration-300">
-                                    <img src="{{ $companyLogoUrl }}" alt="{{ $companyItem->name }}" class="w-full h-full object-contain">
-                                </div>
-                            @else
-                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#93F514]/20 via-[#0a230a] to-[#040e04] border border-[#93F514]/40 flex items-center justify-center text-[#93F514] font-black text-lg sm:text-xl tracking-wider shrink-0 shadow-md group-hover:bg-[#93F514] group-hover:text-black group-hover:shadow-lg group-hover:shadow-[#93F514]/30 transition-all duration-300 group-initial-avatar">
-                                    {{ $companyInitial }}
-                                </div>
-                            @endif
+                            <!-- Logo / Initial Avatar (Klik ke Detail Perusahaan) -->
+                            <a href="{{ route('companies.show', $companyItem->id) }}" 
+                               class="shrink-0 transition-transform duration-300 hover:scale-105"
+                               title="Lihat profil {{ $companyItem->name }}">
+                                @if($companyLogoUrl)
+                                    <div class="w-14 h-14 rounded-2xl bg-white p-2 flex items-center justify-center border border-[#93F514]/30 shadow-md group-hover:border-[#93F514] group-hover:shadow-lg group-hover:shadow-[#93F514]/20 transition-all duration-300">
+                                        <img src="{{ $companyLogoUrl }}" alt="{{ $companyItem->name }}" class="w-full h-full object-contain">
+                                    </div>
+                                @else
+                                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#93F514]/20 via-[#0a230a] to-[#040e04] border border-[#93F514]/40 flex items-center justify-center text-[#93F514] font-black text-lg sm:text-xl tracking-wider shadow-md group-hover:bg-[#93F514] group-hover:text-black group-hover:shadow-lg group-hover:shadow-[#93F514]/30 transition-all duration-300 group-initial-avatar">
+                                        {{ $companyInitial }}
+                                    </div>
+                                @endif
+                            </a>
 
                             <!-- Tagline / Badge Kategori -->
                             @if($companyItem->tagline)
@@ -80,9 +84,15 @@
                             @endif
                         </div>
 
-                        <!-- Nama Perusahaan -->
+                        <!-- Nama Perusahaan (Tautan ke Detail Profil) -->
                         <h3 class="text-lg sm:text-xl font-extrabold text-[#EEEEEE] group-hover:text-[#93F514] transition-colors duration-200 mb-3 relative z-10">
-                            {{ $companyItem->name }}
+                            <a href="{{ route('companies.show', $companyItem->id) }}" 
+                               class="hover:underline flex items-center justify-between gap-2">
+                                <span>{{ $companyItem->name }}</span>
+                                <svg class="w-4 h-4 text-[#93F514] opacity-0 group-hover:opacity-100 transition-all duration-200 -translate-x-1 group-hover:translate-x-0 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </a>
                         </h3>
 
                         <!-- Deskripsi Singkat -->
@@ -91,7 +101,7 @@
                         </p>
                     </div>
 
-                    <!-- Footer Kartu: Lokasi & Tombol/Link Website -->
+                    <!-- Footer Kartu: Lokasi & Tombol Aksi (Detail & Website) -->
                     <div class="mt-8 pt-5 border-t border-[#93F514]/15 flex items-center justify-between gap-3 relative z-10">
                         <!-- Indikator Lokasi -->
                         <div class="text-[11px] sm:text-xs text-gray-400 flex items-center gap-1.5 truncate">
@@ -102,21 +112,26 @@
                             <span class="truncate">{{ $companyItem->city ?? 'Semarang' }}</span>
                         </div>
 
-                        <!-- Tombol Kunjungi Website / Status Sinergi -->
-                        @if($companyWebUrl)
-                            <a href="{{ $companyWebUrl }}" target="_blank" rel="noopener noreferrer" 
-                               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#93F514]/10 hover:bg-[#93F514] text-[#93F514] hover:text-black border border-[#93F514]/30 hover:border-[#93F514] font-bold text-xs transition-all duration-200 shadow-sm shrink-0 group/btn group-website-btn">
-                                <span>Kunjungi Website</span>
-                                <svg class="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        <!-- Aksi: Detail Profil & Website -->
+                        <div class="flex items-center gap-2 shrink-0">
+                            <a href="{{ route('companies.show', $companyItem->id) }}" 
+                               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#93F514]/10 hover:bg-[#93F514] text-[#93F514] hover:text-black border border-[#93F514]/30 hover:border-[#93F514] font-bold text-xs transition-all duration-200 shadow-sm shrink-0 group/btn group-detail-btn">
+                                <span>Detail</span>
+                                <svg class="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 5l7 7-7 7" />
                                 </svg>
                             </a>
-                        @else
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/5 border border-white/10 text-gray-400 text-[11px] font-semibold shrink-0 group-sinergi-badge">
-                                {{-- <span class="w-1.5 h-1.5 rounded-full bg-[#93F514]/60"></span> --}}
-                                <span>Sinergi Grup</span>
-                            </span>
-                        @endif
+
+                            @if($companyWebUrl)
+                                <a href="{{ $companyWebUrl }}" target="_blank" rel="noopener noreferrer" 
+                                   title="Kunjungi Website Resmi: {{ $companyItem->name }}"
+                                   class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 hover:border-[#93F514]/40 transition-all duration-200 shadow-sm shrink-0 group-website-icon-btn">
+                                    <svg class="w-3.5 h-3.5 text-[#93F514]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                    </svg>
+                                </a>
+                            @endif
+                        </div>
                     </div>
                 </div>
             @endforeach

@@ -73,11 +73,82 @@
             background: linear-gradient(145deg, #071f08 0%, #0d3810 50%, #155e1b 100%);
             border: 1px solid rgba(147, 245, 20, 0.3);
         }
+
+        /* 4-Dot Jumping Wave Animation (Clean flat, no shadow/glow) */
+        @keyframes mikaDotBounce {
+            0%, 80%, 100% {
+                transform: translateY(0);
+                opacity: 0.45;
+            }
+            40% {
+                transform: translateY(-16px);
+                opacity: 1;
+            }
+        }
+        .animate-dot-1 {
+            animation: mikaDotBounce 1.3s infinite ease-in-out;
+            animation-delay: 0s;
+        }
+        .animate-dot-2 {
+            animation: mikaDotBounce 1.3s infinite ease-in-out;
+            animation-delay: 0.16s;
+        }
+        .animate-dot-3 {
+            animation: mikaDotBounce 1.3s infinite ease-in-out;
+            animation-delay: 0.32s;
+        }
+        .animate-dot-4 {
+            animation: mikaDotBounce 1.3s infinite ease-in-out;
+            animation-delay: 0.48s;
+        }
     </style>
 </head>
 
 <body class="font-sans antialiased text-[#EEEEEE] bg-[#040904] min-h-screen relative overflow-x-hidden selection:bg-[#93F514] selection:text-black flex items-center justify-center p-3 sm:p-6 lg:p-10">
     
+    @if(request()->routeIs('login') || request()->routeIs('register'))
+        <!-- 4-Dot Loading Overlay saat memuat Halaman Masuk & Daftar -->
+        <div id="auth-page-loader"
+            class="fixed inset-0 z-[100] bg-[#040904]/85 backdrop-blur-[2px] flex flex-col items-center justify-center select-none transition-opacity duration-300">
+            <!-- 4-Dot Jumping Wave Loader (Sesuai Referensi, Tanpa Shadow) -->
+            <div class="flex items-center gap-3 h-10 px-2">
+                <span class="w-3.5 h-3.5 rounded-full bg-[#93F514] animate-dot-1 inline-block"></span>
+                <span class="w-3.5 h-3.5 rounded-full bg-[#93F514] animate-dot-2 inline-block"></span>
+                <span class="w-3.5 h-3.5 rounded-full bg-[#93F514] animate-dot-3 inline-block"></span>
+                <span class="w-3.5 h-3.5 rounded-full bg-[#93F514] animate-dot-4 inline-block"></span>
+            </div>
+            <p class="mt-2.5 text-xs font-semibold text-white tracking-wide">
+                {{ request()->routeIs('login') ? 'Memuat Halaman Masuk...' : 'Memuat Halaman Pendaftaran...' }}
+            </p>
+        </div>
+
+        <script>
+            (function() {
+                const hideAuthLoader = function() {
+                    const loader = document.getElementById('auth-page-loader');
+                    if (loader) {
+                        loader.style.opacity = '0';
+                        loader.style.pointerEvents = 'none';
+                        setTimeout(function() {
+                            if (loader && loader.parentNode) {
+                                loader.parentNode.removeChild(loader);
+                            }
+                        }, 300);
+                    }
+                };
+
+                if (document.readyState === 'complete') {
+                    setTimeout(hideAuthLoader, 120);
+                } else {
+                    window.addEventListener('load', function() {
+                        setTimeout(hideAuthLoader, 160);
+                    });
+                    setTimeout(hideAuthLoader, 1500);
+                }
+            })();
+        </script>
+    @endif
+
     <!-- Background Ambient Glows & Grid Pattern -->
     <div class="fixed inset-0 bg-grid-pattern pointer-events-none z-0"></div>
     <div class="fixed top-[-10%] left-[10%] w-[500px] sm:w-[700px] h-[500px] sm:h-[700px] rounded-full bg-[#93F514]/12 blur-[130px] pointer-events-none animate-pulse-glow z-0"></div>

@@ -58,12 +58,12 @@ new class extends Component
     };
     
     $photoUrl = null;
-    if (!empty($user->avatar)) {
-        $photoUrl = \Illuminate\Support\Str::startsWith($user->avatar, ['http://', 'https://']) ? $user->avatar : asset('storage/' . $user->avatar);
-    } elseif ($profile && !empty($profile->photo)) {
-        $photoUrl = asset('storage/' . $profile->photo);
+    if ($profile && !empty($profile->photo)) {
+        $photoUrl = \Illuminate\Support\Str::startsWith($profile->photo, ['http://', 'https://']) ? $profile->photo : asset('storage/' . $profile->photo);
     } elseif ($user?->applicantProfile && !empty($user->applicantProfile->photo)) {
-        $photoUrl = asset('storage/' . $user->applicantProfile->photo);
+        $photoUrl = \Illuminate\Support\Str::startsWith($user->applicantProfile->photo, ['http://', 'https://']) ? $user->applicantProfile->photo : asset('storage/' . $user->applicantProfile->photo);
+    } elseif (!empty($user->avatar)) {
+        $photoUrl = \Illuminate\Support\Str::startsWith($user->avatar, ['http://', 'https://']) ? $user->avatar : asset('storage/' . $user->avatar);
     }
 
     $displayName = match(true) {
@@ -81,13 +81,18 @@ new class extends Component
             <x-dropdown align="right" width="56">
                 <x-slot name="trigger">
                     <button class="inline-flex items-center gap-2.5 px-3 py-1.5 border border-gray-200 dark:border-gray-700/80 rounded-full text-sm font-semibold text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/60 focus:outline-none transition shadow-2xs group">
-                        @if ($photoUrl)
-                            <img src="{{ $photoUrl }}" alt="{{ $displayName }}" class="w-8 h-8 rounded-full object-cover ring-2 ring-indigo-500/20 group-hover:ring-indigo-500/50 transition">
-                        @else
-                            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-xs shadow-2xs">
-                                {{ $userInitial }}
-                            </div>
-                        @endif
+                        <div x-data="{{ json_encode(['photo' => $photoUrl, 'initial' => $userInitial]) }}"
+                             x-on:profile-updated.window="if ($event.detail && $event.detail.photo) photo = $event.detail.photo"
+                             class="shrink-0 flex items-center justify-center">
+                            <template x-if="photo">
+                                <img :src="photo" alt="{{ $displayName }}" class="w-8 h-8 rounded-full object-cover ring-2 ring-indigo-500/20 group-hover:ring-indigo-500/50 transition">
+                            </template>
+                            <template x-if="!photo">
+                                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-xs shadow-2xs">
+                                    <span x-text="initial"></span>
+                                </div>
+                            </template>
+                        </div>
 
                         <div class="text-left leading-tight max-w-[150px] truncate">
                             <span class="block text-xs font-bold text-gray-800 dark:text-gray-200 truncate" x-data="{{ json_encode(['name' => $displayName]) }}" x-text="name" x-on:profile-updated.window="if ($event.detail && $event.detail.name) name = $event.detail.name"></span>
@@ -169,13 +174,18 @@ new class extends Component
         <!-- Responsive Settings Options -->
         <div class="pt-3.5 pb-2">
             <div class="px-4 pb-3 flex items-center gap-3 border-b border-gray-100 dark:border-gray-700/80">
-                @if ($photoUrl)
-                    <img src="{{ $photoUrl }}" alt="{{ $displayName }}" class="w-10 h-10 rounded-full object-cover ring-2 ring-indigo-500/20 shrink-0">
-                @else
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
-                        {{ $userInitial }}
-                    </div>
-                @endif
+                <div x-data="{{ json_encode(['photo' => $photoUrl, 'initial' => $userInitial]) }}"
+                     x-on:profile-updated.window="if ($event.detail && $event.detail.photo) photo = $event.detail.photo"
+                     class="shrink-0 flex items-center justify-center">
+                    <template x-if="photo">
+                        <img :src="photo" alt="{{ $displayName }}" class="w-10 h-10 rounded-full object-cover ring-2 ring-indigo-500/20 shrink-0">
+                    </template>
+                    <template x-if="!photo">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
+                            <span x-text="initial"></span>
+                        </div>
+                    </template>
+                </div>
                 <div class="min-w-0 flex-1">
                     <div class="font-bold text-sm text-gray-900 dark:text-white truncate" x-data="{{ json_encode(['name' => $displayName]) }}" x-text="name" x-on:profile-updated.window="if ($event.detail && $event.detail.name) name = $event.detail.name"></div>
                     <div class="flex items-center gap-2 mt-0.5">

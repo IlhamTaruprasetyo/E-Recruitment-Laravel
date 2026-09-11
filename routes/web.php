@@ -6,6 +6,7 @@ use App\Http\Controllers\CvController;
 use App\Http\Controllers\DegreeController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeTestController;
+use App\Http\Controllers\FrontendCompanyController;
 use App\Http\Controllers\FrontendJobController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InterviewScheduleController;
@@ -26,6 +27,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('tentang-kami', [AboutController::class, 'index'])->name('about');
+Route::get('perusahaan/{id}', [FrontendCompanyController::class, 'show'])->name('companies.show');
 Route::get('lowongan', [FrontendJobController::class, 'index'])->name('jobs.index');
 Route::get('lowongan/{id}', [FrontendJobController::class, 'show'])->name('jobs.show');
 Route::post('lowongan/{id}/apply', [JobApplicationController::class, 'store'])->middleware(['auth'])->name('jobs.apply');
