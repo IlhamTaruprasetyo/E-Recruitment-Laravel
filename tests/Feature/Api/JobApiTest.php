@@ -169,3 +169,86 @@ test('it returns 404 for non-existent or closed job detail', function () {
     $response->assertStatus(404)
         ->assertJson(['success' => false]);
 });
+
+test('it returns companies with active jobs count', function () {
+    Job::create([
+        'company_id' => $this->company->id,
+        'department_id' => $this->department->id,
+        'title' => 'Backend Engineer',
+        'description' => 'Laravel REST API',
+        'employment_type' => 'Full-time',
+        'location' => 'Jakarta',
+        'quota' => 1,
+        'deadline' => Carbon::now()->addDays(10)->toDateString(),
+        'status' => 'Open',
+    ]);
+
+    // Company without active jobs (should not appear)
+    $emptyCompany = Company::create([
+        'name' => 'PT Kosong Tanpa Lowongan',
+        'city' => 'Bandung',
+    ]);
+
+    $response = $this->getJson('/api/v1/companies');
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'success' => true,
+        ])
+        ->assertJsonStructure([
+            'success',
+            'data' => [
+                '*' => ['id', 'name', 'logo', 'city', 'province', 'jobs_count'],
+            ],
+        ]);
+
+    $companies = collect($response->json('data'));
+    expect($companies->pluck('name'))->toContain('PT Teknologi Nusantara');
+    expect($companies->pluck('name'))->not->toContain('PT Kosong Tanpa Lowongan');
+});
+
+test('it returns job types with active jobs count', function () {
+    Job::create([
+        'company_id' => $this->company->id,
+        'department_id' => $this->department->id,
+        'title' => 'Backend Engineer',
+        'description' => 'Laravel REST API',
+        'employment_type' => 'Full-time',
+        'location' => 'Jakarta',
+        'quota' => 1,
+        'deadline' => Carbon::now()->addDays(10)->toDateString(),
+        'status' => 'Open',
+    ]);
+
+    Job::create([
+        'company_id' => $this->company->id,
+        'department_id' => $this->department->id,
+        'title' => 'Internship Frontend',
+        'description' => 'Vue/React intern',
+        'employment_type' => 'Internship',
+        'location' => 'Jakarta',
+        'quota' => 2,
+        'deadline' => Carbon::now()->addDays(10)->toDateString(),
+        'status' => 'Open',
+    ]);
+
+    $response = $this->getJson('/api/v1/job-types');
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'success' => true,
+        ])
+        ->assertJsonStructure([
+            'success',
+            'data' => [
+                '*' => ['name', 'jobs_count'],
+            ],
+        ]);
+
+    $types = collect($response->json('data'));
+    expect($types->pluck('name'))->toContain('Full-time', 'Internship');
+
+    // Test alias tanpa prefix v1
+    $aliasResponse = $this->getJson('/api/job-types');
+    $aliasResponse->assertStatus(200);
+});
