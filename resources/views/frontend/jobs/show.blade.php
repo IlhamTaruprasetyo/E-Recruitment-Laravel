@@ -264,7 +264,7 @@
                     <div class="flex items-start gap-4 min-w-0 flex-1">
                         @if ($job->company?->logo_url)
                             <div
-                                class="w-16 h-16 rounded-2xl bg-[#051205] border border-[#93F514]/40 p-2 flex items-center justify-center shadow-lg shadow-[#93F514]/20 shrink-0 overflow-hidden company-logo-box">
+                                class="w-16 h-16 rounded-2xl bg-white border border-[#93F514]/40 p-2 flex items-center justify-center shadow-lg shadow-[#93F514]/20 shrink-0 overflow-hidden company-logo-box">
                                 <img src="{{ $job->company->logo_url }}" alt="{{ $job->company->name }}"
                                     class="w-full h-full object-contain">
                             </div>
@@ -601,7 +601,7 @@
                         @endif
                         @if ($job->company?->logo_url)
                             <div
-                                class="w-12 h-12 rounded-xl bg-[#051205] border border-[#93F514]/40 p-1.5 flex items-center justify-center shrink-0 overflow-hidden shadow-md shadow-[#93F514]/15">
+                                class="w-12 h-12 rounded-xl bg-white border border-[#93F514]/40 p-1.5 flex items-center justify-center shrink-0 overflow-hidden shadow-md shadow-[#93F514]/15">
                                 <img src="{{ $job->company->logo_url }}" alt="{{ $job->company->name }}"
                                     class="w-full h-full object-contain">
                             </div>
