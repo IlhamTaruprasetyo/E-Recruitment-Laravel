@@ -40,7 +40,7 @@ class JobResource extends JsonResource
                 return $this->company ? [
                     'id' => $this->company->id,
                     'name' => $this->company->name,
-                    'logo' => $this->company->logo ? asset('storage/' . $this->company->logo) : null,
+                    'logo' => $this->company->logo ? (str_starts_with($this->company->logo, 'http') ? $this->company->logo : asset('storage/' . $this->company->logo)) : null,
                     'website' => $this->company->website,
                     'city' => $this->company->city,
                     'province' => $this->company->province,

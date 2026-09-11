@@ -19,8 +19,15 @@ Route::prefix('v1')->group(function () {
     Route::get('/jobs', [JobApiController::class, 'index']);
     Route::get('/jobs/{id}', [JobApiController::class, 'show']);
     Route::get('/departments', [JobApiController::class, 'departments']);
+    Route::get('/companies', [JobApiController::class, 'companies']);
+    Route::get('/job-types', [JobApiController::class, 'jobTypes']);
+    Route::get('/employment-types', [JobApiController::class, 'jobTypes']);
 });
 
 // Alias tanpa prefix v1 untuk fleksibilitas klien
 Route::get('/jobs', [JobApiController::class, 'index']);
 Route::get('/jobs/{id}', [JobApiController::class, 'show']);
+Route::get('/departments', [JobApiController::class, 'departments']);
+Route::get('/companies', [JobApiController::class, 'companies']);
+Route::get('/job-types', [JobApiController::class, 'jobTypes']);
+Route::get('/employment-types', [JobApiController::class, 'jobTypes']);

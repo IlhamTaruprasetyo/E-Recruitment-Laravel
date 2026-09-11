@@ -9,6 +9,7 @@ use App\Models\Department;
 use App\Models\Company;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class JobApiController extends Controller
 {
@@ -147,13 +148,66 @@ class JobApiController extends Controller
      */
     public function departments(): JsonResponse
     {
-        $departments = Department::withCount(['jobs' => fn($q) => $q->active()])
-            ->having('jobs_count', '>', 0)
+        $departments = Department::whereHas('jobs', fn($q) => $q->active())
+            ->withCount(['jobs' => fn($q) => $q->active()])
+            ->orderBy('name')
             ->get(['id', 'name']);
 
         return response()->json([
             'success' => true,
             'data' => $departments,
+        ]);
+    }
+
+    /**
+     * List companies with active jobs count for frontend filter options.
+     */
+    public function companies(): JsonResponse
+    {
+        $companies = Company::whereHas('jobs', fn($q) => $q->active())
+            ->withCount(['jobs' => fn($q) => $q->active()])
+            ->orderBy('name')
+            ->get(['id', 'name', 'logo', 'city', 'province']);
+
+        $data = $companies->map(function ($company) {
+            return [
+                'id' => $company->id,
+                'name' => $company->name,
+                'logo' => $company->logo_url,
+                'city' => $company->city,
+                'province' => $company->province,
+                'jobs_count' => (int) $company->jobs_count,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+        ]);
+    }
+
+    /**
+     * List distinct employment types with active jobs count for frontend filter options.
+     */
+    public function jobTypes(): JsonResponse
+    {
+        $types = Job::active()
+            ->whereNotNull('employment_type')
+            ->where('employment_type', '!=', '')
+            ->select('employment_type as name', DB::raw('count(*) as jobs_count'))
+            ->groupBy('employment_type')
+            ->orderBy('employment_type')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'name' => $item->name,
+                    'jobs_count' => (int) $item->jobs_count,
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'data' => $types,
         ]);
     }
 }
