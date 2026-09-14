@@ -317,7 +317,7 @@
                             </div>
                         </div>
 
-                        <!-- Dropdown Semua Jenjang (Employment Type) -->
+                        <!-- Dropdown Semua Tipe (Employment Type) -->
                         <div class="w-full lg:w-48 relative" :class="open ? 'z-50' : 'z-10'" x-data="{
                             open: false,
                             search: '',
@@ -355,8 +355,8 @@
                                             1
                                         </span>
                                     </template>
-                                    <span class="truncate" x-text="selected ? selected : 'Semua Jenjang'">
-                                        {{ request('employment_type') ? request('employment_type') : 'Semua Jenjang' }}
+                                    <span class="truncate" x-text="selected ? selected : 'Semua Tipe Pekerjaan'">
+                                        {{ request('employment_type') ? request('employment_type') : 'Semua Tipe Pekerjaan' }}
                                     </span>
                                 </div>
                                 <svg class="w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200"
@@ -385,7 +385,7 @@
                                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                         </svg>
                                     </div>
-                                    <input type="text" x-model="search" placeholder="Temukan jenjang..."
+                                    <input type="text" x-model="search" placeholder="Temukan Tipe Pekerjaan..."
                                         class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#93F514]/40 focus:border-[#93F514]">
                                 </div>
 
@@ -394,12 +394,12 @@
                                     class="flex items-center gap-3 py-2 px-1 text-xs font-semibold text-gray-700 hover:text-black cursor-pointer border-b border-gray-100">
                                     <input type="radio" name="_home_temp_type" value="" x-model="tempSelected"
                                         class="w-4 h-4 rounded border-gray-300 text-[#93F514] focus:ring-[#93F514] cursor-pointer">
-                                    <span>Semua Jenjang</span>
+                                    <span>Semua Tipe Pekerjaan</span>
                                 </label>
 
                                 <!-- Group Title -->
                                 <div class="mt-3 mb-1.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                                    Pilihan Jenjang
+                                    Pilihan Tipe Pekerjaan
                                 </div>
 
                                 <!-- 2-Column Grid List items (Compact & Scrollable) -->

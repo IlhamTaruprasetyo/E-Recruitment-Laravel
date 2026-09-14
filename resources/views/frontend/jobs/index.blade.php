@@ -291,7 +291,7 @@
                     </div>
                 </div>
 
-                <!-- Dropdown Semua Jenjang (Employment Type) -->
+                <!-- Dropdown Semua Tipe Pekerjaan (Employment Type) -->
                 <div class="w-full lg:w-48 relative" :class="open ? 'z-50' : 'z-10'" x-data="{
                     open: false,
                     search: '',
@@ -329,8 +329,8 @@
                                     1
                                 </span>
                             </template>
-                            <span class="truncate" x-text="selected ? selected : 'Semua Jenjang'">
-                                {{ request('employment_type') ? request('employment_type') : 'Semua Jenjang' }}
+                            <span class="truncate" x-text="selected ? selected : 'Semua Tipe Pekerjaan'">
+                                {{ request('employment_type') ? request('employment_type') : 'Semua Tipe Pekerjaan' }}
                             </span>
                         </div>
                         <svg class="w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200"
@@ -358,7 +358,7 @@
                                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
                             </div>
-                            <input type="text" x-model="search" placeholder="Temukan jenjang..."
+                            <input type="text" x-model="search" placeholder="Temukan Tipe Pekerjaan..."
                                 class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#93F514]/40 focus:border-[#93F514]">
                         </div>
 
@@ -367,12 +367,12 @@
                             class="flex items-center gap-3 py-2 px-1 text-xs font-semibold text-gray-700 hover:text-black cursor-pointer border-b border-gray-100">
                             <input type="radio" name="_jobs_temp_type" value="" x-model="tempSelected"
                                 class="w-4 h-4 rounded border-gray-300 text-[#93F514] focus:ring-[#93F514] cursor-pointer">
-                            <span>Semua Jenjang</span>
+                            <span>Semua Tipe Pekerjaan</span>
                         </label>
 
                         <!-- Group Title -->
                         <div class="mt-3 mb-1.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                            Pilihan Jenjang
+                            Pilihan Tipe Pekerjaan
                         </div>
 
                         <!-- 2-Column Grid List items (Compact & Scrollable) -->
@@ -512,95 +512,126 @@
             <div x-show="viewMode === 'grid'" x-transition:enter="transition ease-out duration-200"
                 x-transition:enter-start="opacity-0 translate-y-2"
                 x-transition:enter-end="opacity-100 translate-y-0"
-                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
                 @forelse($jobs as $job)
+                    @php
+                        // Clean description: insert spaces before strip_tags so block tags don't concatenate words
+                        $rawDesc = $job->description ? preg_replace('/<(\/div|\/p|\/li|br\s*\/?>|\/h[1-6])>/i', ' ', $job->description) : '';
+                        $cleanDesc = !empty($rawDesc) ? trim(preg_replace('/\s+/', ' ', strip_tags($rawDesc))) : 'Klik tombol detail untuk membaca rincian kualifikasi dan persyaratan lowongan pekerjaan ini.';
+                        
+                        // Check if position name is distinct from job title and department
+                        $showPositionBadge = $job->position && 
+                            strtolower(trim($job->position->name)) !== strtolower(trim($job->title)) && 
+                            strtolower(trim($job->position->name)) !== strtolower(trim($job->department?->name ?? ''));
+                    @endphp
                     <div
-                        class="job-card-item reveal-on-scroll group relative rounded-3xl bg-gradient-to-b from-[#061506] to-[#030803] border border-[#93F514]/30 hover:border-[#93F514] p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:shadow-[#93F514]/20 hover:-translate-y-1"
+                        class="job-card-item reveal-on-scroll group relative rounded-3xl bg-gradient-to-b from-[#061506] to-[#030803] border border-[#93F514]/30 hover:border-[#93F514] p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:shadow-[#93F514]/20 hover:-translate-y-1 h-full"
                         data-delay="{{ ($loop->index % 6) * 100 }}">
-                        <div>
-                            <!-- Header Card -->
+                        
+                        <!-- Top Content Area -->
+                        <div class="flex-1 flex flex-col">
+                            <!-- Header Card: Logo + Company Info + Employment Type -->
                             <div class="flex items-start justify-between gap-3 mb-4">
-                                <div class="flex items-center gap-3">
+                                <div class="flex items-center gap-3 min-w-0 flex-1">
                                     @if ($job->company?->logo_url)
                                         <div
-                                            class="w-12 h-12 rounded-2xl bg-[#051205] border border-[#93F514]/40 p-1.5 flex items-center justify-center shrink-0 overflow-hidden shadow-md shadow-[#93F514]/15">
+                                            class="w-12 h-12 rounded-2xl bg-white border border-[#93F514]/40 p-1.5 flex items-center justify-center shrink-0 overflow-hidden shadow-md shadow-[#93F514]/15">
                                             <img src="{{ $job->company->logo_url }}" alt="{{ $job->company->name }}"
                                                 class="w-full h-full object-contain">
                                         </div>
                                     @else
                                         <div
-                                            class="w-12 h-12 rounded-2xl bg-[#93F514]/15 border border-[#93F514]/40 flex items-center justify-center text-[#93F514] font-extrabold text-lg shrink-0">
+                                            class="w-12 h-12 rounded-2xl bg-white border border-[#93F514]/40 flex items-center justify-center text-gray-900 font-extrabold text-base shrink-0 shadow-md shadow-[#93F514]/15">
                                             {{ strtoupper(substr($job->company?->name ?? 'M', 0, 2)) }}
                                         </div>
                                     @endif
-                                    <div>
-                                        <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                                    <div class="min-w-0 flex-1">
+                                        <h4 class="text-xs font-bold text-gray-300 uppercase tracking-wider truncate"
+                                            title="{{ $job->company?->name ?? 'Perusahaan Mitra' }}">
                                             {{ $job->company?->name ?? 'Perusahaan Mitra' }}
                                         </h4>
-                                        <div class="flex items-center gap-1.5 flex-wrap mt-0.5">
-                                            <span class="text-xs text-[#93F514] font-semibold">
+                                        <div class="flex items-center gap-1.5 flex-wrap mt-1">
+                                            <span class="inline-flex items-center text-[11px] font-semibold text-[#93F514] truncate max-w-[130px]">
                                                 {{ $job->department?->name ?? 'Umum' }}
                                             </span>
-                                            @if ($job->position)
-                                                <span class="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-[#93F514]/10 text-[#93F514] border border-[#93F514]/30 font-semibold">
-                                                    <span>{{ $job->position->name }}</span>
+                                            @if ($showPositionBadge)
+                                                <span class="inline-flex items-center text-[10px] px-2 py-0.5 rounded-full bg-[#93F514]/10 text-[#93F514] border border-[#93F514]/30 font-semibold truncate max-w-[120px]">
+                                                    {{ $job->position->name }}
                                                 </span>
                                             @endif
                                         </div>
                                     </div>
                                 </div>
                                 <span
-                                    class="px-3 py-1 rounded-full text-xs font-semibold bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] shrink-0">
+                                    class="px-2.5 py-1 rounded-full text-xs font-bold bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] shrink-0 self-start whitespace-nowrap shadow-sm shadow-[#93F514]/10">
                                     {{ $job->employment_type }}
                                 </span>
                             </div>
 
-                            <!-- Job Title -->
-                            <a href="{{ route('jobs.show', $job->id) }}">
+                            <!-- Job Title (Consistent 1 line with clean hover state) -->
+                            <a href="{{ route('jobs.show', $job->id) }}" class="block mt-1">
                                 <h3
-                                    class="text-lg font-bold text-[#EEEEEE] group-hover:text-[#93F514] transition-colors line-clamp-1">
+                                    class="text-lg font-extrabold text-[#EEEEEE] group-hover:text-[#93F514] transition-colors line-clamp-1 leading-snug"
+                                    title="{{ $job->title }}">
                                     {{ $job->title }}
                                 </h3>
                             </a>
 
-                            <!-- Description -->
-                            <p class="text-sm text-gray-400 mt-2 line-clamp-2 leading-relaxed">
-                                {{ !empty($job->description) ? trim(preg_replace('/\s+/', ' ', strip_tags($job->description))) : 'Klik tombol detail untuk membaca rincian kualifikasi dan persyaratan lowongan pekerjaan ini.' }}
+                            <!-- Description (Fixed height h-10 with line-clamp-2 so every card below has identical vertical positioning) -->
+                            <p class="text-xs sm:text-[13px] text-gray-400 mt-2 line-clamp-2 leading-relaxed h-10 overflow-hidden"
+                                title="{{ $cleanDesc }}">
+                                {{ $cleanDesc }}
                             </p>
 
-                            <!-- Details -->
+                            <!-- Details / Metadata Section (Always exactly 3 rows for uniform vertical alignment) -->
                             <div class="mt-5 space-y-2.5 pt-4 border-t border-[#93F514]/15">
-                                <div class="flex items-center gap-2 text-xs text-gray-300">
+                                <!-- Location Row -->
+                                <div class="flex items-center gap-2.5 text-xs text-gray-300">
                                     <svg class="w-4 h-4 text-[#93F514] shrink-0" fill="none" viewBox="0 0 24 24"
                                         stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                     </svg>
-                                    <span>{{ $job->location ?? 'Indonesia' }}</span>
+                                    <span class="truncate">{{ $job->location ?? 'Indonesia' }}</span>
                                 </div>
 
-                                @if ($job->salary_min || $job->salary_max)
-                                    <div class="flex items-center gap-2 text-xs text-[#93F514] font-semibold">
-                                        <svg class="w-4 h-4 text-[#93F514] shrink-0" fill="none" viewBox="0 0 24 24"
-                                            stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        <span>
-                                            Rp {{ number_format($job->salary_min, 0, ',', '.') }} -
-                                            {{ number_format($job->salary_max, 0, ',', '.') }}
+                                <!-- Salary Row (Always rendered so heights never jump) -->
+                                <div class="flex items-center gap-2.5 text-xs">
+                                    <svg class="w-4 h-4 text-[#93F514] shrink-0" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    @if ($job->salary_min && $job->salary_max)
+                                        <span class="text-[#93F514] font-semibold truncate">
+                                            Rp {{ number_format($job->salary_min, 0, ',', '.') }} – {{ number_format($job->salary_max, 0, ',', '.') }}
                                         </span>
-                                    </div>
-                                @endif
+                                    @elseif ($job->salary_min)
+                                        <span class="text-[#93F514] font-semibold truncate">
+                                            Mulai Rp {{ number_format($job->salary_min, 0, ',', '.') }}
+                                        </span>
+                                    @elseif ($job->salary_max)
+                                        <span class="text-[#93F514] font-semibold truncate">
+                                            Hingga Rp {{ number_format($job->salary_max, 0, ',', '.') }}
+                                        </span>
+                                    @else
+                                        <span class="text-gray-400 font-normal">
+                                            Gaji Dirahasiakan / Kompetitif
+                                        </span>
+                                    @endif
+                                </div>
 
-                                @if ($job->deadline)
-                                    <div class="flex items-center gap-2 text-xs {{ $job->days_remaining === 0 ? 'text-rose-400 font-bold' : ($job->days_remaining !== null && $job->days_remaining <= 3 ? 'text-amber-400 font-semibold' : 'text-gray-400') }}">
-                                        <svg class="w-4 h-4 {{ $job->days_remaining === 0 ? 'text-rose-400' : ($job->days_remaining !== null && $job->days_remaining <= 3 ? 'text-amber-400' : 'text-[#93F514]') }} shrink-0" fill="none" viewBox="0 0 24 24"
-                                            stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                        </svg>
-                                        <span>
+                                <!-- Deadline Row (Always rendered so heights never jump) -->
+                                <div class="flex items-center gap-2.5 text-xs">
+                                    <svg class="w-4 h-4 {{ $job->days_remaining === 0 ? 'text-rose-400' : ($job->days_remaining !== null && $job->days_remaining <= 3 ? 'text-amber-400' : 'text-[#93F514]') }} shrink-0" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    @if ($job->deadline)
+                                        <span class="{{ $job->days_remaining === 0 ? 'text-rose-400 font-bold' : ($job->days_remaining !== null && $job->days_remaining <= 3 ? 'text-amber-400 font-semibold' : 'text-gray-400') }} truncate">
                                             @if ($job->days_remaining === 0)
                                                 Berakhir Hari Ini!
                                             @elseif ($job->days_remaining !== null && $job->days_remaining <= 3)
@@ -609,18 +640,29 @@
                                                 Batas: {{ \Carbon\Carbon::parse($job->deadline)->format('d M Y') }}
                                             @endif
                                         </span>
-                                    </div>
-                                @endif
+                                    @else
+                                        <span class="text-gray-400">
+                                            Pendaftaran Terbuka
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Footer Card Action -->
+                        <!-- Footer Card Action: Pinned firmly at bottom -->
                         <div class="mt-6 pt-4 border-t border-[#93F514]/15 flex items-center justify-between gap-3">
-                            <span class="text-xs text-gray-400">Kuota: <strong
-                                    class="text-[#EEEEEE]">{{ $job->quota }}</strong></span>
+                            <div class="flex items-center gap-1.5 text-xs text-gray-400">
+                                <svg class="w-3.5 h-3.5 text-[#93F514]/70 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                <span>Kuota: <strong class="text-[#EEEEEE] font-bold">{{ $job->quota ?? 1 }}</strong></span>
+                            </div>
                             <a href="{{ route('jobs.show', $job->id) }}"
-                                class="px-4 py-2 rounded-full bg-[#93F514] hover:bg-[#7edc0b] text-black font-extrabold text-xs shadow-md transition">
-                                Detail & Lamar
+                                class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#93F514] hover:bg-[#a6ff2e] text-black font-extrabold text-xs shadow-md shadow-[#93F514]/20 hover:shadow-[#93F514]/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200">
+                                <span>Detail & Lamar</span>
+                                <svg class="w-3 h-3 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                                </svg>
                             </a>
                         </div>
                     </div>
@@ -651,6 +693,13 @@
                 x-transition:enter-end="opacity-100 translate-y-0"
                 class="flex flex-col gap-4">
                 @forelse($jobs as $job)
+                    @php
+                        $rawDescList = $job->description ? preg_replace('/<(\/div|\/p|\/li|br\s*\/?>|\/h[1-6])>/i', ' ', $job->description) : '';
+                        $cleanDescList = !empty($rawDescList) ? trim(preg_replace('/\s+/', ' ', strip_tags($rawDescList))) : '';
+                        $showPositionBadgeList = $job->position && 
+                            strtolower(trim($job->position->name)) !== strtolower(trim($job->title)) && 
+                            strtolower(trim($job->position->name)) !== strtolower(trim($job->department?->name ?? ''));
+                    @endphp
                     <div
                         class="job-card-item reveal-on-scroll group relative rounded-3xl bg-gradient-to-r from-[#061506] via-[#051205] to-[#030803] border border-[#93F514]/30 hover:border-[#93F514] p-5 sm:p-6 transition-all duration-300 hover:shadow-2xl hover:shadow-[#93F514]/15 hover:-translate-y-0.5 flex flex-col md:flex-row items-start md:items-center justify-between gap-5"
                         data-delay="{{ ($loop->index % 6) * 80 }}">
@@ -659,11 +708,11 @@
                         <div class="flex items-start sm:items-center gap-4.5 flex-1 min-w-0">
                             <!-- Logo -->
                             @if ($job->company?->logo_url)
-                                <div class="w-14 h-14 mr-5 rounded-2xl bg-[#051205] border border-[#93F514]/40 p-2 flex items-center justify-center shrink-0 overflow-hidden shadow-md shadow-[#93F514]/15">
+                                <div class="w-14 h-14 mr-5 rounded-2xl bg-white border border-[#93F514]/40 p-2 flex items-center justify-center shrink-0 overflow-hidden shadow-md shadow-[#93F514]/15">
                                     <img src="{{ $job->company->logo_url }}" alt="{{ $job->company->name }}" class="w-full h-full object-contain">
                                 </div>
                             @else
-                                <div class="w-14 h-14 mr-5 rounded-2xl bg-[#93F514]/15 border border-[#93F514]/40 flex items-center justify-center text-[#93F514] font-extrabold text-xl shrink-0">
+                                <div class="w-14 h-14 mr-5 rounded-2xl bg-white border border-[#93F514]/40 flex items-center justify-center text-gray-900 font-extrabold text-xl shrink-0 shadow-md shadow-[#93F514]/15">
                                     {{ strtoupper(substr($job->company?->name ?? 'M', 0, 2)) }}
                                 </div>
                             @endif
@@ -671,25 +720,26 @@
                             <div class="flex-1 min-w-0 space-y-1.5">
                                 <!-- Header Badges -->
                                 <div class="flex flex-wrap items-center gap-2">
-                                    <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                                    <span class="text-xs font-bold text-gray-300 uppercase tracking-wider truncate max-w-[200px]"
+                                        title="{{ $job->company?->name ?? 'Perusahaan Mitra' }}">
                                         {{ $job->company?->name ?? 'Perusahaan Mitra' }}
                                     </span>
                                     <span class="text-xs text-[#93F514] font-semibold">
                                         {{ $job->department?->name ?? 'Umum' }}
                                     </span>
-                                    @if ($job->position)
+                                    @if ($showPositionBadgeList)
                                         <span class="inline-flex items-center gap-1 text-[11px] px-2.5 py-0.5 rounded-full bg-[#93F514]/10 text-[#93F514] border border-[#93F514]/30 font-semibold">
                                             <span>Posisi: {{ $job->position->name }}</span>
                                         </span>
                                     @endif
-                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514]">
+                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514]">
                                         {{ $job->employment_type }}
                                     </span>
                                 </div>
 
                                 <!-- Job Title -->
                                 <a href="{{ route('jobs.show', $job->id) }}" class="block">
-                                    <h3 class="text-lg sm:text-xl font-bold text-[#EEEEEE] group-hover:text-[#93F514] transition-colors truncate">
+                                    <h3 class="text-lg sm:text-xl font-extrabold text-[#EEEEEE] group-hover:text-[#93F514] transition-colors truncate">
                                         {{ $job->title }}
                                     </h3>
                                 </a>
@@ -699,25 +749,32 @@
                                     <div class="flex items-center gap-1.5 text-gray-300">
                                         <svg class="w-4 h-4 text-[#93F514] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                         </svg>
                                         <span>{{ $job->location ?? 'Indonesia' }}</span>
                                     </div>
 
-                                    @if ($job->salary_min || $job->salary_max)
-                                        <div class="flex items-center gap-1.5 text-[#93F514] font-semibold">
-                                            <svg class="w-4 h-4 text-[#93F514] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                            <span>Rp {{ number_format($job->salary_min, 0, ',', '.') }} - {{ number_format($job->salary_max, 0, ',', '.') }}</span>
-                                        </div>
-                                    @endif
+                                    <div class="flex items-center gap-1.5">
+                                        <svg class="w-4 h-4 text-[#93F514] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        @if ($job->salary_min && $job->salary_max)
+                                            <span class="text-[#93F514] font-semibold">Rp {{ number_format($job->salary_min, 0, ',', '.') }} – {{ number_format($job->salary_max, 0, ',', '.') }}</span>
+                                        @elseif ($job->salary_min)
+                                            <span class="text-[#93F514] font-semibold">Mulai Rp {{ number_format($job->salary_min, 0, ',', '.') }}</span>
+                                        @elseif ($job->salary_max)
+                                            <span class="text-[#93F514] font-semibold">Hingga Rp {{ number_format($job->salary_max, 0, ',', '.') }}</span>
+                                        @else
+                                            <span class="text-gray-400 font-normal">Gaji Dirahasiakan / Kompetitif</span>
+                                        @endif
+                                    </div>
 
-                                    @if ($job->deadline)
-                                        <div class="flex items-center gap-1.5 text-xs {{ $job->days_remaining === 0 ? 'text-rose-400 font-bold' : ($job->days_remaining !== null && $job->days_remaining <= 3 ? 'text-amber-400 font-semibold' : 'text-gray-400') }}">
-                                            <svg class="w-4 h-4 {{ $job->days_remaining === 0 ? 'text-rose-400' : ($job->days_remaining !== null && $job->days_remaining <= 3 ? 'text-amber-400' : 'text-[#93F514]') }} shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                            </svg>
-                                            <span>
+                                    <div class="flex items-center gap-1.5 text-xs">
+                                        <svg class="w-4 h-4 {{ $job->days_remaining === 0 ? 'text-rose-400' : ($job->days_remaining !== null && $job->days_remaining <= 3 ? 'text-amber-400' : 'text-[#93F514]') }} shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        @if ($job->deadline)
+                                            <span class="{{ $job->days_remaining === 0 ? 'text-rose-400 font-bold' : ($job->days_remaining !== null && $job->days_remaining <= 3 ? 'text-amber-400 font-semibold' : 'text-gray-400') }}">
                                                 @if ($job->days_remaining === 0)
                                                     Berakhir Hari Ini!
                                                 @elseif ($job->days_remaining !== null && $job->days_remaining <= 3)
@@ -726,10 +783,17 @@
                                                     Batas: {{ \Carbon\Carbon::parse($job->deadline)->format('d M Y') }}
                                                 @endif
                                             </span>
-                                        </div>
-                                    @endif
+                                        @else
+                                            <span class="text-gray-400">Pendaftaran Terbuka</span>
+                                        @endif
+                                    </div>
                                     
-                                    <span class="text-gray-400">Kuota: <strong class="text-[#EEEEEE]">{{ $job->quota }}</strong></span>
+                                    <div class="flex items-center gap-1.5 text-gray-400">
+                                        <svg class="w-3.5 h-3.5 text-[#93F514]/70 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        </svg>
+                                        <span>Kuota: <strong class="text-[#EEEEEE] font-bold">{{ $job->quota ?? 1 }}</strong></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -737,8 +801,11 @@
                         <!-- Right / Action -->
                         <div class="w-full md:w-auto flex md:flex-col items-center md:items-end justify-between md:justify-center gap-3 shrink-0 pt-3 md:pt-0 border-t md:border-t-0 border-[#93F514]/15">
                             <a href="{{ route('jobs.show', $job->id) }}"
-                                class="w-full md:w-auto px-6 py-2.5 rounded-full bg-[#93F514] hover:bg-[#7edc0b] text-black font-extrabold text-xs sm:text-sm shadow-md shadow-[#93F514]/20 transition text-center">
-                                Detail & Lamar
+                                class="w-full md:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-[#93F514] hover:bg-[#a6ff2e] text-black font-extrabold text-xs sm:text-sm shadow-md shadow-[#93F514]/20 hover:shadow-[#93F514]/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-center">
+                                <span>Detail & Lamar</span>
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                                </svg>
                             </a>
                         </div>
                     </div>
