@@ -3,11 +3,11 @@
 @section('title', 'Beranda | Mika Career')
 
 @section('content')
-    <div class="relative overflow-hidden">
+    <div class="relative overflow-hidden -mt-[88px] sm:-mt-[96px]">
 
         <!-- ==================== HERO SECTION (IMAGE BACKGROUND + MULTI-LAYER DARK GRADIENTS) ==================== -->
         <section
-            class="relative min-h-[90vh] flex items-center justify-center pt-8 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden bg-[#040804]">
+            class="relative min-h-screen flex items-center justify-center pt-[120px] sm:pt-[128px] pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden bg-[#040804]">
 
             <!-- Hero Background Image (Clear & Crisp) -->
             <div class="absolute inset-0 z-0">
@@ -21,10 +21,7 @@
             <div class="absolute inset-0 z-0 bg-black/35"></div>
             <div class="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,_transparent_40%,_#040804_95%)]"></div>
 
-            <!-- Ambient Green Glow #93F514 (Gentle Edge Highlights) -->
-            <div
-                class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[250px] bg-[#93F514]/15 rounded-full blur-[100px] pointer-events-none z-0">
-            </div>
+
 
             <div class="relative max-w-5xl mx-auto text-center z-10 flex flex-col items-center">
 
@@ -33,7 +30,7 @@
                     class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#EEEEEE] leading-tight sm:leading-none max-w-4xl drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]">
                     Temukan Karir Impian, <br>
                     <span
-                        class="text-transparent bg-clip-text bg-gradient-to-r from-[#93F514] via-[#75f06a] to-[#5FE6B6] drop-shadow-[0_0_25px_rgba(147,245,20,0.4)]">
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-[#93F514] via-[#75f06a] to-[#5FE6B6]">
                         Wujudkan Potensi Terbaikmu
                     </span>
                 </h1>
@@ -183,7 +180,7 @@
                                         Atur Ulang
                                     </button>
                                     <button type="button" @click="apply()"
-                                        class="px-5 py-2 rounded-xl bg-[#93F514] hover:bg-[#7edc0b] text-black font-bold text-xs shadow-md shadow-[#93F514]/25 transition">
+                                        class="px-5 py-2 rounded-xl bg-[#93F514] hover:bg-[#7edc0b] text-black font-bold text-xs shadow-sm transition">
                                         Pilih
                                     </button>
                                 </div>
@@ -310,7 +307,7 @@
                                         Atur Ulang
                                     </button>
                                     <button type="button" @click="apply()"
-                                        class="px-5 py-2 rounded-xl bg-[#93F514] hover:bg-[#7edc0b] text-black font-bold text-xs shadow-md shadow-[#93F514]/25 transition">
+                                        class="px-5 py-2 rounded-xl bg-[#93F514] hover:bg-[#7edc0b] text-black font-bold text-xs shadow-sm transition">
                                         Pilih
                                     </button>
                                 </div>
@@ -426,7 +423,7 @@
                                         Atur Ulang
                                     </button>
                                     <button type="button" @click="apply()"
-                                        class="px-5 py-2 rounded-xl bg-[#93F514] hover:bg-[#7edc0b] text-black font-bold text-xs shadow-md shadow-[#93F514]/25 transition">
+                                        class="px-5 py-2 rounded-xl bg-[#93F514] hover:bg-[#7edc0b] text-black font-bold text-xs shadow-sm transition">
                                         Pilih
                                     </button>
                                 </div>
@@ -625,13 +622,6 @@
                     class="absolute -bottom-56 -left-56 w-[40rem] h-[40rem] rounded-full border border-[#93F514]/5 pointer-events-none">
                 </div>
 
-                <!-- Soft Ambient Glows -->
-                <div
-                    class="absolute top-0 right-1/4 w-80 h-80 bg-[#93F514]/10 rounded-full blur-[100px] pointer-events-none">
-                </div>
-                <div
-                    class="absolute bottom-0 left-1/3 w-72 h-72 bg-[#93F514]/10 rounded-full blur-[90px] pointer-events-none">
-                </div>
             </div>
 
             <!-- Main Inner Container -->
@@ -675,7 +665,7 @@
                             <!-- Left-Bottom Controls & Actions -->
                             <div class="pt-4 flex flex-wrap items-center gap-3">
                                 <a href="{{ route('jobs.index') }}"
-                                    class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#93F514] hover:bg-[#7edc0b] text-black font-extrabold text-xs sm:text-sm tracking-wide shadow-lg shadow-[#93F514]/30 transition duration-200">
+                                    class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#93F514] hover:bg-[#7edc0b] text-black font-extrabold text-xs sm:text-sm tracking-wide shadow-md shadow-black/40 transition duration-200">
                                     <span>Lihat Lowongan</span>
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
@@ -789,7 +779,7 @@
                             <button @click="goTo(index)" :aria-label="'Go to slide ' + (index + 1)"
                                 class="h-1.5 sm:h-2 flex-1 rounded-full transition-all duration-300 cursor-pointer overflow-hidden relative bg-white/10 hover:bg-white/20">
                                 <!-- Background fill for active slide with smooth real-time progress -->
-                                <div class="h-full bg-gradient-to-r from-[#93F514] to-[#5ef558] rounded-full transition-[width] ease-linear shadow-[0_0_10px_rgba(147, 245, 20,0.8)]"
+                                <div class="h-full bg-gradient-to-r from-[#93F514] to-[#5ef558] rounded-full transition-[width] ease-linear"
                                     :style="currentSlide === index ?
                                         `width: ${progress}%; transition-duration: ${isPaused ? '0ms' : '50ms'};` : (
                                             currentSlide > index ? 'width: 100%; transition-duration: 0ms;' :
@@ -822,42 +812,42 @@
                     class="mt-8 inline-flex p-1.5 rounded-2xl bg-[#061206] border border-[#93F514]/30 shadow-lg gap-1.5 flex-wrap justify-center">
                     <button @click="activeStep = 1"
                         :class="activeStep === 1 ?
-                            'bg-gradient-to-r from-[#93F514] to-[#5ef558] text-black font-extrabold shadow-md shadow-[#93F514]/30' :
+                            'bg-gradient-to-r from-[#93F514] to-[#5ef558] text-black font-extrabold shadow-sm' :
                             'text-gray-400 hover:text-[#EEEEEE]'"
                         class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm transition-all duration-200 cursor-pointer">
                         1. Registrasi Akun
                     </button>
                     <button @click="activeStep = 2"
                         :class="activeStep === 2 ?
-                            'bg-gradient-to-r from-[#93F514] to-[#5ef558] text-black font-extrabold shadow-md shadow-[#93F514]/30' :
+                            'bg-gradient-to-r from-[#93F514] to-[#5ef558] text-black font-extrabold shadow-sm' :
                             'text-gray-400 hover:text-[#EEEEEE]'"
                         class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm transition-all duration-200 cursor-pointer">
                         2. Profil & CV Digital
                     </button>
                     <button @click="activeStep = 3"
                         :class="activeStep === 3 ?
-                            'bg-gradient-to-r from-[#93F514] to-[#5ef558] text-black font-extrabold shadow-md shadow-[#93F514]/30' :
+                            'bg-gradient-to-r from-[#93F514] to-[#5ef558] text-black font-extrabold shadow-sm' :
                             'text-gray-400 hover:text-[#EEEEEE]'"
                         class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm transition-all duration-200 cursor-pointer">
                         3. Lamar & Seleksi Berkas
                     </button>
                     <button @click="activeStep = 4"
                         :class="activeStep === 4 ?
-                            'bg-gradient-to-r from-[#93F514] to-[#5ef558] text-black font-extrabold shadow-md shadow-[#93F514]/30' :
+                            'bg-gradient-to-r from-[#93F514] to-[#5ef558] text-black font-extrabold shadow-sm' :
                             'text-gray-400 hover:text-[#EEEEEE]'"
                         class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm transition-all duration-200 cursor-pointer">
                         4. Asesmen Online (CBT)
                     </button>
                     <button @click="activeStep = 5"
                         :class="activeStep === 5 ?
-                            'bg-gradient-to-r from-[#93F514] to-[#5ef558] text-black font-extrabold shadow-md shadow-[#93F514]/30' :
+                            'bg-gradient-to-r from-[#93F514] to-[#5ef558] text-black font-extrabold shadow-sm' :
                             'text-gray-400 hover:text-[#EEEEEE]'"
                         class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm transition-all duration-200 cursor-pointer">
                         5. Sesi Wawancara
                     </button>
                     <button @click="activeStep = 6"
                         :class="activeStep === 6 ?
-                            'bg-gradient-to-r from-[#93F514] to-[#5ef558] text-black font-extrabold shadow-md shadow-[#93F514]/30' :
+                            'bg-gradient-to-r from-[#93F514] to-[#5ef558] text-black font-extrabold shadow-sm' :
                             'text-gray-400 hover:text-[#EEEEEE]'"
                         class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm transition-all duration-200 cursor-pointer">
                         6. Hasil & Penawaran
@@ -867,10 +857,7 @@
 
             <!-- Dynamic Step Content Display -->
             <div
-                class="relative rounded-3xl bg-gradient-to-b from-[#071a07] via-[#051105] to-[#040804] border border-[#93F514]/40 p-8 sm:p-12 shadow-2xl shadow-[#93F514]/20 overflow-hidden">
-                <div
-                    class="absolute -top-24 -right-24 w-72 h-72 bg-[#93F514]/15 rounded-full blur-3xl pointer-events-none">
-                </div>
+                class="relative rounded-3xl bg-gradient-to-b from-[#071a07] via-[#051105] to-[#040804] border border-[#93F514]/40 p-8 sm:p-12 shadow-2xl shadow-black/80 overflow-hidden">
 
                 <!-- Step 1 Content: Registrasi Akun -->
                 <div x-show="activeStep === 1" x-transition:enter="transition ease-out duration-300"
@@ -921,12 +908,12 @@
                                         : route('profile');
                                 @endphp
                                 <a href="{{ $dashRoute }}"
-                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-lg shadow-[#93F514]/30">
+                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-md shadow-black/30">
                                     {{ $isAdminOrRecruiter ? 'Buka Dashboard Manajemen' : 'Buka Profil Saya' }}
                                 </a>
                             @else
                                 <a href="{{ route('register') }}"
-                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-lg shadow-[#93F514]/30">
+                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-md shadow-black/30">
                                     Daftar Akun Sekarang
                                 </a>
                             @endauth
@@ -990,12 +977,12 @@
                         <div class="pt-4 flex flex-wrap items-center gap-3">
                             @auth
                                 <a href="{{ route('profile') }}"
-                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-lg shadow-[#93F514]/30">
+                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-md shadow-black/30">
                                     Lengkapi Profil Sekarang
                                 </a>
                             @else
                                 <a href="{{ route('login') }}"
-                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-lg shadow-[#93F514]/30">
+                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-md shadow-black/30">
                                     Masuk untuk Lengkapi Profil
                                 </a>
                             @endauth
@@ -1058,7 +1045,7 @@
                         </ul>
                         <div class="pt-4 flex flex-wrap items-center gap-3">
                             <a href="{{ route('jobs.index') }}"
-                                class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-lg shadow-[#93F514]/30">
+                                class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-md shadow-black/30">
                                 Jelajahi Lowongan Tersedia
                             </a>
                             <button type="button" @click="activeStep = 4"
@@ -1121,12 +1108,12 @@
                         <div class="pt-4 flex flex-wrap items-center gap-3">
                             @auth
                                 <a href="{{ route('profile', ['tab' => 'riwayat']) }}"
-                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-lg shadow-[#93F514]/30">
+                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-md shadow-black/30">
                                     Cek Status Ujian di Riwayat
                                 </a>
                             @else
                                 <a href="{{ route('login') }}"
-                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-lg shadow-[#93F514]/30">
+                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-md shadow-black/30">
                                     Masuk ke Portal Ujian
                                 </a>
                             @endauth
@@ -1190,12 +1177,12 @@
                         <div class="pt-4 flex flex-wrap items-center gap-3">
                             @auth
                                 <a href="{{ route('profile', ['tab' => 'riwayat']) }}"
-                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-lg shadow-[#93F514]/30">
+                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-md shadow-black/30">
                                     Pantau Jadwal Wawancara
                                 </a>
                             @else
                                 <a href="{{ route('jobs.index') }}"
-                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-lg shadow-[#93F514]/30">
+                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-md shadow-black/30">
                                     Lihat Peluang Karir
                                 </a>
                             @endauth
@@ -1259,12 +1246,12 @@
                         <div class="pt-4 flex flex-wrap items-center gap-3">
                             @auth
                                 <a href="{{ route('profile', ['tab' => 'riwayat']) }}"
-                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-lg shadow-[#93F514]/30">
+                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-md shadow-black/30">
                                     Lihat Riwayat & Status Saya
                                 </a>
                             @else
                                 <a href="{{ route('register') }}"
-                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-lg shadow-[#93F514]/30">
+                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#93F514] text-black font-bold text-xs sm:text-sm hover:bg-[#7edc0b] transition shadow-md shadow-black/30">
                                     Daftar & Raih Karir Impian
                                 </a>
                             @endauth
@@ -1303,7 +1290,7 @@
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                 @forelse($departments as $dept)
                     <a href="{{ route('jobs.index', ['department_id' => $dept->id]) }}"
-                        class="reveal-on-scroll group p-5 rounded-2xl bg-gradient-to-b from-[#061506] to-[#040804] border border-[#93F514]/30 hover:border-[#93F514] hover:shadow-xl hover:shadow-[#93F514]/20 transition-all duration-300 flex flex-col justify-between"
+                        class="reveal-on-scroll group p-5 rounded-2xl bg-gradient-to-b from-[#061506] to-[#040804] border border-[#93F514]/30 hover:border-[#93F514] hover:shadow-xl hover:shadow-black/60 transition-all duration-300 flex flex-col justify-between"
                         data-delay="{{ ($loop->index % 4) * 100 }}">
                         <div
                             class="w-10 h-10 rounded-xl bg-[#93F514]/15 border border-[#93F514]/40 flex items-center justify-center text-[#93F514] group-hover:bg-[#93F514] group-hover:text-black transition-all">
@@ -1328,7 +1315,7 @@
         <!-- ==================== CALL TO ACTION BANNER ==================== -->
         <section class="reveal-on-scroll reveal-scale py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
             <div
-                class="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#041a04] via-[#062906] to-[#031203] border border-[#93F514]/50 p-8 sm:p-12 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-8 shadow-2xl shadow-[#93F514]/20">
+                class="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#041a04] via-[#062906] to-[#031203] border border-[#93F514]/50 p-8 sm:p-12 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-8 shadow-2xl shadow-black/80">
                 <div class="max-w-xl z-10">
                     <h2 class="text-2xl sm:text-3xl font-extrabold text-[#EEEEEE] leading-tight">
                         Siap Memulai Karir Baru Bersama Kami?
@@ -1357,12 +1344,12 @@
                                 : route('profile');
                         @endphp
                         <a href="{{ $dashRoute }}"
-                            class="px-8 py-3.5 rounded-full bg-gradient-to-r from-[#93F514] to-[#5ef558] hover:from-[#7edc0b] hover:to-[#43e63d] text-black font-extrabold text-sm shadow-xl shadow-[#93F514]/30 transition-all duration-300">
+                            class="px-8 py-3.5 rounded-full bg-gradient-to-r from-[#93F514] to-[#5ef558] hover:from-[#7edc0b] hover:to-[#43e63d] text-black font-extrabold text-sm shadow-md shadow-black/40 transition-all duration-300">
                             {{ $isAdminOrRecruiter ? 'Buka Panel Dashboard' : 'Buka Profil Pelamar' }}
                         </a>
                     @else
                         <a href="{{ route('register') }}"
-                            class="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-[#93F514] to-[#5ef558] hover:from-[#7edc0b] hover:to-[#43e63d] text-black font-extrabold text-sm shadow-xl shadow-[#93F514]/30 transition-all duration-300 text-center">
+                            class="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-[#93F514] to-[#5ef558] hover:from-[#7edc0b] hover:to-[#43e63d] text-black font-extrabold text-sm shadow-md shadow-black/40 transition-all duration-300 text-center">
                             Daftar Akun Sekarang
                         </a>
                         <a href="{{ route('login') }}"

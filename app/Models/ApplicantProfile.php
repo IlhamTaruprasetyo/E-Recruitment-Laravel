@@ -134,8 +134,17 @@ class ApplicantProfile extends Model
 
     /**
      * Calculate mandatory profile completion percentage (0 - 100%)
+     * Synchronized with total profile completion percentage to maintain consistency
      */
     public function getMandatoryCompletionPercentageAttribute(): int
+    {
+        return $this->completion_percentage;
+    }
+
+    /**
+     * Get count of completed mandatory profile sections
+     */
+    public function getMandatoryCompletedCountAttribute(): int
     {
         $statuses = $this->section_statuses;
         $mandatoryKeys = ['pribadi', 'cv', 'keluarga', 'pendidikan', 'skill', 'pengalaman'];
@@ -147,7 +156,7 @@ class ApplicantProfile extends Model
             }
         }
 
-        return (int) round(($completedCount / count($mandatoryKeys)) * 100);
+        return $completedCount;
     }
 
     /**

@@ -8,8 +8,7 @@
 
 @if(isset($groupCompanies) && $groupCompanies->count() > 0)
     <section id="meet-the-group" class="relative py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-[#93F514]/20">
-        <!-- Ambient Background Glow -->
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 sm:w-[500px] h-80 sm:h-[300px] bg-[#93F514]/10 rounded-full blur-[140px] pointer-events-none"></div>
+
 
         <!-- Section Header -->
         <div class="text-center max-w-3xl mx-auto mb-14 sm:mb-16 relative z-10">
@@ -48,11 +47,8 @@
                     $companyInitial = $companyItem->initial ?? strtoupper(substr($companyItem->name, 0, 2));
                 @endphp
 
-                <div class="reveal-on-scroll group relative rounded-3xl bg-gradient-to-b from-[#061506] via-[#040e04] to-[#020602] border border-[#93F514]/30 hover:border-[#93F514] p-7 sm:p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-[#93F514]/20 flex flex-col justify-between overflow-hidden group-company-card" 
+                <div class="reveal-on-scroll group relative rounded-3xl bg-gradient-to-b from-[#061506] via-[#040e04] to-[#020602] border border-[#93F514]/30 hover:border-[#93F514] p-7 sm:p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-black/60 flex flex-col justify-between overflow-hidden group-company-card" 
                      data-delay="{{ 100 + ($idx * 75) }}">
-                    
-                    <!-- Decorative Light in Card Corner -->
-                    <div class="absolute -top-10 -right-10 w-32 h-32 bg-[#93F514]/10 rounded-full blur-2xl group-hover:bg-[#93F514]/20 transition-all duration-300 pointer-events-none"></div>
 
                     <div>
                         <!-- Header Kartu: Logo & Tagline / Badge Kategori -->
@@ -62,11 +58,11 @@
                                class="shrink-0 transition-transform duration-300 hover:scale-105"
                                title="Lihat profil {{ $companyItem->name }}">
                                 @if($companyLogoUrl)
-                                    <div class="w-14 h-14 rounded-2xl bg-white p-2 flex items-center justify-center border border-[#93F514]/30 shadow-md group-hover:border-[#93F514] group-hover:shadow-lg group-hover:shadow-[#93F514]/20 transition-all duration-300">
+                                    <div class="w-14 h-14 rounded-2xl bg-white p-2 flex items-center justify-center border border-[#93F514]/30 shadow-md group-hover:border-[#93F514] group-hover:shadow-md transition-all duration-300">
                                         <img src="{{ $companyLogoUrl }}" alt="{{ $companyItem->name }}" class="w-full h-full object-contain">
                                     </div>
                                 @else
-                                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#93F514]/20 via-[#0a230a] to-[#040e04] border border-[#93F514]/40 flex items-center justify-center text-[#93F514] font-black text-lg sm:text-xl tracking-wider shadow-md group-hover:bg-[#93F514] group-hover:text-black group-hover:shadow-lg group-hover:shadow-[#93F514]/30 transition-all duration-300 group-initial-avatar">
+                                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#93F514]/20 via-[#0a230a] to-[#040e04] border border-[#93F514]/40 flex items-center justify-center text-[#93F514] font-black text-lg sm:text-xl tracking-wider shadow-md group-hover:bg-[#93F514] group-hover:text-black group-hover:shadow-md transition-all duration-300 group-initial-avatar">
                                         {{ $companyInitial }}
                                     </div>
                                 @endif

@@ -1,3 +1,4 @@
+
 <!-- Floating Blur Rounded Sticky Header on Scroll -->
 <header x-data="{ mobileMenuOpen: false, scrolled: window.scrollY > 20 }"
     @scroll.window="scrolled = (window.pageYOffset || document.documentElement.scrollTop) > 20" x-init="scrolled = (window.pageYOffset || document.documentElement.scrollTop) > 20"
@@ -5,7 +6,7 @@
 
     <div :class="scrolled
         ?
-        'max-w-5xl mx-auto rounded-full bg-[#050c05]/85 backdrop-blur-xl border border-[#93F514]/40 shadow-2xl shadow-[#93F514]/15 py-2.5 px-6 sm:px-8' :
+        'max-w-5xl mx-auto rounded-full bg-[#050c05]/85 backdrop-blur-xl border border-[#93F514]/40 shadow-2xl shadow-black/80 py-2.5 px-6 sm:px-8' :
         'max-w-7xl mx-auto bg-transparent border-b border-[#EEEEEE]/10 py-3 px-4 sm:px-6'"
         class="transition-all duration-500 ease-in-out flex items-center justify-between">
 
@@ -29,15 +30,15 @@
         <!-- Desktop Navigation Links -->
         <nav class="hidden md:flex items-center gap-8 text-sm font-semibold">
             <a href="{{ route('home') }}"
-                class="{{ request()->routeIs('home') ? 'text-[#93F514] font-bold drop-shadow-[0_0_12px_rgba(147, 245, 20,0.5)]' : 'text-gray-300 hover:text-[#93F514]' }} transition-all duration-200 py-1">
+                class="{{ request()->routeIs('home') ? 'text-[#93F514] font-bold' : 'text-gray-300 hover:text-[#93F514]' }} transition-all duration-200 py-1">
                 Beranda
             </a>
             <a href="{{ route('about') }}"
-                class="{{ request()->routeIs('about') ? 'text-[#93F514] font-bold drop-shadow-[0_0_12px_rgba(147, 245, 20,0.5)]' : 'text-gray-300 hover:text-[#93F514]' }} transition-all duration-200 py-1">
+                class="{{ request()->routeIs('about') ? 'text-[#93F514] font-bold' : 'text-gray-300 hover:text-[#93F514]' }} transition-all duration-200 py-1">
                 Tentang Kami
             </a>
             <a href="{{ route('jobs.index') }}"
-                class="{{ request()->routeIs('jobs.*') ? 'text-[#93F514] font-bold drop-shadow-[0_0_12px_rgba(147, 245, 20,0.5)]' : 'text-gray-300 hover:text-[#93F514]' }} transition-all duration-200 py-1">
+                class="{{ request()->routeIs('jobs.*') ? 'text-[#93F514] font-bold' : 'text-gray-300 hover:text-[#93F514]' }} transition-all duration-200 py-1">
                 Lowongan
             </a>
         </nav>
@@ -81,7 +82,7 @@
                     $shortName = \Illuminate\Support\Str::words($userName, 2, '');
                 @endphp
                 <a href="{{ $targetDashboard }}" title="{{ $userName }}"
-                    class="inline-flex items-center px-4 py-2 rounded-full bg-[#93F514]/10 hover:bg-[#93F514] text-[#93F514] hover:text-black border border-[#93F514]/40 text-xs sm:text-sm font-bold tracking-wide transition-all duration-200 shadow-sm hover:shadow-[#93F514]/30 max-w-[200px] truncate">
+                    class="inline-flex items-center px-4 py-2 rounded-full bg-[#93F514]/10 hover:bg-[#93F514] text-[#93F514] hover:text-black border border-[#93F514]/40 text-xs sm:text-sm font-bold tracking-wide transition-all duration-200 shadow-sm max-w-[200px] truncate">
                     <span class="truncate">{{ $shortName }}</span>
                 </a>
             @else
@@ -92,7 +93,7 @@
 
                 @if (Route::has('register'))
                     <a href="{{ route('register') }}"
-                        class="inline-flex items-center justify-center px-5 py-2 text-xs sm:text-sm font-bold text-[#EEEEEE] hover:text-black rounded-full bg-[#061806] hover:bg-[#93F514] border border-[#93F514]/50 shadow-md shadow-[#93F514]/15 hover:shadow-[#93F514]/30 transition-all duration-200">
+                        class="inline-flex items-center justify-center px-5 py-2 text-xs sm:text-sm font-bold text-[#EEEEEE] hover:text-black rounded-full bg-[#061806] hover:bg-[#93F514] border border-[#93F514]/50 shadow-md shadow-black/30 transition-all duration-200">
                         Daftar
                     </a>
                 @endif
@@ -169,7 +170,7 @@
                 </a>
                 @if (Route::has('register'))
                     <a @click="mobileMenuOpen = false" href="{{ route('register') }}"
-                        class="w-full text-center px-4 py-2.5 rounded-2xl bg-[#061806] hover:bg-[#93F514] text-[#EEEEEE] hover:text-black border border-[#93F514]/50 font-bold text-sm shadow-md shadow-[#93F514]/20 transition">
+                        class="w-full text-center px-4 py-2.5 rounded-2xl bg-[#061806] hover:bg-[#93F514] text-[#EEEEEE] hover:text-black border border-[#93F514]/50 font-bold text-sm shadow-md shadow-black/30 transition">
                         Daftar Akun Baru
                     </a>
                 @endif
