@@ -66,10 +66,7 @@
             @mouseenter="stopAutoplay()"
             @mouseleave="startAutoplay()">
 
-            <!-- Ambient Glow Backgrounds #93F514 -->
-            <div class="absolute top-1/4 left-1/4 w-[500px] h-[350px] bg-[#93F514]/15 rounded-full blur-[140px] pointer-events-none z-0"></div>
-            <div class="absolute bottom-10 right-10 w-96 h-96 bg-[#93F514]/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
-            <div class="absolute top-10 right-1/3 w-80 h-80 bg-[#5FE6B6]/10 rounded-full blur-[100px] pointer-events-none z-0"></div>
+
 
             <!-- Subtle Grid Background Pattern -->
             <div class="absolute inset-0 z-0 opacity-15 bg-[radial-gradient(#93F514_1px,transparent_1px)] [background-size:28px_28px] pointer-events-none"></div>
@@ -154,7 +151,7 @@
                         <!-- Main Heading -->
                         <h1 class="reveal-on-scroll text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold tracking-tight text-[#EEEEEE] leading-[1.15]" data-delay="100">
                             Mengenal Lebih Dekat <br>
-                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#93F514] via-[#75f06a] to-[#5FE6B6] drop-shadow-[0_0_25px_rgba(147,245,20,0.35)]">
+                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#93F514] via-[#75f06a] to-[#5FE6B6]">
                                 {{ $company->name ?? 'PT Mitra Karya Analitika' }}
                             </span>
                         </h1>
@@ -171,7 +168,7 @@
 
                         <!-- Action Buttons & Quick Nav -->
                         <div class="reveal-on-scroll pt-2 flex flex-wrap items-center gap-3.5" data-delay="250">
-                            <a href="{{ route('jobs.index') }}" class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#93F514] hover:bg-[#a6ff2e] text-black font-extrabold text-xs sm:text-sm tracking-wide shadow-lg shadow-[#93F514]/25 hover:scale-[1.02] transition-all duration-200">
+                            <a href="{{ route('jobs.index') }}" class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#93F514] hover:bg-[#a6ff2e] text-black font-extrabold text-xs sm:text-sm tracking-wide shadow-md shadow-black/30 hover:scale-[1.02] transition-all duration-200">
                                 <span>Lihat Lowongan Karir</span>
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -190,7 +187,7 @@
                             <span class="text-xs text-gray-400 font-semibold mr-1 about-doc-label">Dokumentasi:</span>
                             <template x-for="(slide, index) in slides" :key="index">
                                 <button @click="goTo(index)"
-                                    :class="currentSlide === index ? 'w-8 bg-[#93F514] shadow-[0_0_12px_rgba(147,245,20,0.6)] about-dot-active' : 'w-2.5 bg-white/25 hover:bg-white/45 border border-white/10 about-dot-inactive'"
+                                    :class="currentSlide === index ? 'w-8 bg-[#93F514] shadow-sm about-dot-active' : 'w-2.5 bg-white/25 hover:bg-white/45 border border-white/10 about-dot-inactive'"
                                     class="h-2 rounded-full transition-all duration-300 cursor-pointer"
                                     :aria-label="'Slide ' + (index + 1)">
                                 </button>
@@ -261,9 +258,7 @@
 
                 <!-- Right Visual Column (5 cols) -->
                 <div class="lg:col-span-5 reveal-on-scroll" data-delay="200">
-                    <div class="relative rounded-3xl bg-gradient-to-b from-[#071a07] via-[#051105] to-[#040804] border border-[#93F514]/40 p-8 shadow-2xl shadow-[#93F514]/15 overflow-hidden">
-                        <!-- Top Glow Circle -->
-                        <div class="absolute -top-16 -right-16 w-48 h-48 bg-[#93F514]/20 rounded-full blur-3xl pointer-events-none"></div>
+                    <div class="relative rounded-3xl bg-gradient-to-b from-[#071a07] via-[#051105] to-[#040804] border border-[#93F514]/40 p-8 shadow-2xl shadow-black/60 overflow-hidden">
 
                         <!-- Brand Logo Presentation -->
                         <div class="flex items-center gap-4 pb-6 border-b border-[#93F514]/20">
@@ -318,7 +313,7 @@
 
                         <!-- Action Button inside Card -->
                         <div class="pt-4 border-t border-[#93F514]/20">
-                            <a href="{{ route('jobs.index') }}" class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-[#93F514] hover:bg-[#a6ff2e] text-black font-extrabold text-xs sm:text-sm tracking-wide shadow-lg shadow-[#93F514]/25 hover:scale-[1.02] transition-all duration-200">
+                            <a href="{{ route('jobs.index') }}" class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-[#93F514] hover:bg-[#a6ff2e] text-black font-extrabold text-xs sm:text-sm tracking-wide shadow-md shadow-black/30 hover:scale-[1.02] transition-all duration-200">
                                 <span>Bergabung Bersama Kami</span>
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -333,8 +328,7 @@
 
         <!-- ==================== VISI & MISI ==================== -->
         <section class="relative py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-[#93F514]/20">
-            <!-- Ambient green glow -->
-            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#93F514]/10 rounded-full blur-[140px] pointer-events-none"></div>
+
 
             <div class="text-center max-w-3xl mx-auto mb-16">
                 {{-- <div class="reveal-on-scroll inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] text-xs font-bold uppercase tracking-wider mb-4">
@@ -349,15 +343,13 @@
             </div>
 
             <!-- Visi Card (Executive Showcase) -->
-            <div class="reveal-on-scroll relative rounded-3xl bg-gradient-to-br from-[#061806] via-[#041004] to-[#020702] border border-[#93F514]/35 hover:border-[#93F514]/70 p-8 sm:p-12 mb-14 shadow-2xl shadow-[#93F514]/15 overflow-hidden transition-all duration-300 visi-card" data-delay="150">
-                <!-- Background Glowing Light & Watermark Quote -->
-                <div class="absolute top-0 right-1/4 w-96 h-96 bg-[#93F514]/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="reveal-on-scroll relative rounded-3xl bg-gradient-to-br from-[#061806] via-[#041004] to-[#020702] border border-[#93F514]/35 hover:border-[#93F514]/70 p-8 sm:p-12 mb-14 shadow-2xl shadow-black/60 overflow-hidden transition-all duration-300 visi-card" data-delay="150">
                 <span class="absolute -right-4 -bottom-10 text-[180px] font-serif font-black text-[#93F514]/5 pointer-events-none select-none leading-none">&ldquo;</span>
 
                 <div class="relative z-10">
                     <!-- Top Badge & Context -->
                     <div class="flex items-center justify-between gap-4 mb-6">
-                        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] text-xs font-bold uppercase tracking-wider shadow-sm shadow-[#93F514]/10 visi-badge">
+                        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] text-xs font-bold uppercase tracking-wider shadow-sm visi-badge">
                             <span>Visi Perusahaan</span>
                         </div>
                         <span class="text-xs text-gray-400 font-semibold tracking-wide hidden sm:inline-block">Arah & Komitmen Strategis</span>
@@ -434,7 +426,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     @foreach($missionsList as $index => $mission)
-                        <div class="reveal-on-scroll relative rounded-3xl bg-gradient-to-b from-[#061506] to-[#030803] border border-[#93F514]/30 hover:border-[#93F514] p-7 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-[#93F514]/15 flex flex-col justify-between misi-card" data-delay="{{ 200 + ($index * 100) }}">
+                        <div class="reveal-on-scroll relative rounded-3xl bg-gradient-to-b from-[#061506] to-[#030803] border border-[#93F514]/30 hover:border-[#93F514] p-7 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-black/60 flex flex-col justify-between misi-card" data-delay="{{ 200 + ($index * 100) }}">
                             <div>
                                 <div class="flex items-center justify-between mb-5">
                                     <span class="text-3xl font-black text-[#93F514]/70 tracking-tight">0{{ $index + 1 }}</span>
@@ -522,7 +514,7 @@
                         $codeLetter = $val['code'] ?? substr($val['title'] ?? 'M', 0, 1);
                         $isLetterI = ($codeLetter === 'I');
                     @endphp
-                    <div class="reveal-on-scroll group relative rounded-3xl bg-gradient-to-b from-[#061506] via-[#040e04] to-[#020602] border border-[#93F514]/30 hover:border-[#93F514] p-7 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-[#93F514]/25 flex flex-col justify-between overflow-hidden mika-card" data-delay="{{ 150 + ($i * 75) }}">
+                    <div class="reveal-on-scroll group relative rounded-3xl bg-gradient-to-b from-[#061506] via-[#040e04] to-[#020602] border border-[#93F514]/30 hover:border-[#93F514] p-7 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-black/60 flex flex-col justify-between overflow-hidden mika-card" data-delay="{{ 150 + ($i * 75) }}">
                         <!-- Glowing letter background watermark (same font family) -->
                         <span class="absolute {{ $isLetterI ? 'right-4 sm:right-6 -bottom-6' : '-right-4 -bottom-6' }} text-8xl font-black text-[#93F514]/5 group-hover:text-[#93F514]/15 transition-colors duration-300 pointer-events-none select-none mika-watermark">
                             {{ $codeLetter }}
@@ -531,7 +523,7 @@
                         <div>
                             <!-- Header Icon & Letter Pill (same font family for all M-I-K-A) -->
                             <div class="flex items-center justify-between mb-6">
-                                <div class="w-14 h-14 rounded-2xl bg-[#93F514]/15 border border-[#93F514]/40 flex items-center justify-center text-[#93F514] font-black text-3xl group-hover:bg-[#93F514] group-hover:text-black transition-all duration-300 shadow-lg shadow-[#93F514]/10 mika-letter-box">
+                                <div class="w-14 h-14 rounded-2xl bg-[#93F514]/15 border border-[#93F514]/40 flex items-center justify-center text-[#93F514] font-black text-3xl group-hover:bg-[#93F514] group-hover:text-black transition-all duration-300 shadow-sm mika-letter-box">
                                     <span class="leading-none {{ $isLetterI ? 'scale-y-110 tracking-wider' : '' }}">
                                         {{ $codeLetter }}
                                     </span>
@@ -582,7 +574,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <!-- Unit 1: Laboratory -->
-                <div class="reveal-on-scroll rounded-3xl bg-gradient-to-b from-[#061506] to-[#030803] border border-[#93F514]/30 hover:border-[#93F514] p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-[#93F514]/15 flex flex-col justify-between">
+                <div class="reveal-on-scroll rounded-3xl bg-gradient-to-b from-[#061506] to-[#030803] border border-[#93F514]/30 hover:border-[#93F514] p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-black/60 flex flex-col justify-between">
                     <div>
                         <div class="w-14 h-14 rounded-2xl bg-[#93F514]/15 border border-[#93F514]/40 flex items-center justify-center text-[#93F514] mb-6">
                             <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -614,7 +606,7 @@
                 </div>
 
                 <!-- Unit 2: HSE -->
-                <div class="reveal-on-scroll rounded-3xl bg-gradient-to-b from-[#061506] to-[#030803] border border-[#93F514]/30 hover:border-[#93F514] p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-[#93F514]/15 flex flex-col justify-between" data-delay="100">
+                <div class="reveal-on-scroll rounded-3xl bg-gradient-to-b from-[#061506] to-[#030803] border border-[#93F514]/30 hover:border-[#93F514] p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-black/60 flex flex-col justify-between" data-delay="100">
                     <div>
                         <div class="w-14 h-14 rounded-2xl bg-[#93F514]/15 border border-[#93F514]/40 flex items-center justify-center text-[#93F514] mb-6">
                             <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -646,7 +638,7 @@
                 </div>
 
                 <!-- Unit 3: Environmental -->
-                <div class="reveal-on-scroll rounded-3xl bg-gradient-to-b from-[#061506] to-[#030803] border border-[#93F514]/30 hover:border-[#93F514] p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-[#93F514]/15 flex flex-col justify-between" data-delay="200">
+                <div class="reveal-on-scroll rounded-3xl bg-gradient-to-b from-[#061506] to-[#030803] border border-[#93F514]/30 hover:border-[#93F514] p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-black/60 flex flex-col justify-between" data-delay="200">
                     <div>
                         <div class="w-14 h-14 rounded-2xl bg-[#93F514]/15 border border-[#93F514]/40 flex items-center justify-center text-[#93F514] mb-6">
                             <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -797,10 +789,7 @@
 
         <!-- ==================== RECRUITMENT CTA BANNER ==================== -->
         <section class="relative py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-            <div class="reveal-on-scroll relative rounded-3xl bg-gradient-to-r from-[#041a04] via-[#062906] to-[#031203] border border-[#93F514]/40 p-8 sm:p-14 overflow-hidden shadow-2xl shadow-[#93F514]/20 text-center">
-                <!-- Background Ambient Glow -->
-                <div class="absolute -top-24 -left-24 w-72 h-72 bg-[#93F514]/20 rounded-full blur-3xl pointer-events-none"></div>
-                <div class="absolute -bottom-24 -right-24 w-72 h-72 bg-[#93F514]/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="reveal-on-scroll relative rounded-3xl bg-gradient-to-r from-[#041a04] via-[#062906] to-[#031203] border border-[#93F514]/40 p-8 sm:p-14 overflow-hidden shadow-2xl shadow-black/80 text-center">
 
                 <div class="relative z-10 max-w-2xl mx-auto">
                     {{-- <span class="inline-block px-3 py-1 rounded-full bg-[#93F514]/10 border border-[#93F514]/30 text-[#93F514] text-xs font-bold uppercase tracking-wider mb-4">
@@ -814,7 +803,7 @@
                     </p>
 
                     <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <a href="{{ route('jobs.index') }}" class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 rounded-full bg-gradient-to-r from-[#93F514] to-[#7ceb0c] text-black font-extrabold text-sm shadow-lg shadow-[#93F514]/30 hover:scale-105 transition-transform duration-200">
+                        <a href="{{ route('jobs.index') }}" class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 rounded-full bg-gradient-to-r from-[#93F514] to-[#7ceb0c] text-black font-extrabold text-sm shadow-md shadow-black/40 hover:scale-105 transition-transform duration-200">
                             Lihat Lowongan Kerja Aktif
                         </a>
                         @guest

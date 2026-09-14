@@ -231,7 +231,7 @@
 
             <!-- Job Header Card -->
             <div
-                class="reveal-on-scroll rounded-3xl bg-gradient-to-b from-[#061506] to-[#040804] border {{ $job->is_expired || $job->status !== 'Open' ? 'border-rose-500/30' : 'border-[#93F514]/30' }} p-6 sm:p-8 shadow-2xl {{ $job->is_expired || $job->status !== 'Open' ? 'shadow-rose-950/20' : 'shadow-[#93F514]/15' }}">
+                class="reveal-on-scroll rounded-3xl bg-gradient-to-b from-[#061506] to-[#040804] border {{ $job->is_expired || $job->status !== 'Open' ? 'border-rose-500/30' : 'border-[#93F514]/30' }} p-6 sm:p-8 shadow-2xl {{ $job->is_expired || $job->status !== 'Open' ? 'shadow-rose-950/20' : 'shadow-black/80' }}">
 
                 @if ($isAdminOrRecruiter)
                     <!-- Notice Banner Khusus Admin / Recruiter -->
@@ -264,13 +264,13 @@
                     <div class="flex items-start gap-4 min-w-0 flex-1">
                         @if ($job->company?->logo_url)
                             <div
-                                class="w-16 h-16 rounded-2xl bg-white border border-[#93F514]/40 p-2 flex items-center justify-center shadow-lg shadow-[#93F514]/20 shrink-0 overflow-hidden company-logo-box">
+                                class="w-16 h-16 rounded-2xl bg-white border border-[#93F514]/40 p-2 flex items-center justify-center shadow-md shadow-black/30 shrink-0 overflow-hidden company-logo-box">
                                 <img src="{{ $job->company->logo_url }}" alt="{{ $job->company->name }}"
                                     class="w-full h-full object-contain">
                             </div>
                         @else
                             <div
-                                class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#93F514] to-[#5ef558] flex items-center justify-center text-black font-extrabold text-2xl shadow-lg shadow-[#93F514]/25 shrink-0">
+                                class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#93F514] to-[#5ef558] flex items-center justify-center text-black font-extrabold text-2xl shadow-md shadow-black/30 shrink-0">
                                 {{ strtoupper(substr($job->company?->name ?? 'M', 0, 2)) }}
                             </div>
                         @endif
@@ -342,7 +342,7 @@
                                         <span>Dashboard</span>
                                     </a>
                                 @elseif($hasApplied)
-                                    <div class="flex-1 md:flex-initial h-11 sm:h-12 px-4 sm:px-5 rounded-2xl bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] font-bold text-xs sm:text-sm inline-flex items-center justify-center gap-2 shadow-lg shadow-[#93F514]/10 select-none whitespace-nowrap">
+                                    <div class="flex-1 md:flex-initial h-11 sm:h-12 px-4 sm:px-5 rounded-2xl bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] font-bold text-xs sm:text-sm inline-flex items-center justify-center gap-2 shadow-sm select-none whitespace-nowrap">
                                         <svg class="w-4 h-4 text-[#93F514] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                                         </svg>
@@ -355,7 +355,7 @@
                                 @else
                                     <button type="button" 
                                             @click="handleApplyClick()"
-                                            class="flex-1 md:flex-initial h-11 sm:h-12 px-6 rounded-2xl bg-[#93F514] hover:bg-[#82dc0a] text-black font-extrabold text-sm sm:text-base shadow-lg shadow-[#93F514]/25 transition cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap active:scale-[0.98]">
+                                            class="flex-1 md:flex-initial h-11 sm:h-12 px-6 rounded-2xl bg-[#93F514] hover:bg-[#82dc0a] text-black font-extrabold text-sm sm:text-base shadow-md shadow-black/30 transition cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap active:scale-[0.98]">
                                         <svg class="w-4 h-4 text-black shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
                                         </svg>
@@ -364,7 +364,7 @@
                                 @endif
                             @else
                                 <a href="{{ route('login') }}"
-                                    class="flex-1 md:flex-initial h-11 sm:h-12 px-6 rounded-2xl bg-[#93F514] hover:bg-[#82dc0a] text-black font-extrabold text-sm sm:text-base shadow-lg shadow-[#93F514]/25 transition inline-flex items-center justify-center gap-2 whitespace-nowrap active:scale-[0.98]">
+                                    class="flex-1 md:flex-initial h-11 sm:h-12 px-6 rounded-2xl bg-[#93F514] hover:bg-[#82dc0a] text-black font-extrabold text-sm sm:text-base shadow-md shadow-black/30 transition inline-flex items-center justify-center gap-2 whitespace-nowrap active:scale-[0.98]">
                                     <span>Masuk & Lamar</span>
                                 </a>
                             @endauth
@@ -601,7 +601,7 @@
                         @endif
                         @if ($job->company?->logo_url)
                             <div
-                                class="w-12 h-12 rounded-xl bg-white border border-[#93F514]/40 p-1.5 flex items-center justify-center shrink-0 overflow-hidden shadow-md shadow-[#93F514]/15">
+                                class="w-12 h-12 rounded-xl bg-white border border-[#93F514]/40 p-1.5 flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
                                 <img src="{{ $job->company->logo_url }}" alt="{{ $job->company->name }}"
                                     class="w-full h-full object-contain">
                             </div>
@@ -750,7 +750,7 @@
                         <!-- Modal Header -->
                         <div class="flex items-start justify-between gap-4">
                             <div class="flex items-center gap-3.5">
-                                <div class="w-12 h-12 rounded-2xl bg-[#93F514]/15 border border-[#93F514]/40 flex items-center justify-center text-[#93F514] shadow-lg shadow-[#93F514]/20 shrink-0">
+                                <div class="w-12 h-12 rounded-2xl bg-[#93F514]/15 border border-[#93F514]/40 flex items-center justify-center text-[#93F514] shadow-sm shrink-0">
                                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                     </svg>
@@ -809,7 +809,7 @@
                             </button>
                             <button type="submit" 
                                     :disabled="isSubmitting"
-                                    class="confirm-submit-btn px-6 py-2.5 rounded-xl bg-[#93F514] hover:bg-[#82dc0a] text-black font-extrabold text-xs shadow-lg shadow-[#93F514]/30 transition flex items-center gap-2 cursor-pointer disabled:opacity-50">
+                                    class="confirm-submit-btn px-6 py-2.5 rounded-xl bg-[#93F514] hover:bg-[#82dc0a] text-black font-extrabold text-xs shadow-md shadow-black/30 transition flex items-center gap-2 cursor-pointer disabled:opacity-50">
                                 <svg x-show="isSubmitting" class="animate-spin w-4 h-4 text-black" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -857,7 +857,7 @@
                         <!-- Modal Header -->
                         <div class="flex items-start justify-between gap-4">
                             <div class="flex items-center gap-3.5">
-                                <div class="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-lg shadow-amber-500/20 shrink-0">
+                                <div class="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-sm shrink-0">
                                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                                     </svg>
@@ -904,7 +904,7 @@
                                 Tutup
                             </button>
                             <a href="{{ route('profile') }}" 
-                               class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-600 hover:to-amber-500 text-black font-extrabold text-xs shadow-lg shadow-amber-500/20 transition text-center flex items-center justify-center gap-2">
+                               class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-600 hover:to-amber-500 text-black font-extrabold text-xs shadow-md shadow-black/30 transition text-center flex items-center justify-center gap-2">
                                 <span>Lengkapi Profil Sekarang</span>
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>

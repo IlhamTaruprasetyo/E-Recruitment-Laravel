@@ -288,14 +288,37 @@
                                         rows="6"
                                         wire:model.lazy="answers.{{ $currentQuestion['id'] }}"
                                         wire:change="submitEssayAnswer({{ $currentQuestion['id'] }})"
-                                        placeholder="Ketikkan jawaban essay Anda secara lengkap dan terstruktur..."
+                                        placeholder="Ketikkan jawaban essay Anda secara lengkap dan terstruktur... (Jika menyertakan link video/Google Drive, cantumkan di sini)"
                                         class="w-full p-4 rounded-2xl bg-gray-50 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-700 text-xs sm:text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition leading-relaxed"></textarea>
                                     <div class="flex items-center justify-between text-[11px] text-gray-400">
-                                        <span>💡 Jawaban teks tersimpan otomatis saat Anda berpindah soal atau menekan tombol navigasi.</span>
+                                        <span>Jawaban teks tersimpan otomatis saat Anda berpindah soal atau menekan tombol navigasi.</span>
                                     </div>
                                 </div>
 
-                                <!-- UPLOAD FILE ATTACHMENT ESSAY (ALL FILES, MAX 20MB, CLOUDINARY) -->
+                                <!-- PERHATIAN UNTUK FILE BESAR / VIDEO VIA GOOGLE DRIVE -->
+                                <div class="p-4 sm:p-5 rounded-2xl bg-amber-50/95 dark:bg-amber-950/40 border-2 border-amber-300/80 dark:border-amber-700/60 shadow-sm flex items-start gap-3.5">
+                                    <div class="w-10 h-10 rounded-xl bg-amber-500/20 dark:bg-amber-400/20 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0 mt-0.5">
+                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1 space-y-2 text-amber-950 dark:text-amber-100">
+                                        <div class="text-sm sm:text-base font-bold flex items-center gap-2 text-amber-900 dark:text-amber-200">
+                                            <span>Perhatian Khusus File Video / Ukuran Besar:</span>
+                                        </div>
+                                        <p class="text-xs sm:text-sm text-amber-900/90 dark:text-amber-200 leading-relaxed font-normal">
+                                            Batas unggah langsung dokumen adalah <strong>5 MB</strong>. Jika jawaban Anda membutuhkan lampiran berukuran besar atau berbentuk <strong>Video</strong>, mohon unggah terlebih dahulu ke <strong>Google Drive / Cloud Storage</strong> dan cantumkan link tautannya pada kolom jawaban uraian di atas.
+                                        </p>
+                                        <div class="p-2.5 sm:p-3 rounded-xl bg-amber-100/80 dark:bg-amber-900/50 border border-amber-300/60 dark:border-amber-700/60 text-xs sm:text-sm text-amber-900 dark:text-amber-200 font-medium flex items-start gap-2.5">
+                                            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                            </svg>
+                                            <span>Pastikan akses link Google Drive telah diatur ke <strong class="underline underline-offset-2">"Siapa saja yang memiliki link" (Anyone with the link)</strong> agar penguji dapat membukanya.</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- UPLOAD FILE ATTACHMENT ESSAY (MAKS 5MB) -->
                                 <div class="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 space-y-3">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center gap-2 text-xs font-bold text-gray-800 dark:text-gray-200">
@@ -305,7 +328,7 @@
                                             <span>Lampiran File Pendukung (Opsional)</span>
                                         </div>
                                         <span class="text-[11px] font-medium text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 px-2.5 py-0.5 rounded-full border border-slate-200 dark:border-slate-700">
-                                            Semua Format File - Maks. 20 MB
+                                            Dokumen Pendukung - Maks. 5 MB
                                         </span>
                                     </div>
 
@@ -334,28 +357,29 @@
                                                 <div class="truncate">
                                                     <a href="{{ $uploadedAttachment['url'] }}" target="_blank" class="text-xs font-semibold text-indigo-700 dark:text-indigo-300 hover:underline truncate block">
                                                         {{ $uploadedAttachment['name'] }}
-                                                                                                     <span class="text-[11px] text-gray-500 dark:text-slate-400">
+                                                    </a>
+                                                    <span class="text-[11px] text-gray-500 dark:text-slate-400">
                                                          @if(!empty($uploadedAttachment['size']))
                                                              {{ round($uploadedAttachment['size'] / 1024, 1) }} KB •
                                                          @endif
                                                          File Tersimpan
-                                                     </span>
-                                                 </div>
-                                             </div>
-                                             <div class="flex items-center gap-2 shrink-0 ml-2">
-                                                 <a href="{{ $uploadedAttachment['url'] }}" target="_blank" download class="p-2 text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 rounded-lg transition" title="Buka / Unduh File">
-                                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                                     </svg>
-                                                 </a>
-                                                 <button type="button" wire:click="removeEssayAttachment({{ $currentQuestion['id'] }})" wire:confirm="Apakah Anda yakin ingin menghapus lampiran file ini?" class="p-2 text-xs font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg transition" title="Hapus File">
-                                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                     </svg>
-                                                 </button>
-                                             </div>
-                                         </div>
-                                     @else
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center gap-2 shrink-0 ml-2">
+                                                <a href="{{ $uploadedAttachment['url'] }}" target="_blank" download class="p-2 text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 rounded-lg transition" title="Buka / Unduh File">
+                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                    </svg>
+                                                </a>
+                                                <button type="button" wire:click="removeEssayAttachment({{ $currentQuestion['id'] }})" wire:confirm="Apakah Anda yakin ingin menghapus lampiran file ini?" class="p-2 text-xs font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg transition" title="Hapus File">
+                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    @else
                                         <!-- INPUT UPLOAD FILE BARU (AUTO SAVE) -->
                                         <div>
                                             <label class="flex items-center gap-3 px-4 py-3 rounded-xl border border-dashed border-gray-300 dark:border-gray-700 bg-white dark:bg-slate-900/60 hover:border-indigo-400 cursor-pointer transition group">
@@ -366,9 +390,9 @@
                                                 </div>
                                                 <div class="flex-1 truncate">
                                                     <span class="text-xs text-gray-700 dark:text-gray-300 font-medium">
-                                                        Pilih atau drag file dokumen/analisis (Semua format, maks 20MB)
+                                                        Pilih atau drag file dokumen/analisis (Maks. 5 MB)
                                                     </span>
-                                                    <span class="block text-[10px] text-gray-400">File langsung tersimpan otomatis setelah dipilih</span>
+                                                    <span class="block text-[10px] text-gray-400">File otomatis tersimpan setelah dipilih • Khusus video harap cantumkan link Google Drive</span>
                                                 </div>
                                                 <input type="file" wire:model="essayFiles.{{ $currentQuestion['id'] }}" class="sr-only">
                                             </label>
@@ -714,8 +738,16 @@
         @endphp
 
         <div class="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm p-6 sm:p-10 text-center space-y-6">
-            <div class="w-16 h-16 rounded-3xl {{ $isWaitingReview ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400' : 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400' }} flex items-center justify-center mx-auto text-3xl shadow-md">
-                {{ $isWaitingReview ? '⏳' : '🎉' }}
+            <div class="w-16 h-16 rounded-3xl {{ $isWaitingReview ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400' : 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400' }} flex items-center justify-center mx-auto shadow-md">
+                @if ($isWaitingReview)
+                    <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                @else
+                    <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                @endif
             </div>
 
             <div>

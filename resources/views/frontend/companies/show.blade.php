@@ -90,7 +90,7 @@
                 <div class="space-y-2.5 min-w-0">
                     <div class="flex flex-wrap items-center gap-2">
                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] text-[11px] sm:text-xs font-bold uppercase tracking-wider shadow-xs company-ecosystem-badge">
-                            Ekosistem Grup MIKA
+                            Grup Perusahaan MIKA
                         </span>
 
                         @if($company->tagline)
