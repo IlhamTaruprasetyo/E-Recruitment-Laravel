@@ -49,7 +49,7 @@ Aplikasi web sistem rekrutmen terpadu, seleksi berkas, asesmen psikotes (DISC Te
 - **Authentication**: Laravel Breeze & Laravel Socialite (Google Login)
 - **PDF Generator**: [barryvdh/laravel-dompdf](https://github.com/barryvdh/laravel-dompdf)
 - **Excel Importer**: [maatwebsite/excel](https://maatwebsite.nl/laravel-excel)
-- **Database**: MySQL / MariaDB / SQLite
+- **Database**: MySQL / PostgreSQL
 
 ---
 
