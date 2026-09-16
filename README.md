@@ -42,7 +42,7 @@ Aplikasi web sistem rekrutmen terpadu, seleksi berkas, asesmen psikotes (DISC Te
 ---
 
 ## 🛠 Teknologi yang Digunakan
-- **Backend Framework**: [Laravel 12](https://laravel.com/)
+- **Backend Framework**: [Laravel 13](https://laravel.com/)
 - **PHP Version**: PHP 8.3+
 - **Reactive UI**: [Laravel Livewire 3](https://livewire.laravel.com/) & [Livewire Volt](https://livewire.laravel.com/docs/volt)
 - **Frontend / Styling**: [TailwindCSS](https://tailwindcss.com/) & [Vite](https://vitejs.dev/)
