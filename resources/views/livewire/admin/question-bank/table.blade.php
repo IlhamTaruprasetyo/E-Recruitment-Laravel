@@ -168,69 +168,156 @@
         </div>
     @endif
 
-    <!-- Header & Action Section -->
-    <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 overflow-hidden shadow-sm rounded-2xl p-6">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+    <!-- Main Container Card -->
+    <div class="relative bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+        
+        <!-- Header & Action Section -->
+        <div class="p-5 sm:p-6 border-b border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Daftar Bank Soal</h3>
-                <p class="text-xs text-gray-500 dark:text-slate-400">Kelola Pertanyaan Tes untuk seleksi pelamar.</p>
+                <h3 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white">Daftar Bank Soal</h3>
+                <p class="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Kelola butir soal ujian, kunci jawaban, dan integrasi paket tes seleksi.</p>
             </div>
-            <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-                <!-- Search Input -->
-                <div class="relative flex-1 sm:w-64 min-w-[200px]">
-                    <input type="text" 
-                           wire:model.live.debounce.300ms="search"
-                           placeholder="Cari teks pertanyaan..." 
-                           class="w-full pl-9 pr-4 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                    <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                </div>
 
-                <!-- Filter Category -->
-                <select wire:model.live="categoryId" class="px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                    <option value="">Semua Kategori</option>
-                    @foreach ($categories as $cat)
-                        <option value="{{ $cat->id }}">{{ $cat->name }}</option>
-                    @endforeach
-                </select>
-
-                <!-- Filter Type -->
-                <select wire:model.live="type" class="px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                    <option value="">Semua Jenis</option>
-                    <option value="multiple_choice">Pilihan Ganda</option>
-                    <option value="essay">Uraian / Essay</option>
-                    <option value="disc">Tes DISC</option>
-                </select>
-
-                @if ($search || $categoryId || $type)
-                    <button wire:click="resetFilters" class="px-3 py-2 text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition">
-                        Reset
-                    </button>
-                @endif
-
-                <button @click="showImportModal = true" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold shadow-md shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 w-full sm:w-auto shrink-0">
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                <button type="button" @click="showImportModal = true" class="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-600/20 transition active:scale-95 shrink-0 cursor-pointer">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                     </svg>
-                    Import Excel
+                    <span>Import Excel</span>
                 </button>
 
-                <button @click="showCreateModal = true" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-md shadow-indigo-500/20 transition-all flex items-center justify-center gap-2 w-full sm:w-auto shrink-0">
+                <button type="button" @click="showCreateModal = true" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-md shadow-indigo-600/20 transition active:scale-95 shrink-0 cursor-pointer">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
-                    Tambah Soal
+                    <span>Tambah Soal</span>
                 </button>
             </div>
         </div>
-    </div>
 
-    <!-- Data Table Section -->
-    <div class="relative bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
-        
+        <!-- Filter & Search Toolbar -->
+        <div class="p-4 sm:p-5 bg-gray-50/70 dark:bg-slate-800/50 border-b border-gray-100 dark:border-slate-800 space-y-3.5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
+                <!-- Search Input -->
+                <div class="relative lg:col-span-4">
+                    <input type="text" 
+                           wire:model.live.debounce.300ms="search" 
+                           placeholder="Cari pertanyaan, kategori, opsi..." 
+                           class="w-full pl-9 pr-4 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Filter Kategori -->
+                <div class="relative lg:col-span-3">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                        </svg>
+                    </div>
+                    <select wire:model.live="categoryId" class="w-full pl-9 pr-8 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition appearance-none cursor-pointer [color-scheme:light] dark:[color-scheme:dark]">
+                        <option value="">Semua Kategori</option>
+                        @foreach ($categories as $cat)
+                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                        @endforeach
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Filter Status Penggunaan di Tes -->
+                <div class="relative lg:col-span-3">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                        </svg>
+                    </div>
+                    <select wire:model.live="usageFilter" class="w-full pl-9 pr-8 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition appearance-none cursor-pointer [color-scheme:light] dark:[color-scheme:dark]">
+                        <option value="">Semua Status Tes</option>
+                        <option value="used">Sudah Dipakai di Tes</option>
+                        <option value="unused">Belum Dipakai (Standalone)</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Urutkan / Sort By -->
+                <div class="relative lg:col-span-2">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                        </svg>
+                    </div>
+                    <select wire:model.live="sortBy" class="w-full pl-9 pr-8 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition appearance-none cursor-pointer [color-scheme:light] dark:[color-scheme:dark]">
+                        <option value="latest">Terbaru</option>
+                        <option value="oldest">Terlama</option>
+                        <option value="points_desc">Poin Tertinggi</option>
+                        <option value="points_asc">Poin Terendah</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Toolbar Bottom Row: Quick Type Pills, Media Filter & Reset Button -->
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+                <div class="flex flex-wrap items-center gap-3">
+                    <!-- Quick Type Filter -->
+                    <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                        <span class="text-[11px] font-bold text-gray-400 uppercase mr-1">Jenis:</span>
+                        <button type="button" wire:click="$set('type', '')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $type === '' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-800' }}">
+                            Semua
+                        </button>
+                        <button type="button" wire:click="$set('type', 'multiple_choice')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $type === 'multiple_choice' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/40' }}">
+                            Pilihan Ganda
+                        </button>
+                        <button type="button" wire:click="$set('type', 'essay')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $type === 'essay' ? 'bg-amber-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 hover:bg-amber-50 dark:hover:bg-amber-950/40' }}">
+                            Essay
+                        </button>
+                        <button type="button" wire:click="$set('type', 'disc')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $type === 'disc' ? 'bg-purple-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-800 hover:bg-purple-50 dark:hover:bg-purple-950/40' }}">
+                            DISC
+                        </button>
+                    </div>
+
+                    <div class="hidden sm:block h-4 w-px bg-gray-200 dark:bg-slate-700"></div>
+
+                    <!-- Quick Media Filter -->
+                    <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                        <span class="text-[11px] font-bold text-gray-400 uppercase mr-1">Media:</span>
+                        <button type="button" wire:click="$set('hasImage', '')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $hasImage === '' ? 'bg-slate-700 dark:bg-slate-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-800' }}">
+                            Semua
+                        </button>
+                        <button type="button" wire:click="$set('hasImage', 'with_image')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $hasImage === 'with_image' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-800' }}">
+                            Ada Lampiran
+                        </button>
+                    </div>
+                </div>
+
+                @if ($search || $categoryId || $type || $usageFilter || $hasImage || $sortBy !== 'latest')
+                    <button type="button" wire:click="resetFilters" class="text-xs font-semibold text-rose-600 dark:text-rose-400 hover:underline inline-flex items-center gap-1 cursor-pointer">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        <span>Reset Filter</span>
+                    </button>
+                @endif
+            </div>
+        </div>
+
         <!-- Livewire Loading Overlay -->
-        <div wire:loading wire:target="search, categoryFilter, typeFilter, previousPage, nextPage, gotoPage" class="absolute inset-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-[1px] flex items-center justify-center z-10 transition">
+        <div wire:loading wire:target="search, categoryId, type, usageFilter, hasImage, sortBy, previousPage, nextPage, gotoPage, resetFilters" class="absolute inset-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-[1px] flex items-center justify-center z-10 transition">
             <div class="flex items-center gap-2.5 px-4 py-2.5 bg-slate-900/90 dark:bg-slate-800/90 text-white rounded-xl shadow-xl text-xs font-semibold">
                 <svg class="animate-spin w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -263,25 +350,40 @@
                                     <p class="font-bold text-gray-900 dark:text-white line-clamp-2" title="{{ $q->question }}">
                                         {{ Str::limit(trim($q->question), 120) }}
                                     </p>
-                                    @if ($q->image_path)
-                                        @php
-                                            $ext = strtolower(pathinfo($q->image_path, PATHINFO_EXTENSION));
-                                            $isImg = in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']);
-                                        @endphp
-                                        <div class="flex items-center gap-1.5 text-[11px] text-indigo-600 dark:text-indigo-400">
-                                            @if ($isImg)
-                                                <svg class="w-3.5 h-3.5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    <div class="flex flex-wrap items-center gap-2 pt-0.5">
+                                        @if ($q->image_path)
+                                            @php
+                                                $ext = strtolower(pathinfo($q->image_path, PATHINFO_EXTENSION));
+                                                $isImg = in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']);
+                                            @endphp
+                                            <div class="flex items-center gap-1 text-[11px] text-indigo-600 dark:text-indigo-400 font-medium">
+                                                @if ($isImg)
+                                                    <svg class="w-3.5 h-3.5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                    </svg>
+                                                    <span>Gambar ({{ strtoupper($ext) }})</span>
+                                                @else
+                                                    <svg class="w-3.5 h-3.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                    </svg>
+                                                    <span>Berkas ({{ strtoupper($ext) }})</span>
+                                                @endif
+                                            </div>
+                                        @endif
+
+                                        @if ($q->tests_count > 0)
+                                            <span class="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60" title="Digunakan dalam {{ $q->tests_count }} paket tes">
+                                                <svg class="w-3 h-3 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                                 </svg>
-                                                <span>Lampiran Gambar ({{ strtoupper($ext) }})</span>
-                                            @else
-                                                <svg class="w-3.5 h-3.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                                </svg>
-                                                <span>Lampiran Berkas ({{ strtoupper($ext) }})</span>
-                                            @endif
-                                        </div>
-                                    @endif
+                                                <span>{{ $q->tests_count }} Paket Tes</span>
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1 text-[10px] text-gray-400 dark:text-slate-500">
+                                                Belum masuk paket tes
+                                            </span>
+                                        @endif
+                                    </div>
                                     @if ($q->question_type === 'multiple_choice')
                                         <div class="text-[11px] text-gray-500 dark:text-slate-400">
                                             <span class="font-medium">Kunci:</span> 

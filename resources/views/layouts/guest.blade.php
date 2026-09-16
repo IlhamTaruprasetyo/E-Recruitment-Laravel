@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" id="guest-html-root">
 
 <head>
     <meta charset="utf-8">
@@ -20,6 +20,27 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <!-- Tailwind CSS CDN Fallback -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        };
+    </script>
+
+    <!-- Sync tema dengan frontend & app (mika-theme): apply sebelum render -->
+    <script>
+        (function () {
+            var root = document.getElementById('guest-html-root');
+            var mikaTheme = localStorage.getItem('mika-theme');
+            if (mikaTheme === 'light') {
+                root.classList.add('light-mode');
+                root.classList.remove('dark');
+            } else {
+                // Default = dark (sama dengan frontend)
+                root.classList.remove('light-mode');
+                root.classList.add('dark');
+            }
+        })();
+    </script>
 
     <style>
         :root {

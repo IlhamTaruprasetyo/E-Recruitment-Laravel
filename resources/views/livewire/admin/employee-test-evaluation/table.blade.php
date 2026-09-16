@@ -117,94 +117,198 @@
         </div>
     @endif
 
-    <!-- Control Header -->
-    <div
-        class="p-5 bg-white dark:bg-slate-800 rounded-3xl border border-gray-100 dark:border-slate-700 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+    <!-- Main Container Card -->
+    <div class="relative bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+        
+        <!-- Header Section -->
+        <div class="p-5 sm:p-6 border-b border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h3 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white">Hasil & Evaluasi Asesmen Karyawan</h3>
+                <p class="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Tinjau riwayat pengerjaan asesmen karyawan, berikan penilaian (grading) soal essay, dan evaluasi hasil tes.</p>
+            </div>
+        </div>
 
-        <!-- Search & Filter Controls -->
-        <div class="flex flex-wrap items-center gap-3 w-full flex-1">
-            <div class="relative w-full sm:w-64">
-                <input wire:model.live.debounce.300ms="search" type="text" placeholder="Cari nama karyawan / NIK..."
-                    class="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl text-xs text-gray-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition cursor-pointer">
-                <svg class="w-4 h-4 text-gray-400 dark:text-slate-400 absolute left-3.5 top-2.5" fill="none"
-                    viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
+        <!-- Filter & Search Toolbar -->
+        <div class="p-4 sm:p-5 bg-gray-50/70 dark:bg-slate-800/50 border-b border-gray-100 dark:border-slate-800 space-y-3.5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
+                <!-- Search Input -->
+                <div class="relative lg:col-span-3">
+                    <input type="text" 
+                           wire:model.live.debounce.300ms="search" 
+                           placeholder="Cari nama karyawan, NIK, asesmen..." 
+                           class="w-full pl-9 pr-4 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Filter Perusahaan -->
+                <div class="relative lg:col-span-3">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                    </div>
+                    <select wire:model.live="companyId" class="w-full pl-9 pr-8 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition appearance-none cursor-pointer [color-scheme:light] dark:[color-scheme:dark]">
+                        <option value="">Semua Perusahaan</option>
+                        @foreach ($companies as $comp)
+                            <option value="{{ $comp->id }}">{{ $comp->name }}</option>
+                        @endforeach
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Filter Departemen -->
+                <div class="relative lg:col-span-2">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg>
+                    </div>
+                    <select wire:model.live="departmentId" class="w-full pl-9 pr-8 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition appearance-none cursor-pointer [color-scheme:light] dark:[color-scheme:dark]">
+                        <option value="">Semua Departemen</option>
+                        @foreach ($departments as $dept)
+                            <option value="{{ $dept->id }}">
+                                {{ $dept->name }} @if(!$companyId && $dept->company)({{ $dept->company->name }})@endif
+                            </option>
+                        @endforeach
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Filter Paket Asesmen -->
+                <div class="relative lg:col-span-2">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                    </div>
+                    <select wire:model.live="testId" class="w-full pl-9 pr-8 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition appearance-none cursor-pointer [color-scheme:light] dark:[color-scheme:dark]">
+                        <option value="">Semua Asesmen</option>
+                        @foreach ($tests as $t)
+                            <option value="{{ $t->id }}">{{ $t->title }}</option>
+                        @endforeach
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Filter Status -->
+                <div class="relative lg:col-span-2">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <select wire:model.live="status" class="w-full pl-9 pr-8 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition appearance-none cursor-pointer [color-scheme:light] dark:[color-scheme:dark]">
+                        <option value="">Semua Status</option>
+                        <option value="needs_grading">Perlu Penilaian Essay</option>
+                        <option value="passed">Lolos Standar</option>
+                        <option value="failed">Di Bawah Standar</option>
+                        <option value="disc">Tes Kepribadian (DISC)</option>
+                        <option value="in_progress">Sedang Mengerjakan</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
             </div>
 
-            <!-- Filter Departemen -->
-            <select wire:model.live="departmentId"
-                class="pl-3 pr-8 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition cursor-pointer">
-                <option value="">Semua Departemen</option>
-                @foreach ($departments as $dept)
-                    <option value="{{ $dept->id }}">{{ $dept->name }}</option>
-                @endforeach
-            </select>
+            <!-- Toolbar Bottom Row: Quick Tipe Pegawai Badges & Reset Button -->
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+                <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                    <span class="text-[11px] font-bold text-gray-400 uppercase mr-1">Tipe:</span>
+                    <button type="button" wire:click="$set('employeeType', '')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $employeeType === '' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-800' }}">
+                        Semua
+                    </button>
+                    <button type="button" wire:click="$set('employeeType', 'permanent')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $employeeType === 'permanent' ? 'bg-emerald-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40' }}">
+                        Karyawan Tetap
+                    </button>
+                    <button type="button" wire:click="$set('employeeType', 'contract')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $employeeType === 'contract' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-950/40' }}">
+                        Kontrak
+                    </button>
+                    <button type="button" wire:click="$set('employeeType', 'internship')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $employeeType === 'internship' ? 'bg-amber-500 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 hover:bg-amber-50 dark:hover:bg-amber-950/40' }}">
+                        Magang
+                    </button>
+                    <button type="button" wire:click="$set('employeeType', 'probation')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $employeeType === 'probation' ? 'bg-purple-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-800 hover:bg-purple-50 dark:hover:bg-purple-950/40' }}">
+                        Probation
+                    </button>
+                </div>
 
-            <!-- Filter Tipe Pegawai -->
-            <select wire:model.live="employeeType"
-                class="pl-3 pr-8 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition cursor-pointer">
-                <option value="">Semua Tipe</option>
-                <option value="permanent">Karyawan Tetap</option>
-                <option value="contract">Kontrak</option>
-                <option value="internship">Magang / Intern</option>
-                <option value="probation">Probation</option>
-            </select>
-
-            <!-- Filter Paket Asesmen -->
-            <select wire:model.live="testId"
-                class="pl-3 pr-8 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition cursor-pointer">
-                <option value="">Semua Paket Asesmen</option>
-                @foreach ($tests as $t)
-                    <option value="{{ $t->id }}">{{ $t->title }}</option>
-                @endforeach
-            </select>
-
-            <!-- Filter Status -->
-            <select wire:model.live="status"
-                class="pl-3 pr-8 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition cursor-pointer">
-                <option value="">Semua Hasil</option>
-                <option value="in_progress">Sedang Mengerjakan</option>
-                <option value="disc">Tes Kepribadian DISC</option>
-                <option value="passed">Lolos Standar</option>
-                <option value="failed">Di Bawah Standar</option>
-                <option value="needs_grading">Perlu Penilaian Essay</option>
-            </select>
-
-            @if ($search || $departmentId || $employeeType || $testId || $status)
-                <button wire:click="resetFilters"
-                    class="p-2 text-gray-400 hover:text-rose-500 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-700 transition"
-                    title="Reset Filter">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                </button>
-            @endif
+                @if ($search || $companyId || $departmentId || $employeeType || $testId || $status || $sortField !== 'id')
+                    <button type="button" wire:click="resetFilters" class="text-xs font-semibold text-rose-600 dark:text-rose-400 hover:underline inline-flex items-center gap-1 cursor-pointer">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        <span>Reset Filter</span>
+                    </button>
+                @endif
+            </div>
         </div>
-    </div>
 
-    <!-- Table Card Container -->
-    <div
-        class="bg-white dark:bg-slate-800 rounded-3xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden">
+        <!-- Livewire Loading Overlay -->
+        <div wire:loading wire:target="search, companyId, departmentId, employeeType, testId, status, sortBy, previousPage, nextPage, gotoPage, resetFilters" class="absolute inset-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-[1px] flex items-center justify-center z-10 transition">
+            <div class="flex items-center gap-2.5 px-4 py-2.5 bg-slate-900/90 dark:bg-slate-800/90 text-white rounded-xl shadow-xl text-xs font-semibold">
+                <svg class="animate-spin w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Memuat data...</span>
+            </div>
+        </div>
+
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr
-                        class="border-b border-gray-100 dark:border-slate-700/80 bg-gray-50/50 dark:bg-slate-700/20 text-[11px] font-bold text-gray-400 dark:text-slate-400 uppercase tracking-wider">
+                    <tr class="border-b border-gray-200 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/50 text-gray-500 dark:text-slate-400 uppercase tracking-wider font-semibold text-[11px]">
                         <th class="py-4 px-6 w-12 text-center">No</th>
-                        <th class="py-4 px-6">Karyawan</th>
+                        <th class="py-4 px-6 cursor-pointer select-none hover:text-indigo-600 transition" wire:click="sortBy('employee')">
+                            <div class="flex items-center gap-1">
+                                <span>Karyawan</span>
+                                @if ($sortField === 'employee')
+                                    <span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
+                                @endif
+                            </div>
+                        </th>
                         <th class="py-4 px-6 text-center">Tipe Pegawai</th>
                         <th class="py-4 px-6">Departemen / Posisi</th>
                         <th class="py-4 px-6">Paket Asesmen</th>
-                        <th class="py-4 px-6 text-center">Waktu Pengerjaan</th>
-                        <th class="py-4 px-6 text-center">Hasil / Nilai</th>
+                        <th class="py-4 px-6 text-center cursor-pointer select-none hover:text-indigo-600 transition" wire:click="sortBy('started_at')">
+                            <div class="flex items-center justify-center gap-1">
+                                <span>Waktu Pengerjaan</span>
+                                @if ($sortField === 'started_at')
+                                    <span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
+                                @endif
+                            </div>
+                        </th>
+                        <th class="py-4 px-6 text-center cursor-pointer select-none hover:text-indigo-600 transition" wire:click="sortBy('score')">
+                            <div class="flex items-center justify-center gap-1">
+                                <span>Hasil / Nilai</span>
+                                @if ($sortField === 'score')
+                                    <span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
+                                @endif
+                            </div>
+                        </th>
                         <th class="py-4 px-6 text-center">Status</th>
                         <th class="py-4 px-6 text-right">Laporan / Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100 dark:divide-slate-700/50 text-xs">
+                <tbody class="divide-y divide-gray-100 dark:divide-slate-800/60 text-xs text-gray-700 dark:text-slate-300">
                     @forelse ($attempts as $index => $attempt)
                         @php
                             $emp = $attempt->user?->employeeProfile;
@@ -219,17 +323,36 @@
                             $totalScore = (float) ($attempt->total_score ?? 0);
                             $isPassed = $attempt->status === 'passed' || (!$isDisc && $totalScore >= $passingScore && $passingScore > 0) || ($passingScore == 0 && $attempt->status === 'passed');
                         @endphp
-                        <tr class="hover:bg-gray-50/80 dark:hover:bg-slate-700/30 transition duration-150">
+                        <tr class="hover:bg-gray-50/80 dark:hover:bg-slate-800/40 transition duration-150">
                             <td class="py-4 px-6 text-center font-medium text-gray-400 dark:text-slate-500">
                                 {{ $attempts->firstItem() + $index }}
                             </td>
                             <td class="py-4 px-6">
-                                <div class="font-bold text-gray-800 dark:text-slate-100 text-sm">
-                                    {{ $emp?->full_name ?? ($attempt->user?->name ?? 'Karyawan') }}
-                                </div>
-                                <div class="text-[11px] text-gray-400 dark:text-slate-500 mt-0.5 flex items-center gap-1.5 flex-wrap">
-                                    <span>NIK: {{ $emp?->nik ?? ($attempt->user?->nik ?? '-') }}</span>
-                                    <span>{{ $attempt->user?->email ?? '-' }}</span>
+                                <div class="flex items-center gap-3">
+                                    @php
+                                        $empPhoto = $emp?->photo ?? $attempt->user?->avatar;
+                                        $empPhotoUrl = null;
+                                        if ($empPhoto) {
+                                            $empPhotoUrl = str_starts_with($empPhoto, 'http') ? $empPhoto : asset('storage/' . $empPhoto);
+                                        }
+                                    @endphp
+                                    @if ($empPhotoUrl)
+                                        <img src="{{ $empPhotoUrl }}" alt="{{ $emp?->full_name ?? ($attempt->user?->name ?? 'Karyawan') }}" class="w-9 h-9 rounded-full object-cover ring-2 ring-indigo-500/20 shadow-xs shrink-0">
+                                    @else
+                                        <div class="w-9 h-9 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-bold text-xs flex items-center justify-center ring-2 ring-indigo-500/20 shrink-0">
+                                            {{ strtoupper(substr($emp?->full_name ?? ($attempt->user?->name ?? 'K'), 0, 2)) }}
+                                        </div>
+                                    @endif
+                                    <div>
+                                        <div class="font-bold text-gray-900 dark:text-white text-sm">
+                                            {{ $emp?->full_name ?? ($attempt->user?->name ?? 'Karyawan') }}
+                                        </div>
+                                        <div class="text-[11px] text-gray-400 dark:text-slate-400 mt-0.5 flex items-center gap-1.5 flex-wrap">
+                                            <span>NIK: {{ $emp?->nik ?? ($attempt->user?->nik ?? '-') }}</span>
+                                            <span>•</span>
+                                            <span>{{ $attempt->user?->email ?? '-' }}</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </td>
                             <td class="py-4 px-6 text-center whitespace-nowrap">
@@ -365,12 +488,11 @@
         </div>
 
         @if ($attempts->hasPages() || $perPage != 10)
-            <div
-                class="p-4 border-t border-gray-100 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="px-6 py-4 border-t border-gray-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div class="flex items-center gap-2">
                     <span class="text-xs text-gray-500 dark:text-slate-400">Tampilkan</span>
                     <select wire:model.live="perPage"
-                        class="pl-2.5 pr-7 py-1.5 text-xs rounded-lg bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition cursor-pointer">
+                        class="pl-2.5 pr-7 py-1.5 text-xs rounded-lg bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition cursor-pointer">
                         <option value="10">10</option>
                         <option value="25">25</option>
                         <option value="50">50</option>

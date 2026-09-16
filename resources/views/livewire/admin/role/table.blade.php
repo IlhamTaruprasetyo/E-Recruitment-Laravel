@@ -129,7 +129,7 @@
                 <tbody class="divide-y divide-gray-100 dark:divide-slate-800/60 text-gray-700 dark:text-slate-300">
                     @forelse ($roles as $role)
                         @php
-                            $isCore = in_array(strtolower($role->name), ['admin', 'applicant', 'recruiter', 'superadmin']);
+                            $isCore = in_array(strtolower($role->name), ['admin', 'applicant', 'recruiter', 'employee', 'karyawan', 'superadmin']);
                         @endphp
                         <tr class="hover:bg-gray-50/80 dark:hover:bg-slate-800/40 transition-colors">
                             <td class="px-6 py-4 font-mono font-bold text-gray-500 dark:text-slate-400">

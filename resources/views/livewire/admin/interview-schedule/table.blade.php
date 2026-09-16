@@ -54,10 +54,18 @@
         notes: ''
     },
 
+    // Helper to get candidate photo from schedule
+    getCandidatePhoto(schedule) {
+        let p = schedule?.job_application?.applicant_profile?.photo || schedule?.job_application?.applicant_profile?.user?.avatar || null;
+        if (!p) return null;
+        return p.startsWith('http') ? p : ('/storage/' + p);
+    },
+
     // Edit form data
     editData: {
         id: null,
         applicant_name: '',
+        applicant_photo: null,
         job_title: '',
         users_id: '',
         interview_date: '',
@@ -72,6 +80,7 @@
     completeData: {
         id: null,
         applicant_name: '',
+        applicant_photo: null,
         job_title: '',
         company_name: '',
         users_id: '',
@@ -89,6 +98,7 @@
     deleteData: {
         id: null,
         applicant_name: '',
+        applicant_photo: null,
         interview_date: ''
     },
 
@@ -116,6 +126,7 @@
     openEditModal(schedule) {
         this.editData.id = schedule.id;
         this.editData.applicant_name = schedule.job_application?.applicant_profile?.full_name || 'Kandidat';
+        this.editData.applicant_photo = this.getCandidatePhoto(schedule);
         this.editData.job_title = schedule.job_application?.job?.title || 'Posisi';
         this.editData.users_id = schedule.users_id;
         
@@ -143,6 +154,7 @@
     openCompleteModal(schedule) {
         this.completeData.id = schedule.id;
         this.completeData.applicant_name = schedule.job_application?.applicant_profile?.full_name || 'Kandidat';
+        this.completeData.applicant_photo = this.getCandidatePhoto(schedule);
         this.completeData.job_title = schedule.job_application?.job?.title || 'Posisi';
         this.completeData.company_name = schedule.job_application?.job?.company?.name || '';
         this.completeData.users_id = schedule.users_id;
@@ -160,6 +172,7 @@
     openDeleteModal(schedule) {
         this.deleteData.id = schedule.id;
         this.deleteData.applicant_name = schedule.job_application?.applicant_profile?.full_name || 'Kandidat';
+        this.deleteData.applicant_photo = this.getCandidatePhoto(schedule);
         this.deleteData.interview_date = schedule.interview_date;
         this.showDeleteModal = true;
     },
@@ -260,10 +273,13 @@
 
         <!-- Filter & Search Toolbar -->
         <div class="p-4 sm:p-5 bg-gray-50/70 dark:bg-slate-800/50 border-b border-gray-100 dark:border-slate-800 space-y-3.5">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
                 <!-- Search Input -->
-                <div class="relative lg:col-span-2">
-                    <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari nama pelamar, lowongan, lokasi, atau pewawancara..." class="w-full pl-9 pr-4 py-2 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                <div class="relative lg:col-span-3">
+                    <input type="text" 
+                           wire:model.live.debounce.300ms="search" 
+                           placeholder="Cari pelamar, lokasi, pewawancara..." 
+                           class="w-full pl-9 pr-4 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -271,74 +287,116 @@
                     </div>
                 </div>
 
-                <!-- Filter Lowongan -->
-                <div>
-                    <select wire:model.live="jobFilter" class="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                        <option value="">Semua Lowongan</option>
-                        @foreach ($jobs as $job)
-                            <option value="{{ $job->id }}">{{ $job->title }} ({{ $job->company->name ?? '-' }})</option>
+                <!-- Filter Perusahaan -->
+                <div class="relative lg:col-span-3">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                    </div>
+                    <select wire:model.live="companyFilter" class="w-full pl-9 pr-8 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition appearance-none cursor-pointer [color-scheme:light] dark:[color-scheme:dark]">
+                        <option value="">Semua Perusahaan</option>
+                        @foreach ($companies as $comp)
+                            <option value="{{ $comp->id }}">{{ $comp->name }}</option>
                         @endforeach
                     </select>
+                    <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Filter Lowongan (Otomatis terfilter sesuai perusahaan yang dipilih) -->
+                <div class="relative lg:col-span-3">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <select wire:model.live="jobFilter" class="w-full pl-9 pr-8 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition appearance-none cursor-pointer [color-scheme:light] dark:[color-scheme:dark]">
+                        <option value="">{{ $companyFilter ? 'Semua Lowongan di Perusahaan Ini' : 'Semua Lowongan' }}</option>
+                        @foreach ($jobs as $job)
+                            <option value="{{ $job->id }}">
+                                {{ $job->title }} @if(!$companyFilter && $job->company)({{ $job->company->name }})@endif
+                            </option>
+                        @endforeach
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
                 </div>
 
                 <!-- Filter Pewawancara -->
-                <div>
-                    <select wire:model.live="interviewerFilter" class="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                <div class="relative lg:col-span-3">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                    </div>
+                    <select wire:model.live="interviewerFilter" class="w-full pl-9 pr-8 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition appearance-none cursor-pointer [color-scheme:light] dark:[color-scheme:dark]">
                         <option value="">Semua Pewawancara</option>
                         @foreach ($interviewers as $user)
                             <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->role->name ?? 'Staff' }})</option>
                         @endforeach
                     </select>
+                    <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
                 </div>
             </div>
 
             <!-- Quick Filter Badges (Time, Type, Status) -->
             <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
-                <div class="flex flex-wrap items-center gap-2">
+                <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
                     <span class="text-[11px] font-bold text-gray-400 uppercase mr-1">Waktu:</span>
-                    <button type="button" wire:click="$set('timeFilter', 'all')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition {{ $timeFilter === 'all' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-slate-700 hover:bg-gray-100' }}">
+                    <button type="button" wire:click="$set('timeFilter', 'all')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $timeFilter === 'all' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-800' }}">
                         Semua
                     </button>
-                    <button type="button" wire:click="$set('timeFilter', 'today')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition {{ $timeFilter === 'today' ? 'bg-amber-500 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-slate-700 hover:bg-gray-100' }}">
+                    <button type="button" wire:click="$set('timeFilter', 'today')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $timeFilter === 'today' ? 'bg-amber-500 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-800' }}">
                         Hari Ini
                     </button>
-                    <button type="button" wire:click="$set('timeFilter', 'upcoming')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition {{ $timeFilter === 'upcoming' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-slate-700 hover:bg-gray-100' }}">
+                    <button type="button" wire:click="$set('timeFilter', 'upcoming')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $timeFilter === 'upcoming' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-800' }}">
                         Mendatang
                     </button>
 
                     <div class="h-4 w-px bg-gray-300 dark:bg-slate-700 mx-1 hidden sm:block"></div>
 
                     <span class="text-[11px] font-bold text-gray-400 uppercase mr-1">Metode:</span>
-                    <button type="button" wire:click="$set('typeFilter', 'all')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition {{ $typeFilter === 'all' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-slate-700 hover:bg-gray-100' }}">
+                    <button type="button" wire:click="$set('typeFilter', 'all')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $typeFilter === 'all' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-800' }}">
                         Semua
                     </button>
-                    <button type="button" wire:click="$set('typeFilter', 'online')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition {{ $typeFilter === 'online' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-slate-700 hover:bg-gray-100' }}">
+                    <button type="button" wire:click="$set('typeFilter', 'online')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $typeFilter === 'online' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-800' }}">
                         Online (Video)
                     </button>
-                    <button type="button" wire:click="$set('typeFilter', 'offline')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition {{ $typeFilter === 'offline' ? 'bg-purple-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-slate-700 hover:bg-gray-100' }}">
+                    <button type="button" wire:click="$set('typeFilter', 'offline')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $typeFilter === 'offline' ? 'bg-purple-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-800' }}">
                         Tatap Muka
                     </button>
 
                     <div class="h-4 w-px bg-gray-300 dark:bg-slate-700 mx-1 hidden sm:block"></div>
 
                     <span class="text-[11px] font-bold text-gray-400 uppercase mr-1">Keputusan:</span>
-                    <button type="button" wire:click="$set('statusFilter', '')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition {{ $statusFilter === '' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-slate-700 hover:bg-gray-100' }}">
+                    <button type="button" wire:click="$set('statusFilter', '')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $statusFilter === '' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-800' }}">
                         Semua
                     </button>
-                    <button type="button" wire:click="$set('statusFilter', 'Accepted')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition {{ $statusFilter === 'Accepted' ? 'bg-emerald-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50' }}">
+                    <button type="button" wire:click="$set('statusFilter', 'Accepted')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $statusFilter === 'Accepted' ? 'bg-emerald-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40' }}">
                         Lolos (Diterima)
                     </button>
-                    <button type="button" wire:click="$set('statusFilter', 'Rejected')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition {{ $statusFilter === 'Rejected' ? 'bg-rose-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800 hover:bg-rose-50' }}">
+                    <button type="button" wire:click="$set('statusFilter', 'Rejected')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $statusFilter === 'Rejected' ? 'bg-rose-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800 hover:bg-rose-50 dark:hover:bg-rose-950/40' }}">
                         Tidak Lolos
                     </button>
-                    <button type="button" wire:click="$set('statusFilter', 'Scheduled')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition {{ $statusFilter === 'Scheduled' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 hover:bg-blue-50' }}">
+                    <button type="button" wire:click="$set('statusFilter', 'Scheduled')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $statusFilter === 'Scheduled' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-950/40' }}">
                         Terjadwal
                     </button>
                 </div>
 
                 <!-- Reset Filter Button -->
-                @if ($search || $jobFilter || $interviewerFilter || $statusFilter || $timeFilter !== 'all' || $typeFilter !== 'all')
-                    <button type="button" wire:click="resetFilters" class="text-xs font-semibold text-rose-600 dark:text-rose-400 hover:underline inline-flex items-center gap-1">
+                @if ($search || $companyFilter || $jobFilter || $interviewerFilter || $statusFilter || $timeFilter !== 'all' || $typeFilter !== 'all')
+                    <button type="button" wire:click="resetFilters" class="text-xs font-semibold text-rose-600 dark:text-rose-400 hover:underline inline-flex items-center gap-1 cursor-pointer">
                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -391,18 +449,33 @@
                             <!-- Kandidat & Posisi -->
                             <td class="py-4 px-4 sm:px-6">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
-                                        {{ strtoupper(substr($schedule->jobApplication->applicantProfile->full_name ?? 'K', 0, 1)) }}
-                                    </div>
+                                    @php
+                                        $candProfile = $schedule->jobApplication?->applicantProfile;
+                                        $candPhoto = $candProfile?->photo ?? $candProfile?->user?->avatar;
+                                        $candPhotoUrl = null;
+                                        if ($candPhoto) {
+                                            $candPhotoUrl = \Illuminate\Support\Str::startsWith($candPhoto, ['http://', 'https://'])
+                                                ? $candPhoto
+                                                : asset('storage/' . $candPhoto);
+                                        }
+                                        $candName = $candProfile->full_name ?? 'Pelamar Tidak Ditemukan';
+                                    @endphp
+                                    @if ($candPhotoUrl)
+                                        <img src="{{ $candPhotoUrl }}" alt="{{ $candName }}" class="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-slate-700 shadow-sm shrink-0">
+                                    @else
+                                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
+                                            {{ strtoupper(substr($candName, 0, 2)) }}
+                                        </div>
+                                    @endif
                                     <div class="min-w-0">
                                         <p class="font-bold text-gray-900 dark:text-white truncate">
-                                            {{ $schedule->jobApplication->applicantProfile->full_name ?? 'Pelamar Tidak Ditemukan' }}
+                                            {{ $candName }}
                                         </p>
                                         <p class="text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold truncate">
                                             {{ $schedule->jobApplication->job->title ?? '-' }}
                                         </p>
                                         <p class="text-[10px] text-gray-400 truncate">
-                                            {{ $schedule->jobApplication->job->company->name ?? '-' }} • {{ $schedule->jobApplication->applicantProfile->user->email ?? '-' }}
+                                            {{ $schedule->jobApplication->job->company->name ?? '-' }} • {{ $candProfile->user->email ?? '-' }}
                                         </p>
                                     </div>
                                 </div>
@@ -429,6 +502,10 @@
                                             <span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 dark:bg-gray-800 text-gray-500">
                                                 Lewat
                                             </span>
+                                        @else
+                                            <span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400">
+                                                Mendatang
+                                            </span>
                                         @endif
                                     </div>
                                 </div>
@@ -436,33 +513,31 @@
 
                             <!-- Metode & Lokasi -->
                             <td class="py-4 px-4">
-                                <div class="space-y-1.5">
+                                <div class="space-y-1">
                                     @if ($isOnline)
                                         <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
                                             <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                                             </svg>
-                                            <span>Online</span>
-                                        </div>
-
-                                        <div class="text-[11px] text-gray-700 dark:text-gray-300 truncate max-w-xs">
-                                            {{ $schedule->location }}
+                                            <span>Online (Video Call)</span>
                                         </div>
 
                                         @if ($schedule->meeting_link)
                                             <div class="flex items-center gap-2 pt-0.5">
-                                                <a href="{{ $schedule->meeting_link }}" target="_blank" class="inline-flex items-center gap-1 px-2 py-1 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 text-[11px] font-bold transition">
-                                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <a href="{{ $schedule->meeting_link }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline max-w-[200px] truncate">
+                                                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                                     </svg>
-                                                    <span>Buka Link Meeting</span>
+                                                    <span class="truncate">{{ $schedule->meeting_link }}</span>
                                                 </a>
-                                                <button type="button" @click="copyToClipboard('{{ $schedule->meeting_link }}')" title="Salin Link Meeting" class="p-1 rounded text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition">
+                                                <button type="button" @click="copyToClipboard('{{ $schedule->meeting_link }}')" class="p-1 rounded text-gray-400 hover:text-indigo-600 hover:bg-gray-100 dark:hover:bg-slate-800 transition" title="Salin Link Meeting">
                                                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
                                                     </svg>
                                                 </button>
                                             </div>
+                                        @else
+                                            <p class="text-[11px] text-gray-400 italic">Tautan meeting belum diisi</p>
                                         @endif
                                     @else
                                         <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
@@ -471,7 +546,7 @@
                                             </svg>
                                             <span>Tatap Muka (Offline)</span>
                                         </div>
-                                        <p class="text-[11px] text-gray-700 dark:text-gray-300 font-medium line-clamp-2 max-w-xs">
+                                        <p class="text-[11px] text-gray-700 dark:text-gray-300 font-medium line-clamp-2 max-w-xs mt-1">
                                             {{ $schedule->location }}
                                         </p>
                                     @endif
@@ -480,10 +555,23 @@
 
                             <!-- Pewawancara -->
                             <td class="py-4 px-4 whitespace-nowrap">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center justify-center font-bold text-[10px]">
-                                        {{ strtoupper(substr($schedule->user->name ?? 'U', 0, 1)) }}
-                                    </div>
+                                <div class="flex items-center gap-2.5">
+                                    @php
+                                        $interviewerPhoto = $schedule->user?->avatar ?? $schedule->user?->employeeProfile?->photo;
+                                        $interviewerPhotoUrl = null;
+                                        if ($interviewerPhoto) {
+                                            $interviewerPhotoUrl = \Illuminate\Support\Str::startsWith($interviewerPhoto, ['http://', 'https://'])
+                                                ? $interviewerPhoto
+                                                : asset('storage/' . $interviewerPhoto);
+                                        }
+                                    @endphp
+                                    @if ($interviewerPhotoUrl)
+                                        <img src="{{ $interviewerPhotoUrl }}" alt="{{ $schedule->user->name ?? 'Pewawancara' }}" class="w-7 h-7 rounded-full object-cover border border-gray-200 dark:border-slate-700 shrink-0 shadow-2xs">
+                                    @else
+                                        <div class="w-7 h-7 rounded-full bg-indigo-50 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-slate-700 flex items-center justify-center font-bold text-[10px] shrink-0">
+                                            {{ strtoupper(substr($schedule->user->name ?? 'U', 0, 1)) }}
+                                        </div>
+                                    @endif
                                     <div>
                                         <p class="font-bold text-gray-800 dark:text-gray-200 text-xs">
                                             {{ $schedule->user->name ?? '-' }}
@@ -659,9 +747,14 @@
                             <!-- Selected Candidate Card Display -->
                             <div x-show="selectedCandidate" class="p-3 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 flex items-center justify-between gap-3 transition">
                                 <div class="flex items-center gap-3 min-w-0">
-                                    <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
-                                        <span x-text="selectedCandidate ? selectedCandidate.name.charAt(0).toUpperCase() : 'K'"></span>
-                                    </div>
+                                    <template x-if="selectedCandidate && selectedCandidate.photo">
+                                        <img :src="selectedCandidate.photo" :alt="selectedCandidate.name" class="w-9 h-9 rounded-full object-cover border border-indigo-200 dark:border-indigo-800 shrink-0 shadow-xs">
+                                    </template>
+                                    <template x-if="!selectedCandidate || !selectedCandidate.photo">
+                                        <div class="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+                                            <span x-text="selectedCandidate ? selectedCandidate.name.charAt(0).toUpperCase() : 'K'"></span>
+                                        </div>
+                                    </template>
                                     <div class="min-w-0">
                                         <p class="font-bold text-gray-900 dark:text-white text-xs truncate" x-text="selectedCandidate ? selectedCandidate.name : ''"></p>
                                         <p class="text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold truncate" x-text="selectedCandidate ? (selectedCandidate.job_title + (selectedCandidate.company ? ' • ' + selectedCandidate.company : '')) : ''"></p>
@@ -707,9 +800,14 @@
                                     <template x-for="cand in filteredCandidates()" :key="cand.id">
                                         <button type="button" @click="selectCandidate(cand)" class="w-full text-left p-2.5 rounded-xl hover:bg-indigo-50/80 dark:hover:bg-slate-800/80 transition flex items-center justify-between gap-3 group">
                                             <div class="flex items-center gap-2.5 min-w-0">
-                                                <div class="w-7 h-7 rounded-full bg-gray-100 dark:bg-gray-800 group-hover:bg-indigo-600 group-hover:text-white text-gray-600 dark:text-gray-300 flex items-center justify-center font-bold text-[11px] shrink-0 transition">
-                                                    <span x-text="cand.name.charAt(0).toUpperCase()"></span>
-                                                </div>
+                                                <template x-if="cand.photo">
+                                                    <img :src="cand.photo" :alt="cand.name" class="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-slate-700 shrink-0">
+                                                </template>
+                                                <template x-if="!cand.photo">
+                                                    <div class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 group-hover:bg-indigo-600 group-hover:text-white text-gray-600 dark:text-gray-300 flex items-center justify-center font-bold text-[11px] shrink-0 transition">
+                                                        <span x-text="cand.name.charAt(0).toUpperCase()"></span>
+                                                    </div>
+                                                </template>
                                                 <div class="min-w-0">
                                                     <p class="font-bold text-gray-900 dark:text-white text-xs truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400" x-text="cand.name"></p>
                                                     <p class="text-[11px] text-gray-500 dark:text-gray-400 truncate" x-text="cand.job_title + (cand.company ? ' • ' + cand.company : '')"></p>
@@ -863,10 +961,20 @@
                         @method('PUT')
 
                         <!-- Info Pelamar -->
-                        <div class="p-3 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200/60 dark:border-slate-700 text-xs">
-                            <span class="text-gray-400 block text-[11px]">Kandidat & Posisi</span>
-                            <span class="font-bold text-gray-900 dark:text-white block" x-text="editData.applicant_name"></span>
-                            <span class="text-indigo-600 dark:text-indigo-400 block text-[11px]" x-text="editData.job_title"></span>
+                        <div class="p-3 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200/60 dark:border-slate-700 text-xs flex items-center gap-3">
+                            <template x-if="editData.applicant_photo">
+                                <img :src="editData.applicant_photo" :alt="editData.applicant_name" class="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-slate-700 shrink-0 shadow-sm">
+                            </template>
+                            <template x-if="!editData.applicant_photo">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
+                                    <span x-text="editData.applicant_name ? editData.applicant_name.charAt(0).toUpperCase() : 'K'"></span>
+                                </div>
+                            </template>
+                            <div class="min-w-0">
+                                <span class="text-gray-400 block text-[10px] uppercase font-semibold tracking-wider">Kandidat & Posisi</span>
+                                <span class="font-bold text-gray-900 dark:text-white block truncate text-sm" x-text="editData.applicant_name"></span>
+                                <span class="text-indigo-600 dark:text-indigo-400 block text-xs font-semibold truncate" x-text="editData.job_title"></span>
+                            </div>
                         </div>
 
                         <!-- Waktu & Pewawancara -->
@@ -1015,13 +1123,23 @@
                         <input type="hidden" name="status" value="Completed">
 
                         <!-- Info Pelamar Card -->
-                        <div class="p-3 rounded-xl bg-gray-50 dark:bg-slate-800/80 border border-gray-200/70 dark:border-slate-700 text-xs flex items-center justify-between">
-                            <div>
-                                <span class="text-gray-400 font-semibold block text-[10px] uppercase tracking-wider">Kandidat & Posisi</span>
-                                <span class="font-bold text-gray-900 dark:text-white block mt-0.5 text-xs" x-text="completeData.applicant_name"></span>
-                                <span class="text-indigo-600 dark:text-indigo-400 block text-[11px] font-semibold" x-text="completeData.job_title + (completeData.company_name ? ' • ' + completeData.company_name : '')"></span>
+                        <div class="p-3 rounded-xl bg-gray-50 dark:bg-slate-800/80 border border-gray-200/70 dark:border-slate-700 text-xs flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <template x-if="completeData.applicant_photo">
+                                    <img :src="completeData.applicant_photo" :alt="completeData.applicant_name" class="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-slate-700 shrink-0 shadow-sm">
+                                </template>
+                                <template x-if="!completeData.applicant_photo">
+                                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
+                                        <span x-text="completeData.applicant_name ? completeData.applicant_name.charAt(0).toUpperCase() : 'K'"></span>
+                                    </div>
+                                </template>
+                                <div class="min-w-0">
+                                    <span class="text-gray-400 font-semibold block text-[10px] uppercase tracking-wider">Kandidat & Posisi</span>
+                                    <span class="font-bold text-gray-900 dark:text-white block mt-0.5 text-xs truncate" x-text="completeData.applicant_name"></span>
+                                    <span class="text-indigo-600 dark:text-indigo-400 block text-[11px] font-semibold truncate" x-text="completeData.job_title + (completeData.company_name ? ' • ' + completeData.company_name : '')"></span>
+                                </div>
                             </div>
-                            <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                            <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 shrink-0">
                                 Selesai Wawancara
                             </span>
                         </div>
@@ -1142,8 +1260,23 @@
                     </h3>
                     
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                        Apakah Anda yakin ingin menghapus jadwal wawancara untuk kandidat <strong class="text-gray-900 dark:text-white" x-text="deleteData.applicant_name"></strong>? Tindakan ini tidak dapat dibatalkan.
+                        Apakah Anda yakin ingin menghapus jadwal wawancara untuk kandidat ini? Tindakan ini tidak dapat dibatalkan.
                     </p>
+
+                    <div class="p-3 my-3 rounded-xl bg-gray-50 dark:bg-slate-800/70 border border-gray-200/60 dark:border-slate-700 text-xs flex items-center gap-3 text-left">
+                        <template x-if="deleteData.applicant_photo">
+                            <img :src="deleteData.applicant_photo" :alt="deleteData.applicant_name" class="w-9 h-9 rounded-full object-cover border border-gray-200 dark:border-slate-700 shrink-0 shadow-xs">
+                        </template>
+                        <template x-if="!deleteData.applicant_photo">
+                            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+                                <span x-text="deleteData.applicant_name ? deleteData.applicant_name.charAt(0).toUpperCase() : 'K'"></span>
+                            </div>
+                        </template>
+                        <div class="min-w-0">
+                            <span class="font-bold text-gray-900 dark:text-white block truncate text-xs" x-text="deleteData.applicant_name"></span>
+                            <span class="text-[10px] text-gray-400 block truncate">Jadwal wawancara yang akan dihapus</span>
+                        </div>
+                    </div>
 
                     <form :action="'{{ $routePrefix }}/' + deleteData.id" method="POST" class="mt-6 flex items-center justify-center gap-3">
                         @csrf

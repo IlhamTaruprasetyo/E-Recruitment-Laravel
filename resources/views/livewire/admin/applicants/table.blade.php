@@ -117,32 +117,111 @@
             </button>
         </div>
     @endif
-
-    <!-- Header & Filter Section -->
-    <div class="relative z-20 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 shadow-sm rounded-2xl p-6">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+    <!-- Header, Quick Tabs & Filter Section -->
+    <div class="relative z-20 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 shadow-sm rounded-2xl p-5 space-y-4">
+        <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-3 pb-3 border-b border-gray-100 dark:border-slate-800">
             <div>
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Daftar Lamaran Kerja</h3>
-                <p class="text-xs text-gray-500 dark:text-slate-400">Pantau dan kelola tahapan seleksi berkas pelamar pekerjaan.</p>
+                <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <span>Daftar Lamaran Kerja Masuk</span>
+                    @if(($stats['submitted'] ?? 0) > 0)
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                            {{ $stats['submitted'] }} Perlu Diproses
+                        </span>
+                    @endif
+                </h3>
+                <p class="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Kelola dan seleksi pelamar dari tahap pendaftaran hingga diterima.</p>
             </div>
-            
-            <div class="flex flex-wrap items-center gap-3">
+
+            <!-- Quick Status Horizontal Pill Tabs -->
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 xl:pb-0 custom-scrollbar">
+                @php
+                    $tabs = [
+                        '' => ['label' => 'Semua', 'count' => $stats['total'] ?? 0],
+                        'Submitted' => ['label' => 'Perlu Review', 'count' => $stats['submitted'] ?? 0],
+                        'Reviewed' => ['label' => 'Lolos Berkas', 'count' => $stats['reviewed'] ?? 0],
+                        'Shortlisted' => ['label' => 'Shortlisted', 'count' => $stats['shortlisted'] ?? 0],
+                        'Interview' => ['label' => 'Wawancara', 'count' => $stats['interview'] ?? 0],
+                        'Accepted' => ['label' => 'Diterima', 'count' => $stats['accepted'] ?? 0],
+                        'Rejected' => ['label' => 'Ditolak', 'count' => $stats['rejected'] ?? 0],
+                    ];
+                @endphp
+                @foreach($tabs as $tabKey => $tabData)
+                    <button type="button" 
+                            wire:click="setStatusFilter('{{ $tabKey }}')"
+                            class="px-2.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer {{ ($statusFilter === $tabKey && empty($selectedStatuses)) ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/20' : 'bg-gray-50 dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/80 border border-gray-200/60 dark:border-slate-700/60' }}">
+                        <span>{{ $tabData['label'] }}</span>
+                        <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold {{ ($statusFilter === $tabKey && empty($selectedStatuses)) ? 'bg-white/20 text-white' : 'bg-gray-200/70 dark:bg-slate-700 text-gray-700 dark:text-slate-300' }}">
+                            {{ $tabData['count'] }}
+                        </span>
+                    </button>
+                @endforeach
+            </div>
+        </div>
+        
+        <!-- Filter Controls Toolbar -->
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-2.5 flex-1 min-w-[280px]">
                 <!-- Search Input -->
-                <div class="relative w-full sm:w-60">
+                <div class="relative flex-1 min-w-[200px] max-w-xs">
                     <input type="text" 
                            wire:model.live.debounce.300ms="search"
-                           placeholder="Cari pelamar, posisi..." 
-                           class="w-full pl-9 pr-4 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                    <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+                           placeholder="Cari pelamar, email, NIK, posisi..." 
+                           class="w-full pl-9 pr-4 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
                 </div>
 
+                <!-- Company Filter -->
+                <div class="relative min-w-[160px] sm:w-52">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                    </div>
+                    <select wire:model.live="companyFilter" class="w-full pl-9 pr-8 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition appearance-none cursor-pointer [color-scheme:light] dark:[color-scheme:dark]">
+                        <option value="">Semua Perusahaan</option>
+                        @foreach($companies as $company)
+                            <option value="{{ $company->id }}">{{ $company->name }}</option>
+                        @endforeach
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Job Filter -->
+                <div class="relative min-w-[160px] sm:w-56">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <select wire:model.live="jobFilter" class="w-full pl-9 pr-8 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition appearance-none cursor-pointer [color-scheme:light] dark:[color-scheme:dark]">
+                        <option value="">{{ $companyFilter ? 'Semua Lowongan di Perusahaan Ini' : 'Semua Lowongan' }}</option>
+                        @foreach($jobs as $job)
+                            <option value="{{ $job->id }}">{{ $job->title }}</option>
+                        @endforeach
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
                 <!-- Multi-Checklist Status Filter Dropdown -->
                 <div x-data="{ open: false }" class="relative">
                     <button @click="open = !open" 
                             type="button" 
-                            class="inline-flex items-center gap-2 px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700/80 transition focus:outline-none">
+                            class="inline-flex items-center gap-2 px-3.5 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700/80 transition focus:outline-none cursor-pointer shadow-2xs">
                         <svg class="w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                         </svg>
@@ -202,7 +281,7 @@
                 <div x-data="{ open: false }" class="relative">
                     <button @click="open = !open" 
                             type="button" 
-                            class="inline-flex items-center gap-2 px-3 py-2 text-xs rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/60 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition focus:outline-none font-semibold">
+                            class="inline-flex items-center gap-2 px-3 py-2 text-xs rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/60 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition focus:outline-none font-semibold cursor-pointer">
                         <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
                         </svg>
@@ -256,9 +335,9 @@
                     </div>
                 </div>
 
-                @if(!empty($selectedStatuses) || $search || $sortField !== 'id')
-                    <button wire:click="resetAllFilters" class="px-3 py-2 text-xs rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 transition font-medium">
-                        Reset Semua Filter
+                @if(!empty($selectedStatuses) || $statusFilter || $companyFilter || $jobFilter || $search || $sortField !== 'id')
+                    <button wire:click="resetAllFilters" class="px-3 py-2 text-xs rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/60 transition font-medium cursor-pointer">
+                        Reset Filter
                     </button>
                 @endif
             </div>
@@ -397,15 +476,25 @@
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         @if ($app->applicantProfile && $app->applicantProfile->photo)
-                                            <img src="{{ \Illuminate\Support\Str::startsWith($app->applicantProfile->photo, ['http://', 'https://']) ? $app->applicantProfile->photo : asset('storage/' . $app->applicantProfile->photo) }}" alt="{{ $app->applicantProfile->full_name }}" class="w-9 h-9 rounded-full object-cover border border-gray-200 dark:border-slate-700 shadow-sm shrink-0">
+                                            <img src="{{ \Illuminate\Support\Str::startsWith($app->applicantProfile->photo, ['http://', 'https://']) ? $app->applicantProfile->photo : asset('storage/' . $app->applicantProfile->photo) }}" alt="{{ $app->applicantProfile->full_name }}" class="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-slate-700 shadow-sm shrink-0">
                                         @else
-                                            <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-sm shrink-0">
+                                            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-sm shrink-0">
                                                 {{ strtoupper(substr($app->applicantProfile->full_name ?? 'P', 0, 2)) }}
                                             </div>
                                         @endif
                                         <div>
-                                            <span class="font-bold text-gray-900 dark:text-white block text-sm">{{ $app->applicantProfile->full_name ?? 'Pelamar' }}</span>
-                                            <span class="text-[11px] text-gray-400 dark:text-slate-400 block">{{ $app->applicantProfile->user->email ?? '-' }}</span>
+                                            <div class="flex items-center gap-1.5 flex-wrap">
+                                                <span class="font-bold text-gray-900 dark:text-white text-sm">{{ $app->applicantProfile->full_name ?? 'Pelamar' }}</span>
+                                                @if ($app->status === 'Submitted' || \Carbon\Carbon::parse($app->applied_at)->greaterThanOrEqualTo(now()->subHours(48)))
+                                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-300/60" title="Lamaran baru diajukan">
+                                                        Baru
+                                                    </span>
+                                                @endif
+                                            </div>
+                                            <span class="text-[11px] text-gray-500 dark:text-slate-400 block mt-0.5">{{ $app->applicantProfile->user->email ?? '-' }}</span>
+                                            @if($app->applicantProfile && $app->applicantProfile->phone)
+                                                <span class="text-[10.5px] text-gray-400 dark:text-slate-500 block">{{ $app->applicantProfile->phone }}</span>
+                                            @endif
                                         </div>
                                     </div>
                                 </td>
@@ -423,16 +512,16 @@
                             @if(in_array('job', $selectedColumns))
                                 <td class="px-6 py-4">
                                     <div>
-                                        <span class="font-semibold text-gray-800 dark:text-slate-200 block">{{ $app->job->title ?? 'Lowongan' }}</span>
-                                        <div class="flex items-center gap-2 mt-0.5">
+                                        <span class="font-semibold text-gray-800 dark:text-slate-200 block text-xs">{{ $app->job->title ?? 'Lowongan' }}</span>
+                                        <div class="flex flex-wrap items-center gap-1.5 mt-1">
                                             @if ($app->job && $app->job->company)
-                                                <span class="text-[11px] font-medium text-indigo-600 dark:text-indigo-400">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/60">
                                                     {{ $app->job->company->name }}
                                                 </span>
                                             @endif
                                             @if ($app->job && $app->job->department)
-                                                <span class="text-[11px] text-gray-400">
-                                                    • {{ $app->job->department->name }}
+                                                <span class="text-[11px] text-gray-400 dark:text-slate-500">
+                                                    {{ $app->job->department->name }}
                                                 </span>
                                             @endif
                                         </div>
@@ -442,9 +531,14 @@
 
                             @if(in_array('applied_at', $selectedColumns))
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="text-gray-600 dark:text-slate-300 font-medium text-xs">
-                                        {{ \Carbon\Carbon::parse($app->applied_at)->timezone('Asia/Jakarta')->translatedFormat('d M Y, H:i') }} WIB
-                                    </span>
+                                    <div>
+                                        <span class="text-gray-900 dark:text-white font-medium text-xs block">
+                                            {{ \Carbon\Carbon::parse($app->applied_at)->timezone('Asia/Jakarta')->translatedFormat('d M Y, H:i') }} WIB
+                                        </span>
+                                        <span class="text-[10.5px] text-gray-400 dark:text-slate-500 block">
+                                            {{ \Carbon\Carbon::parse($app->applied_at)->timezone('Asia/Jakarta')->diffForHumans() }}
+                                        </span>
+                                    </div>
                                 </td>
                             @endif
 
@@ -488,16 +582,29 @@
 
                             @if(in_array('actions', $selectedColumns))
                                 <td class="px-6 py-4 text-right">
-                                    <div class="flex items-center justify-end gap-2">
-                                        <!-- View Detail Button -->
-                                        <button @click="openDetailModal({{ \Illuminate\Support\Js::from($app) }})" class="p-1.5 rounded-lg text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors" title="Lihat Detail Profil">
+                                    <div class="flex items-center justify-end gap-1.5">
+                                        @php
+                                            $cvUrl = $app->applicantProfile?->cv_file_url ?? ($app->applicantProfile?->cv_file_path ? asset('storage/' . $app->applicantProfile->cv_file_path) : null);
+                                        @endphp
+                                        @if($cvUrl)
+                                            <!-- Quick CV Document Preview Link -->
+                                            <a href="{{ $cvUrl }}" target="_blank" class="px-2 py-1.5 rounded-xl text-rose-600 dark:text-rose-400 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 transition-colors border border-rose-200/80 dark:border-rose-900/60 flex items-center gap-1 text-[11px] font-semibold cursor-pointer" title="Buka Dokumen CV Pelamar (PDF)">
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                                </svg>
+                                                <span>CV</span>
+                                            </a>
+                                        @endif
+
+                                        <!-- View Detail Profile Modal Button -->
+                                        <button @click="openDetailModal({{ \Illuminate\Support\Js::from($app) }})" class="p-1.5 rounded-xl text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors border border-transparent hover:border-gray-200 dark:hover:border-slate-700 cursor-pointer" title="Lihat Profil Lengkap">
                                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
                                         </button>
 
-                                        <!-- Edit Status Button -->
+                                        <!-- Update Status Button -->
                                         <button @click="openStatusModal({{ \Illuminate\Support\Js::from([
                                             'id' => $app->id,
                                             'applicant_name' => $app->applicantProfile->full_name ?? 'Pelamar',
@@ -505,10 +612,11 @@
                                             'job_title' => $app->job->title ?? 'Lowongan',
                                             'status' => $app->status ?? 'Submitted',
                                             'notes' => $app->notes ?? '',
-                                        ]) }})" class="p-1.5 rounded-lg text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors" title="Update Status Lamaran">
-                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        ]) }})" class="px-2.5 py-1.5 rounded-xl text-emerald-700 dark:text-emerald-300 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/50 dark:hover:bg-emerald-900/60 transition-colors border border-emerald-200/80 dark:border-emerald-800/80 flex items-center gap-1 text-[11px] font-semibold cursor-pointer" title="Update Status Lamaran">
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
+                                            <span>Proses</span>
                                         </button>
                                     </div>
                                 </td>
@@ -564,9 +672,18 @@
                 <div class="p-6 space-y-6">
                     <div class="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-slate-800">
                         <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-base shadow-md">
-                                <span x-text="detailData.applicant_profile ? (detailData.applicant_profile.full_name || 'P').substring(0, 2).toUpperCase() : 'P'"></span>
-                            </div>
+                            <template x-if="detailData.applicant_profile && detailData.applicant_profile.photo">
+                                <img :src="detailData.applicant_profile.photo.startsWith('http') 
+                                    ? detailData.applicant_profile.photo 
+                                    : ('/storage/' + detailData.applicant_profile.photo)" 
+                                    :alt="detailData.applicant_profile ? detailData.applicant_profile.full_name : 'Pelamar'" 
+                                    class="w-12 h-12 rounded-full object-cover border border-gray-200 dark:border-slate-700 shadow-md shrink-0">
+                            </template>
+                            <template x-if="!detailData.applicant_profile || !detailData.applicant_profile.photo">
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-base shadow-md shrink-0">
+                                    <span x-text="detailData.applicant_profile ? (detailData.applicant_profile.full_name || 'P').substring(0, 2).toUpperCase() : 'P'"></span>
+                                </div>
+                            </template>
                             <div>
                                 <h3 class="text-lg font-bold text-gray-900 dark:text-white" x-text="detailData.applicant_profile ? detailData.applicant_profile.full_name : 'Detail Pelamar'"></h3>
                                 <p class="text-xs text-indigo-600 dark:text-indigo-400 font-semibold" x-text="detailData.job ? (detailData.job.title + ' • ' + (detailData.job.company ? detailData.job.company.name : '')) : ''"></p>
