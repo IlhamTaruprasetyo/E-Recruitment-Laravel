@@ -5,6 +5,7 @@ namespace App\Livewire\Admin;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\TestAttempt;
+use App\Models\Company;
 use App\Models\Department;
 use App\Models\Test;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +15,7 @@ class EmployeeTestEvaluationTable extends Component
     use WithPagination;
 
     public $search = '';
+    public $companyId = '';
     public $departmentId = '';
     public $employeeType = '';
     public $testId = '';
@@ -25,6 +27,13 @@ class EmployeeTestEvaluationTable extends Component
 
     public function updatingSearch()
     {
+        $this->resetPage();
+    }
+
+    public function updatingCompanyId()
+    {
+        $this->departmentId = '';
+        $this->testId = '';
         $this->resetPage();
     }
 
@@ -67,6 +76,7 @@ class EmployeeTestEvaluationTable extends Component
     public function resetFilters()
     {
         $this->search = '';
+        $this->companyId = '';
         $this->departmentId = '';
         $this->employeeType = '';
         $this->testId = '';
@@ -78,11 +88,31 @@ class EmployeeTestEvaluationTable extends Component
 
     public function render()
     {
-        $departments = Department::orderBy('name', 'asc')->get();
-        $tests = Test::where('test_type', 'employee')->orderBy('title', 'asc')->get();
+        $companies = Company::orderBy('name', 'asc')->get();
+
+        $departments = Department::with('company')
+            ->when($this->companyId, function ($q) {
+                $q->where('company_id', $this->companyId);
+            })
+            ->orderBy('name', 'asc')
+            ->get();
+
+        $tests = Test::where('test_type', 'employee')
+            ->when($this->companyId, function ($query) {
+                $query->where(function ($q) {
+                    $q->whereHas('departments', function ($d) {
+                        $d->where('company_id', $this->companyId);
+                    })->orWhereHas('department', function ($d) {
+                        $d->where('company_id', $this->companyId);
+                    });
+                });
+            })
+            ->orderBy('title', 'asc')
+            ->get();
 
         $query = TestAttempt::with([
-            'user.employeeProfile.department',
+            'user.employeeProfile.company',
+            'user.employeeProfile.department.company',
             'user.employeeProfile.position',
             'test.category',
             'test.department',
@@ -115,10 +145,34 @@ class EmployeeTestEvaluationTable extends Component
             });
         }
 
+        // Filter Perusahaan
+        if (!empty($this->companyId)) {
+            $query->where(function ($q) {
+                $q->whereHas('user.employeeProfile', function ($ep) {
+                    $ep->where('company_id', $this->companyId)
+                       ->orWhereHas('department', function ($d) {
+                           $d->where('company_id', $this->companyId);
+                       });
+                })->orWhereHas('test', function ($t) {
+                    $t->whereHas('departments', function ($d) {
+                        $d->where('company_id', $this->companyId);
+                    })->orWhereHas('department', function ($d) {
+                        $d->where('company_id', $this->companyId);
+                    });
+                });
+            });
+        }
+
         // Filter Departemen
         if (!empty($this->departmentId)) {
-            $query->whereHas('user.employeeProfile', function ($ep) {
-                $ep->where('department_id', $this->departmentId);
+            $query->where(function ($q) {
+                $q->whereHas('user.employeeProfile', function ($ep) {
+                    $ep->where('department_id', $this->departmentId);
+                })->orWhereHas('test', function ($t) {
+                    $t->whereHas('departments', function ($d) {
+                        $d->where('departments.id', $this->departmentId);
+                    })->orWhere('department_id', $this->departmentId);
+                });
             });
         }
 
@@ -171,8 +225,10 @@ class EmployeeTestEvaluationTable extends Component
 
         return view('livewire.admin.employee-test-evaluation.table', [
             'attempts' => $attempts,
+            'companies' => $companies,
             'departments' => $departments,
             'tests' => $tests,
         ]);
     }
 }
+

@@ -45,7 +45,7 @@ class RoleController extends Controller
         $role = Role::findOrFail($id);
 
         // Protect primary core roles from deletion
-        if (in_array(strtolower($role->name), ['admin', 'applicant', 'recruiter'])) {
+        if (in_array(strtolower($role->name), ['admin', 'applicant', 'recruiter', 'employee', 'karyawan', 'superadmin'])) {
             return redirect()->route('admin.role')->with('error', 'Role utama sistem (' . $role->name . ') tidak dapat dihapus');
         }
 

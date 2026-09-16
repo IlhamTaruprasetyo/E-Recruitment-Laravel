@@ -3,8 +3,14 @@
 <script>
     // Early theme detection — runs before CSS renders to prevent flash
     (function() {
-        if (localStorage.getItem('mika-theme') === 'light') {
-            document.getElementById('html-root').classList.add('light-mode');
+        var mikaTheme = localStorage.getItem('mika-theme');
+        var html = document.getElementById('html-root');
+        if (mikaTheme === 'light') {
+            html.classList.add('light-mode');
+            html.classList.remove('dark');
+        } else {
+            html.classList.remove('light-mode');
+            html.classList.add('dark');
         }
     })();
 </script>
@@ -48,6 +54,11 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <!-- Tailwind CSS CDN Fallback for instant styling -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        };
+    </script>
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
@@ -1989,8 +2000,10 @@
                     const html = document.getElementById('html-root');
                     if (this.isDark) {
                         html.classList.remove('light-mode');
+                        html.classList.add('dark');
                         localStorage.setItem('mika-theme', 'dark');
                     } else {
+                        html.classList.remove('dark');
                         html.classList.add('light-mode');
                         localStorage.setItem('mika-theme', 'light');
                     }

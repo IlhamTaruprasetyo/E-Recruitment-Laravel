@@ -5,6 +5,7 @@ namespace App\Livewire\Admin;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\TestAttempt;
+use App\Models\Company;
 use App\Models\Job;
 use App\Models\Test;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +15,7 @@ class TestEvaluationTable extends Component
     use WithPagination;
 
     public $search = '';
+    public $companyId = '';
     public $jobId = '';
     public $testId = '';
     public $status = '';
@@ -24,6 +26,12 @@ class TestEvaluationTable extends Component
 
     public function updatingSearch()
     {
+        $this->resetPage();
+    }
+
+    public function updatingCompanyId()
+    {
+        $this->jobId = '';
         $this->resetPage();
     }
 
@@ -61,6 +69,7 @@ class TestEvaluationTable extends Component
     public function resetFilters()
     {
         $this->search = '';
+        $this->companyId = '';
         $this->jobId = '';
         $this->testId = '';
         $this->status = '';
@@ -71,7 +80,14 @@ class TestEvaluationTable extends Component
 
     public function render()
     {
-        $jobs = Job::orderBy('title', 'asc')->get();
+        $companies = Company::orderBy('name', 'asc')->get();
+
+        $jobsQuery = Job::with('company')->orderBy('title', 'asc');
+        if (!empty($this->companyId)) {
+            $jobsQuery->where('company_id', $this->companyId);
+        }
+        $jobs = $jobsQuery->get();
+
         $tests = Test::where(function ($q) {
             $q->where('test_type', 'recruitment')
               ->orWhereNull('test_type');
@@ -79,7 +95,7 @@ class TestEvaluationTable extends Component
 
         $query = TestAttempt::with([
             'jobApplication.applicantProfile.user',
-            'jobApplication.job',
+            'jobApplication.job.company',
             'test.category',
             'answers.question.options',
             'answers.option',
@@ -105,6 +121,13 @@ class TestEvaluationTable extends Component
                 ->orWhereHas('jobApplication.job', function ($j) use ($search) {
                     $j->whereRaw('LOWER(title) LIKE ?', ['%' . $search . '%']);
                 });
+            });
+        }
+
+        // Filter Perusahaan
+        if (!empty($this->companyId)) {
+            $query->whereHas('jobApplication.job', function ($j) {
+                $j->where('company_id', $this->companyId);
             });
         }
 
@@ -194,9 +217,11 @@ class TestEvaluationTable extends Component
 
         return view('livewire.admin.test-evaluation.table', [
             'attempts'      => $attempts,
+            'companies'     => $companies,
             'jobs'          => $jobs,
             'tests'         => $tests,
             'search'        => $this->search,
+            'companyId'     => $this->companyId,
             'jobId'         => $this->jobId,
             'testId'        => $this->testId,
             'status'        => $this->status,

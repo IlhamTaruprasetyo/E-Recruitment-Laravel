@@ -18,52 +18,123 @@
         </div>
     @endif
 
-    <!-- Control Header -->
-    <div class="p-5 bg-white dark:bg-slate-800 rounded-3xl border border-gray-100 dark:border-slate-700 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+    <!-- Main Container Card -->
+    <div class="relative bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
         
-        <!-- Search & Filter Controls -->
-        <div class="flex flex-wrap items-center gap-3 w-full flex-1">
-            <div class="relative w-full sm:w-72">
-                <input wire:model.live.debounce.300ms="search" type="text" placeholder="Cari nama karyawan, NIK, posisi..." 
-                    class="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl text-xs text-gray-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#93F514] focus:border-transparent transition-all">
-                <svg class="w-4 h-4 text-gray-400 dark:text-slate-400 absolute left-3.5 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
+        <!-- Header Section -->
+        <div class="p-5 sm:p-6 border-b border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h3 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white">Data Karyawan Terdaftar</h3>
+                <p class="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Kelola data seluruh karyawan internal, status kepegawaian, dan pengangkatan magang.</p>
+            </div>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="p-4 sm:p-5 bg-gray-50/70 dark:bg-slate-800/50 border-b border-gray-100 dark:border-slate-800 space-y-3.5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
+                <!-- Search Input -->
+                <div class="relative lg:col-span-4">
+                    <input type="text" 
+                           wire:model.live.debounce.300ms="search" 
+                           placeholder="Cari nama karyawan, NIK, jabatan, email..." 
+                           class="w-full pl-9 pr-4 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Filter Perusahaan -->
+                <div class="relative lg:col-span-4">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                    </div>
+                    <select wire:model.live="companyId" class="w-full pl-9 pr-8 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition appearance-none cursor-pointer [color-scheme:light] dark:[color-scheme:dark]">
+                        <option value="">Semua Perusahaan</option>
+                        @foreach ($companies as $comp)
+                            <option value="{{ $comp->id }}">{{ $comp->name }}</option>
+                        @endforeach
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Filter Departemen -->
+                <div class="relative lg:col-span-4">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg>
+                    </div>
+                    <select wire:model.live="departmentId" class="w-full pl-9 pr-8 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition appearance-none cursor-pointer [color-scheme:light] dark:[color-scheme:dark]">
+                        <option value="">{{ $companyId ? 'Semua Departemen di Perusahaan Ini' : 'Semua Departemen' }}</option>
+                        @foreach ($filterDepartments as $dept)
+                            <option value="{{ $dept->id }}">
+                                {{ $dept->name }} @if(!$companyId && $dept->company)({{ $dept->company->name }})@endif
+                            </option>
+                        @endforeach
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
             </div>
 
-            <!-- Filter Departemen -->
-            <select wire:model.live="departmentId" class="px-3 py-2 text-xs rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition max-w-[180px] [color-scheme:light] dark:[color-scheme:dark]">
-                <option value="" class="bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400">Semua Departemen</option>
-                @foreach ($departments as $dept)
-                    <option value="{{ $dept->id }}" class="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">{{ $dept->name }} {{ $dept->company ? '('.$dept->company->name.')' : '' }}</option>
-                @endforeach
-            </select>
+            <!-- Toolbar Bottom Row: Quick Tipe Pegawai Badges & Reset Button -->
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+                <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                    <span class="text-[11px] font-bold text-gray-400 uppercase mr-1">Tipe:</span>
+                    <button type="button" wire:click="$set('employeeType', '')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $employeeType === '' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-800' }}">
+                        Semua
+                    </button>
+                    <button type="button" wire:click="$set('employeeType', 'permanent')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $employeeType === 'permanent' ? 'bg-emerald-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40' }}">
+                        Karyawan Tetap
+                    </button>
+                    <button type="button" wire:click="$set('employeeType', 'contract')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $employeeType === 'contract' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-950/40' }}">
+                        Kontrak
+                    </button>
+                    <button type="button" wire:click="$set('employeeType', 'internship')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $employeeType === 'internship' ? 'bg-amber-500 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 hover:bg-amber-50 dark:hover:bg-amber-950/40' }}">
+                        Magang
+                    </button>
+                    <button type="button" wire:click="$set('employeeType', 'probation')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $employeeType === 'probation' ? 'bg-purple-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-800 hover:bg-purple-50 dark:hover:bg-purple-950/40' }}">
+                        Probation
+                    </button>
+                </div>
 
-            <!-- Filter Tipe Pegawai -->
-            <select wire:model.live="employeeType" class="px-3 py-2 text-xs rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition max-w-[160px] [color-scheme:light] dark:[color-scheme:dark]">
-                <option value="" class="bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400">Semua Tipe</option>
-                <option value="permanent" class="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">Karyawan Tetap</option>
-                <option value="contract" class="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">Kontrak</option>
-                <option value="internship" class="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">Magang</option>
-                <option value="probation" class="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">Probation</option>
-            </select>
-
-            @if ($search || $departmentId || $employeeType)
-                <button wire:click="resetFilters" class="p-2 text-gray-400 hover:text-rose-500 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-700 transition" title="Reset Filter">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                </button>
-            @endif
+                @if ($search || $companyId || $departmentId || $employeeType)
+                    <button type="button" wire:click="resetFilters" class="text-xs font-semibold text-rose-600 dark:text-rose-400 hover:underline inline-flex items-center gap-1 cursor-pointer">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        <span>Reset Filter</span>
+                    </button>
+                @endif
+            </div>
         </div>
-    </div>
 
-    <!-- Table Card Container -->
-    <div class="bg-white dark:bg-slate-800 rounded-3xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden">
+        <!-- Livewire Loading Overlay -->
+        <div wire:loading wire:target="search, companyId, departmentId, employeeType, previousPage, nextPage, gotoPage, resetFilters" class="absolute inset-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-[1px] flex items-center justify-center z-10 transition">
+            <div class="flex items-center gap-2.5 px-4 py-2.5 bg-slate-900/90 dark:bg-slate-800/90 text-white rounded-xl shadow-xl text-xs font-semibold">
+                <svg class="animate-spin w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Memuat data...</span>
+            </div>
+        </div>
+
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="border-b border-gray-100 dark:border-slate-700/80 bg-gray-50/50 dark:bg-slate-700/20 text-[11px] font-bold text-gray-400 dark:text-slate-400 uppercase tracking-wider">
+                    <tr class="border-b border-gray-200 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/50 text-gray-500 dark:text-slate-400 uppercase tracking-wider font-semibold text-[11px]">
                         <th class="py-4 px-6 w-12 text-center">No</th>
                         <th class="py-4 px-6">Identitas Karyawan</th>
                         <th class="py-4 px-6">Tipe Pegawai</th>
@@ -74,27 +145,45 @@
                         <th class="py-4 px-6 text-right">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100 dark:divide-slate-700/50 text-xs">
+                <tbody class="divide-y divide-gray-100 dark:divide-slate-800/60 text-xs text-gray-700 dark:text-slate-300">
                     @forelse ($employees as $index => $emp)
-                        <tr class="hover:bg-gray-50/80 dark:hover:bg-slate-700/30 transition duration-150">
+                        <tr class="hover:bg-gray-50/80 dark:hover:bg-slate-800/40 transition duration-150">
                             <td class="py-4 px-6 text-center font-medium text-gray-400 dark:text-slate-500">
                                 {{ $employees->firstItem() + $index }}
                             </td>
                             <td class="py-4 px-6">
-                                <div class="font-bold text-gray-800 dark:text-slate-100 text-sm">
-                                    {{ $emp->full_name ?? ($emp->user?->name ?? '-') }}
-                                </div>
-                                <div class="flex items-center gap-1.5 flex-wrap text-[11px] text-gray-400 dark:text-slate-500 mt-0.5">
-                                    <span>NIK:</span>
-                                    <span class="font-mono font-medium text-gray-600 dark:text-slate-300">{{ $emp->nik ?? ($emp->user?->nik ?? '-') }}</span>
+                                <div class="flex items-center gap-3">
                                     @php
-                                        $rawNik = preg_replace('/[^0-9]/', '', (string) ($emp->nik ?? ($emp->user?->nik ?? '')));
+                                        $empPhoto = $emp->photo ?? $emp->user?->avatar;
+                                        $empPhotoUrl = null;
+                                        if ($empPhoto) {
+                                            $empPhotoUrl = str_starts_with($empPhoto, 'http') ? $empPhoto : asset('storage/' . $empPhoto);
+                                        }
                                     @endphp
-                                    @if (!empty($rawNik) && strlen($rawNik) !== 16)
-                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9.5px] font-semibold bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border border-rose-200/80 dark:border-rose-900/60" title="Format NIK harus 16 digit angka">
-                                            Bukan 16 Digit
-                                        </span>
+                                    @if ($empPhotoUrl)
+                                        <img src="{{ $empPhotoUrl }}" alt="{{ $emp->full_name ?? ($emp->user?->name ?? 'Karyawan') }}" class="w-9 h-9 rounded-full object-cover ring-2 ring-indigo-500/20 shadow-xs shrink-0">
+                                    @else
+                                        <div class="w-9 h-9 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-bold text-xs flex items-center justify-center ring-2 ring-indigo-500/20 shrink-0">
+                                            {{ strtoupper(substr($emp->full_name ?? ($emp->user?->name ?? 'K'), 0, 2)) }}
+                                        </div>
                                     @endif
+                                    <div>
+                                        <div class="font-bold text-gray-900 dark:text-white text-sm">
+                                            {{ $emp->full_name ?? ($emp->user?->name ?? '-') }}
+                                        </div>
+                                        <div class="flex items-center gap-1.5 flex-wrap text-[11px] text-gray-400 dark:text-slate-500 mt-0.5">
+                                            <span>NIK:</span>
+                                            <span class="font-mono font-medium text-gray-600 dark:text-slate-300">{{ $emp->nik ?? ($emp->user?->nik ?? '-') }}</span>
+                                            @php
+                                                $rawNik = preg_replace('/[^0-9]/', '', (string) ($emp->nik ?? ($emp->user?->nik ?? '')));
+                                            @endphp
+                                            @if (!empty($rawNik) && strlen($rawNik) !== 16)
+                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9.5px] font-semibold bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border border-rose-200/80 dark:border-rose-900/60" title="Format NIK harus 16 digit angka">
+                                                    Bukan 16 Digit
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
                                 </div>
                             </td>
                             <td class="py-4 px-6">
@@ -223,10 +312,10 @@
         </div>
 
         @if ($employees->hasPages() || $perPage != 10)
-            <div class="p-4 border-t border-gray-100 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="px-6 py-4 border-t border-gray-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div class="flex items-center gap-2">
                     <span class="text-xs text-gray-500 dark:text-slate-400">Tampilkan</span>
-                    <select wire:model.live="perPage" class="pl-2.5 pr-7 py-1.5 text-xs rounded-lg bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition cursor-pointer">
+                    <select wire:model.live="perPage" class="pl-2.5 pr-7 py-1.5 text-xs rounded-lg bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition cursor-pointer">
                         <option value="10">10</option>
                         <option value="25">25</option>
                         <option value="50">50</option>

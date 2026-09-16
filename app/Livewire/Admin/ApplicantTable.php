@@ -15,6 +15,8 @@ class ApplicantTable extends Component
 
     public $search = '';
     public $statusFilter = '';
+    public $jobFilter = '';
+    public $companyFilter = '';
     public array $selectedStatuses = [];
     public array $selectedColumns = ['applicant', 'job', 'applied_at', 'status', 'actions'];
     public $perPage = 10;
@@ -32,6 +34,17 @@ class ApplicantTable extends Component
         $this->resetPage();
     }
 
+    public function updatingJobFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingCompanyFilter()
+    {
+        $this->jobFilter = '';
+        $this->resetPage();
+    }
+
     public function updatingSelectedStatuses()
     {
         $this->resetPage();
@@ -39,6 +52,13 @@ class ApplicantTable extends Component
 
     public function updatingPerPage()
     {
+        $this->resetPage();
+    }
+
+    public function setStatusFilter($status = '')
+    {
+        $this->statusFilter = $status;
+        $this->selectedStatuses = [];
         $this->resetPage();
     }
 
@@ -67,6 +87,8 @@ class ApplicantTable extends Component
     {
         $this->search = '';
         $this->statusFilter = '';
+        $this->jobFilter = '';
+        $this->companyFilter = '';
         $this->selectedStatuses = [];
         $this->sortField = 'id';
         $this->sortDirection = 'desc';
@@ -122,6 +144,14 @@ class ApplicantTable extends Component
                   });
             });
         })
+        ->when($this->companyFilter, function ($query) {
+            $query->whereHas('job', function ($jq) {
+                $jq->where('company_id', $this->companyFilter);
+            });
+        })
+        ->when($this->jobFilter, function ($query) {
+            $query->where('job_id', $this->jobFilter);
+        })
         ->when(!empty($this->selectedStatuses), function ($query) {
             $query->whereIn('status', $this->selectedStatuses);
         })
@@ -145,7 +175,7 @@ class ApplicantTable extends Component
                   ->select('job_applications.*');
         })
         ->when($this->sortField === 'applied_at', function ($query) {
-            $query->orderBy('job_applications.created_at', $this->sortDirection);
+            $query->orderBy('job_applications.applied_at', $this->sortDirection);
         })
         ->when($this->sortField === 'status', function ($query) {
             $query->orderBy('job_applications.status', $this->sortDirection);
@@ -155,11 +185,57 @@ class ApplicantTable extends Component
         })
         ->paginate($this->perPage);
 
+        // Calculate quick stats counters
+        $baseStatsQuery = JobApplication::query()
+            ->when($isRecruiterOnly, function ($query) {
+                $query->whereHas('job', function ($jq) {
+                    $jq->whereIn(DB::raw('LOWER(status)'), ['open', 'published', 'active', 'draft'])
+                      ->where(function($q) {
+                          $q->whereNull('deadline')->orWhere('deadline', '>=', now()->toDateString());
+                      });
+                });
+            })
+            ->when($this->companyFilter, function ($query) {
+                $query->whereHas('job', fn($q) => $q->where('company_id', $this->companyFilter));
+            })
+            ->when($this->jobFilter, function ($query) {
+                $query->where('job_id', $this->jobFilter);
+            });
+
+        $statusGroupCounts = (clone $baseStatsQuery)
+            ->select('status', DB::raw('count(*) as count_val'))
+            ->groupBy('status')
+            ->pluck('count_val', 'status')
+            ->toArray();
+
+        $stats = [
+            'total'       => (clone $baseStatsQuery)->count(),
+            'submitted'   => $statusGroupCounts['Submitted'] ?? 0,
+            'reviewed'    => $statusGroupCounts['Reviewed'] ?? 0,
+            'shortlisted' => $statusGroupCounts['Shortlisted'] ?? 0,
+            'interview'   => $statusGroupCounts['Interview'] ?? 0,
+            'accepted'    => $statusGroupCounts['Accepted'] ?? 0,
+            'rejected'    => $statusGroupCounts['Rejected'] ?? 0,
+        ];
+
+        $companies = Company::select('id', 'name')->orderBy('name')->get();
+
+        $jobsQuery = Job::select('id', 'title', 'company_id');
+        if ($this->companyFilter) {
+            $jobsQuery->where('company_id', $this->companyFilter);
+        }
+        $jobs = $jobsQuery->orderBy('title')->get();
+
         return view('livewire.admin.applicants.table', [
             'applications'     => $applications,
             'isRecruiter'      => $isRecruiterOnly,
             'search'           => $this->search,
             'statusFilter'     => $this->statusFilter,
+            'companyFilter'    => $this->companyFilter,
+            'jobFilter'        => $this->jobFilter,
+            'companies'        => $companies,
+            'jobs'             => $jobs,
+            'stats'            => $stats,
             'selectedStatuses' => $this->selectedStatuses,
             'selectedColumns'  => $this->selectedColumns,
             'sortField'        => $this->sortField,

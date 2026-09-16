@@ -6,17 +6,26 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Position;
 use App\Models\Department;
+use App\Models\Company;
 
 class PositionTable extends Component
 {
     use WithPagination;
 
     public $search = '';
+    public $companyFilter = '';
     public $departmentId = '';
     public $perPage = 10;
 
     public function updatingSearch()
     {
+        $this->resetPage();
+    }
+
+    public function updatingCompanyFilter()
+    {
+        // Reset department when company changes (cascade)
+        $this->departmentId = '';
         $this->resetPage();
     }
 
@@ -33,6 +42,7 @@ class PositionTable extends Component
     public function resetFilters()
     {
         $this->search = '';
+        $this->companyFilter = '';
         $this->departmentId = '';
         $this->resetPage();
     }
@@ -40,6 +50,11 @@ class PositionTable extends Component
     public function render()
     {
         $positions = Position::with(['department.company'])
+            ->when($this->companyFilter, function ($query) {
+                $query->whereHas('department', function ($q) {
+                    $q->where('company_id', $this->companyFilter);
+                });
+            })
             ->when($this->departmentId, function ($query) {
                 $query->where('department_id', $this->departmentId);
             })
@@ -59,10 +74,17 @@ class PositionTable extends Component
             ->orderBy('id', 'desc')
             ->paginate($this->perPage);
 
-        $departments = Department::with('company')->orderBy('name')->get();
+        $companies = Company::orderBy('name')->get();
+
+        // Filter departments by selected company for cascading dropdown
+        $departments = Department::with('company')
+            ->when($this->companyFilter, fn($q) => $q->where('company_id', $this->companyFilter))
+            ->orderBy('name')
+            ->get();
 
         return view('livewire.admin.position.table', [
-            'positions' => $positions,
+            'positions'   => $positions,
+            'companies'   => $companies,
             'departments' => $departments,
         ]);
     }

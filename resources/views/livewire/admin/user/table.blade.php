@@ -83,49 +83,86 @@
         </div>
     @endif
 
-    <!-- Header & Filter Section -->
-    <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 overflow-hidden shadow-sm rounded-2xl p-6">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Daftar Pengguna</h3>
-                <p class="text-xs text-gray-500 dark:text-slate-400">Kelola pengguna sistem dan pembagian hak akses (Admin, Recruiter, Karyawan dan Pelamar).</p>
-            </div>
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
-                <!-- Role Filter Dropdown -->
-                <div class="w-full sm:w-44">
-                    <select wire:model.live="roleFilter" class="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition [color-scheme:light] dark:[color-scheme:dark]">
-                        <option value="" class="bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400">Semua Role</option>
-                        @foreach ($roles as $r)
-                            <option value="{{ $r->id }}" class="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">{{ $r->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <!-- Search Input -->
-                <div class="relative w-full sm:w-64">
-                    <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari nama / email / NIK..."
-                        class="w-full pl-9 pr-4 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                    <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                </div>
-
-                <button @click="showCreateModal = true"
-                    class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-md shadow-indigo-500/20 transition-all flex items-center justify-center gap-2 w-full sm:w-auto shrink-0">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                    Tambah Pengguna
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Data Table Section -->
+    <!-- Main Container Card -->
     <div class="relative bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
         
+        <!-- Header & Action Section -->
+        <div class="p-5 sm:p-6 border-b border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h3 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white">Daftar Pengguna</h3>
+                <p class="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Kelola akun pengguna, hak akses peran (Role), dan verifikasi profil akun sistem.</p>
+            </div>
+
+            <button type="button" @click="showCreateModal = true" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-md shadow-indigo-600/20 transition active:scale-95 shrink-0 cursor-pointer">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                <span>Tambah Pengguna</span>
+            </button>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="p-4 sm:p-5 bg-gray-50/70 dark:bg-slate-800/50 border-b border-gray-100 dark:border-slate-800 space-y-3.5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
+                <!-- Search Input -->
+                <div class="relative lg:col-span-6">
+                    <input type="text" 
+                           wire:model.live.debounce.300ms="search" 
+                           placeholder="Cari nama, email, NIK..." 
+                           class="w-full pl-9 pr-4 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Role Filter -->
+                <div class="relative lg:col-span-3">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                    </div>
+                    <select wire:model.live="roleFilter" class="w-full pl-9 pr-8 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition appearance-none cursor-pointer [color-scheme:light] dark:[color-scheme:dark]">
+                        <option value="">Semua Role</option>
+                        @foreach ($roles as $r)
+                            <option value="{{ $r->id }}">{{ $r->name }}</option>
+                        @endforeach
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Urutkan / Sort By -->
+                <div class="relative lg:col-span-3">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                        </svg>
+                    </div>
+                    <select wire:model.live="sortBy" class="w-full pl-9 pr-8 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition appearance-none cursor-pointer [color-scheme:light] dark:[color-scheme:dark]">
+                        <option value="latest">Terbaru</option>
+                        <option value="oldest">Terlama</option>
+                        <option value="name_asc">Nama (A - Z)</option>
+                        <option value="name_desc">Nama (Z - A)</option>
+                        <option value="role_asc">Berdasarkan Role</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
         <!-- Livewire Loading Overlay -->
-        <div wire:loading wire:target="search, roleFilter, previousPage, nextPage, gotoPage" class="absolute inset-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-[1px] flex items-center justify-center z-10 transition">
+        <div wire:loading wire:target="search, roleFilter, sortBy, previousPage, nextPage, gotoPage, resetFilters" class="absolute inset-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-[1px] flex items-center justify-center z-10 transition">
             <div class="flex items-center gap-2.5 px-4 py-2.5 bg-slate-900/90 dark:bg-slate-800/90 text-white rounded-xl shadow-xl text-xs font-semibold">
                 <svg class="animate-spin w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -148,32 +185,59 @@
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-slate-800/60 text-gray-700 dark:text-slate-300">
                     @forelse ($users as $user)
+                        @php
+                            $photoUrl = null;
+                            if (!empty($user->avatar)) {
+                                $photoUrl = str_starts_with($user->avatar, 'http') ? $user->avatar : asset('storage/' . $user->avatar);
+                            } elseif (!empty($user->applicantProfile?->photo)) {
+                                $photoUrl = asset('storage/' . $user->applicantProfile->photo);
+                            } elseif (!empty($user->employeeProfile?->photo)) {
+                                $photoUrl = asset('storage/' . $user->employeeProfile->photo);
+                            }
+                        @endphp
                         <tr class="hover:bg-gray-50/80 dark:hover:bg-slate-800/40 transition-colors">
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-sm shrink-0 uppercase">
-                                        {{ strtoupper(substr($user->name, 0, 2)) }}
-                                    </div>
-                                    <div>
-                                        <span class="font-bold text-gray-900 dark:text-white block">
-                                            {{ $user->name }}
+                                    @if ($photoUrl)
+                                        <img src="{{ $photoUrl }}" alt="{{ $user->name }}" class="w-9 h-9 rounded-xl object-cover ring-1 ring-gray-200 dark:ring-slate-700 shrink-0">
+                                    @else
+                                        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-sm shrink-0 uppercase">
+                                            {{ strtoupper(substr($user->name, 0, 2)) }}
+                                        </div>
+                                    @endif
+                                    <div class="space-y-0.5">
+                                        <div class="flex items-center gap-1.5 flex-wrap">
+                                            <span class="font-bold text-gray-900 dark:text-white">
+                                                {{ $user->name }}
+                                            </span>
                                             @if(auth()->id() == $user->id)
-                                                <span class="ml-1 text-[10px] bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 px-1.5 py-0.5 rounded font-normal">(Anda)</span>
+                                                <span class="text-[10px] bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 px-1.5 py-0.5 rounded-md font-medium border border-indigo-200/60 dark:border-indigo-800/60">(Anda)</span>
                                             @endif
-                                        </span>
-                                        <span class="text-[11px] text-gray-400 dark:text-slate-400 block">{{ $user->email }}</span>
+                                        </div>
+                                        <div class="flex items-center gap-1 text-[11px] text-gray-400 dark:text-slate-400">
+                                            <span>{{ $user->email }}</span>
+                                            @if($user->email_verified_at)
+                                                <svg class="w-3.5 h-3.5 text-emerald-500 shrink-0" title="Email terverifikasi" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                                </svg>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="flex items-center gap-1.5 flex-wrap">
-                                    <span class="font-mono text-gray-600 dark:text-slate-300">{{ $user->nik ?? '-' }}</span>
-                                    @if($user->nik && strlen(preg_replace('/[^0-9]/', '', $user->nik)) !== 16)
-                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200 dark:border-rose-800" title="Format NIK harus 16 digit angka">
-                                            Bukan 16 Digit
-                                        </span>
-                                    @endif
-                                </div>
+                                @if($user->nik)
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <span class="font-mono text-gray-700 dark:text-slate-300 font-medium">{{ $user->nik }}</span>
+                                        @if(strlen(preg_replace('/[^0-9]/', '', $user->nik)) !== 16)
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200 dark:border-rose-800" title="Format NIK harus 16 digit angka">
+                                                Bukan 16 Digit
+                                            </span>
+                                        @endif
+                                    </div>
+                                @else
+                                    <span class="text-gray-400 dark:text-slate-500 italic text-[11px]">Belum diisi</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4">
                                 @php
@@ -201,11 +265,16 @@
                                     </span>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 text-gray-500 dark:text-slate-400">
-                                {{ $user->created_at ? $user->created_at->format('d M Y') : '-' }}
+                            <td class="px-6 py-4">
+                                <div class="text-gray-700 dark:text-slate-300 font-medium">
+                                    {{ $user->created_at ? $user->created_at->format('d M Y') : '-' }}
+                                </div>
+                                <div class="text-[10px] text-gray-400 dark:text-slate-500">
+                                    {{ $user->created_at ? $user->created_at->diffForHumans() : '' }}
+                                </div>
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <div class="flex items-center justify-end gap-2">
+                                <div class="flex items-center justify-end gap-1.5">
                                     <button @click="openEditModal({{ json_encode([
                                         'id' => $user->id,
                                         'name' => $user->name,
@@ -213,8 +282,8 @@
                                         'nik' => $user->nik,
                                         'role_id' => $user->role_id,
                                     ]) }})"
-                                        class="p-1.5 rounded-lg text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
-                                        title="Edit">
+                                        class="p-1.5 rounded-lg text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                                        title="Edit Pengguna">
                                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                         </svg>
@@ -224,8 +293,8 @@
                                             'id' => $user->id,
                                             'name' => $user->name
                                         ]) }})"
-                                            class="p-1.5 rounded-lg text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
-                                            title="Hapus">
+                                            class="p-1.5 rounded-lg text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                                            title="Hapus Pengguna">
                                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>

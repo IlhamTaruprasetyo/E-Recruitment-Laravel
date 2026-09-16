@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Test;
 use App\Models\Job;
+use App\Models\Company;
 use App\Models\TestCategory;
 use App\Models\QuestionBank;
 
@@ -14,12 +15,19 @@ class TestTable extends Component
     use WithPagination;
 
     public $search = '';
+    public $companyId = '';
     public $jobId = '';
     public $categoryId = '';
     public $perPage = 10;
 
     public function updatingSearch()
     {
+        $this->resetPage();
+    }
+
+    public function updatingCompanyId()
+    {
+        $this->jobId = '';
         $this->resetPage();
     }
 
@@ -41,6 +49,7 @@ class TestTable extends Component
     public function resetFilters()
     {
         $this->search = '';
+        $this->companyId = '';
         $this->jobId = '';
         $this->categoryId = '';
         $this->resetPage();
@@ -48,7 +57,17 @@ class TestTable extends Component
 
     public function render()
     {
-        $jobs = Job::orderBy('title', 'asc')->get();
+        $companies = Company::orderBy('name', 'asc')->get();
+
+        $allJobs = Job::with('company')->orderBy('title', 'asc')->get();
+
+        $jobs = Job::with('company')
+            ->when($this->companyId, function ($query) {
+                $query->where('company_id', $this->companyId);
+            })
+            ->orderBy('title', 'asc')
+            ->get();
+
         $categories = TestCategory::orderBy('name', 'asc')->get();
 
         $allQuestions = QuestionBank::with(['category', 'options'])
@@ -67,6 +86,15 @@ class TestTable extends Component
             ->when($this->search, function ($query) {
                 $search = strtolower(trim($this->search));
                 $query->whereRaw('LOWER(title) LIKE ?', ['%' . $search . '%']);
+            })
+            ->when($this->companyId, function ($query) {
+                $query->where(function ($q) {
+                    $q->whereHas('jobs', function ($j) {
+                        $j->where('jobs.company_id', $this->companyId);
+                    })->orWhereHas('job', function ($j) {
+                        $j->where('company_id', $this->companyId);
+                    });
+                });
             })
             ->when($this->jobId, function ($query) {
                 if ($this->jobId === 'all') {
@@ -87,7 +115,9 @@ class TestTable extends Component
 
         return view('livewire.admin.test.table', [
             'tests' => $tests,
+            'companies' => $companies,
             'jobs' => $jobs,
+            'allJobs' => $allJobs,
             'categories' => $categories,
             'allQuestions' => $allQuestions,
         ]);

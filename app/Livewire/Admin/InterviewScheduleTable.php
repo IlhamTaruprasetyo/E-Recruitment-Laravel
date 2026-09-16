@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\InterviewSchedule;
 use App\Models\JobApplication;
+use App\Models\Company;
 use App\Models\Job;
 use App\Models\User;
 use Carbon\Carbon;
@@ -19,6 +20,7 @@ class InterviewScheduleTable extends Component
     public $statusFilter = '';
     public $timeFilter = 'all'; // all, today, upcoming, past
     public $typeFilter = 'all'; // all, online, offline
+    public $companyFilter = '';
     public $jobFilter = '';
     public $interviewerFilter = '';
     public $perPage = 10;
@@ -46,6 +48,12 @@ class InterviewScheduleTable extends Component
         $this->resetPage();
     }
 
+    public function updatingCompanyFilter()
+    {
+        $this->jobFilter = '';
+        $this->resetPage();
+    }
+
     public function updatingJobFilter()
     {
         $this->resetPage();
@@ -64,10 +72,11 @@ class InterviewScheduleTable extends Component
     public function resetFilters()
     {
         $this->search = '';
+        $this->companyFilter = '';
+        $this->jobFilter = '';
         $this->statusFilter = '';
         $this->timeFilter = 'all';
         $this->typeFilter = 'all';
-        $this->jobFilter = '';
         $this->interviewerFilter = '';
         $this->sortField = 'interview_date';
         $this->sortDirection = 'asc';
@@ -119,7 +128,7 @@ class InterviewScheduleTable extends Component
             'jobApplication.applicantProfile.user',
             'jobApplication.job.company',
             'jobApplication.job.department',
-            'user', // interviewer
+            'user.employeeProfile', // interviewer profile & photo
         ]);
 
         // Search Filter
@@ -188,6 +197,13 @@ class InterviewScheduleTable extends Component
             });
         }
 
+        // Company Filter
+        if (!empty($this->companyFilter)) {
+            $query->whereHas('jobApplication.job', function ($jq) {
+                $jq->where('company_id', $this->companyFilter);
+            });
+        }
+
         // Job Filter
         if (!empty($this->jobFilter)) {
             $query->whereHas('jobApplication', function ($jaq) {
@@ -209,6 +225,11 @@ class InterviewScheduleTable extends Component
             ->orderBy('id', 'desc')
             ->get()
             ->map(function ($app) {
+                $photo = $app->applicantProfile?->photo ?? $app->applicantProfile?->user?->avatar ?? null;
+                $photoUrl = null;
+                if ($photo) {
+                    $photoUrl = str_starts_with($photo, 'http') ? $photo : asset('storage/' . $photo);
+                }
                 return [
                     'id'        => $app->id,
                     'name'      => $app->applicantProfile->full_name ?? ('Pelamar #' . $app->id),
@@ -216,6 +237,7 @@ class InterviewScheduleTable extends Component
                     'job_title' => $app->job->title ?? 'Posisi',
                     'company'   => $app->job->company->name ?? '',
                     'status'    => $app->status,
+                    'photo'     => $photoUrl,
                 ];
             });
 
@@ -225,13 +247,20 @@ class InterviewScheduleTable extends Component
         ->orderBy('name', 'asc')
         ->get();
 
-        $jobs = Job::with('company')->orderBy('title', 'asc')->get();
+        $companies = Company::orderBy('name', 'asc')->get();
+
+        $jobsQuery = Job::with('company')->orderBy('title', 'asc');
+        if (!empty($this->companyFilter)) {
+            $jobsQuery->where('company_id', $this->companyFilter);
+        }
+        $jobs = $jobsQuery->get();
 
         return view('livewire.admin.interview-schedule.table', [
             'schedules'          => $schedules,
             'stats'              => $stats,
             'activeApplications' => $activeApplications,
             'interviewers'       => $interviewers,
+            'companies'          => $companies,
             'jobs'               => $jobs,
         ]);
     }

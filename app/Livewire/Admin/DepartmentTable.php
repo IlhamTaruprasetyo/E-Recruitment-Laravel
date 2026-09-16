@@ -12,9 +12,15 @@ class DepartmentTable extends Component
     use WithPagination;
 
     public $search = '';
+    public $companyFilter = '';
     public $perPage = 10;
 
     public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingCompanyFilter()
     {
         $this->resetPage();
     }
@@ -24,9 +30,19 @@ class DepartmentTable extends Component
         $this->resetPage();
     }
 
+    public function resetFilters()
+    {
+        $this->search = '';
+        $this->companyFilter = '';
+        $this->resetPage();
+    }
+
     public function render()
     {
         $departments = Department::with('company')
+            ->when($this->companyFilter, function ($query) {
+                $query->where('company_id', $this->companyFilter);
+            })
             ->when($this->search, function ($query) {
                 $search = strtolower(trim($this->search));
                 $query->where(function ($q) use ($search) {
@@ -40,7 +56,7 @@ class DepartmentTable extends Component
             ->orderBy('id', 'desc')
             ->paginate($this->perPage);
 
-        $companies = Company::all();
+        $companies = Company::orderBy('name')->get();
 
         return view('livewire.admin.department.table', [
             'departments' => $departments,

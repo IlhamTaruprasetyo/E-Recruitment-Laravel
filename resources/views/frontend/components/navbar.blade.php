@@ -49,18 +49,30 @@
             <!-- Theme Toggle Button -->
             <button type="button" class="theme-toggle-btn" @click="$store.theme.toggle()"
                 :title="$store.theme.isDark ? 'Aktifkan Light Mode' : 'Aktifkan Dark Mode'" x-data>
-                <!-- Moon icon (shown in dark mode) -->
-                <svg x-show="$store.theme.isDark" x-cloak x-data class="w-4.5 h-4.5" style="width:18px;height:18px"
-                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                <!-- Sun icon (shown in dark mode → klik untuk ke light) -->
+                <svg x-show="$store.theme.isDark" x-cloak
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 rotate-90 scale-50"
+                     x-transition:enter-end="opacity-100 rotate-0 scale-100"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 rotate-0 scale-100"
+                     x-transition:leave-end="opacity-0 -rotate-90 scale-50"
+                     class="w-5 h-5 text-amber-400" style="width:18px;height:18px"
+                     fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
                 </svg>
-                <!-- Sun icon (shown in light mode) -->
-                <svg x-show="!$store.theme.isDark" x-cloak x-data class="w-4.5 h-4.5"
-                    style="width:18px;height:18px;color:#5a9e08" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 3v1m0 16v1m8.66-9H21M3 12H2m15.07-6.07-.71.71M7.64 16.36l-.71.71M18.36 16.36l-.71.71M6.34 7.64l-.71-.71M12 7a5 5 0 100 10A5 5 0 0012 7z" />
+                <!-- Moon icon (shown in light mode → klik untuk ke dark) -->
+                <svg x-show="!$store.theme.isDark" x-cloak
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 -rotate-90 scale-50"
+                     x-transition:enter-end="opacity-100 rotate-0 scale-100"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 rotate-0 scale-100"
+                     x-transition:leave-end="opacity-0 rotate-90 scale-50"
+                     class="w-4 h-4" style="width:15px;height:15px"
+                     fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
                 </svg>
             </button>
 
@@ -143,17 +155,28 @@
             <button type="button" @click="$store.theme.toggle()" x-data
                 class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl border border-[#93F514]/30 text-sm font-semibold transition"
                 :class="$store.theme.isDark ? 'text-gray-300 bg-transparent' : 'text-[#5a9e08] bg-[#f0fde4]'">
-                <!-- Moon -->
-                <svg x-show="$store.theme.isDark" x-cloak x-data style="width:16px;height:16px" fill="none"
-                    viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                <!-- Sun icon (shown in dark mode) -->
+                <svg x-show="$store.theme.isDark" x-cloak
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 rotate-90 scale-50"
+                     x-transition:enter-end="opacity-100 rotate-0 scale-100"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 rotate-0 scale-100"
+                     x-transition:leave-end="opacity-0 -rotate-90 scale-50"
+                     class="w-4 h-4 text-amber-400" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
                 </svg>
-                <!-- Sun -->
-                <svg x-show="!$store.theme.isDark" x-cloak x-data style="width:16px;height:16px" fill="none"
-                    viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 3v1m0 16v1m8.66-9H21M3 12H2m15.07-6.07-.71.71M7.64 16.36l-.71.71M18.36 16.36l-.71.71M6.34 7.64l-.71-.71M12 7a5 5 0 100 10A5 5 0 0012 7z" />
+                <!-- Moon icon (shown in light mode) -->
+                <svg x-show="!$store.theme.isDark" x-cloak
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 -rotate-90 scale-50"
+                     x-transition:enter-end="opacity-100 rotate-0 scale-100"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 rotate-0 scale-100"
+                     x-transition:leave-end="opacity-0 rotate-90 scale-50"
+                     class="w-4 h-4" style="width:14px;height:14px" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
                 </svg>
                 <span x-text="$store.theme.isDark ? 'Aktifkan Light Mode' : 'Aktifkan Dark Mode'"></span>
             </button>

@@ -71,14 +71,20 @@
                             $profile = $candidate->applicantProfile;
                             $latestEdu = $profile?->educations?->sortByDesc('end_year')->first();
                             $appCount = $profile?->jobApplications?->count() ?? 0;
+                            $photo = $profile?->photo ?? $candidate->avatar;
+                            $photoUrl = $photo ? (\Illuminate\Support\Str::startsWith($photo, ['http://', 'https://']) ? $photo : asset('storage/' . $photo)) : null;
                         @endphp
                         <tr class="hover:bg-gray-50/80 dark:hover:bg-slate-800/40 transition-colors">
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
-                                    <div
-                                        class="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-sm flex-shrink-0">
-                                        {{ strtoupper(substr($profile?->full_name ?? $candidate->name, 0, 2)) }}
-                                    </div>
+                                    @if ($photoUrl)
+                                        <img src="{{ $photoUrl }}" alt="{{ $profile?->full_name ?? $candidate->name }}" class="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-slate-700 shadow-sm shrink-0">
+                                    @else
+                                        <div
+                                            class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-sm flex-shrink-0">
+                                            {{ strtoupper(substr($profile?->full_name ?? $candidate->name, 0, 2)) }}
+                                        </div>
+                                    @endif
                                     <div>
                                         <span class="font-semibold text-gray-900 dark:text-white block">
                                             {{ $profile?->full_name ?? $candidate->name }}
@@ -118,7 +124,7 @@
                             </td>
 
                             <td class="px-6 py-4 text-right">
-                                <button @click="openDetailModal({{ json_encode($candidate) }})"
+                                <button @click="openDetailModal({{ \Illuminate\Support\Js::from($candidate) }})"
                                     class="px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 font-semibold transition text-xs">
                                     Detail Profil Lengkap
                                 </button>
@@ -177,11 +183,20 @@
             <!-- Header Modal -->
             <div class="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-slate-800">
                 <div class="flex items-center gap-3">
-                    <div
-                        class="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-base shadow-md">
-                        <span
-                            x-text="detailData.applicant_profile ? (detailData.applicant_profile.full_name || detailData.name || 'K').substring(0, 2).toUpperCase() : (detailData.name ? detailData.name.substring(0,2).toUpperCase() : 'K')"></span>
-                    </div>
+                    <template x-if="(detailData.applicant_profile && detailData.applicant_profile.photo) || detailData.avatar">
+                        <img :src="((detailData.applicant_profile && detailData.applicant_profile.photo) || detailData.avatar).startsWith('http') 
+                            ? ((detailData.applicant_profile && detailData.applicant_profile.photo) || detailData.avatar) 
+                            : ('/storage/' + ((detailData.applicant_profile && detailData.applicant_profile.photo) || detailData.avatar))" 
+                            :alt="detailData.applicant_profile ? (detailData.applicant_profile.full_name || detailData.name) : detailData.name" 
+                            class="w-12 h-12 rounded-full object-cover border border-gray-200 dark:border-slate-700 shadow-md shrink-0">
+                    </template>
+                    <template x-if="(!detailData.applicant_profile || !detailData.applicant_profile.photo) && !detailData.avatar">
+                        <div
+                            class="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-base shadow-md shrink-0">
+                            <span
+                                x-text="detailData.applicant_profile ? (detailData.applicant_profile.full_name || detailData.name || 'K').substring(0, 2).toUpperCase() : (detailData.name ? detailData.name.substring(0,2).toUpperCase() : 'K')"></span>
+                        </div>
+                    </template>
                     <div>
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white"
                             x-text="detailData.applicant_profile ? (detailData.applicant_profile.full_name || detailData.name) : detailData.name">

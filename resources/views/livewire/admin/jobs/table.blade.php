@@ -2,7 +2,93 @@
     showCreateModal: {{ $errors->any() && !old('is_edit') ? 'true' : 'false' }},
     showEditModal: {{ $errors->any() && old('is_edit') ? 'true' : 'false' }},
     showDeleteModal: false,
+    createStep: {{ $errors->has('description') ? '2' : '1' }},
+    editStep: {{ $errors->has('description') ? '2' : '1' }},
+    createCompanyId: '{{ old('company_id', '') }}',
     createDepartmentId: '{{ old('department_id', '') }}',
+    createPositionId: '{{ old('position_id', '') }}',
+    goToCreateStep2() {
+        let company = document.getElementById('company_id');
+        let dept = document.getElementById('department_id');
+        let title = document.getElementById('title');
+        let quota = document.getElementById('quota');
+        let deadline = document.getElementById('deadline');
+
+        if (company && !company.value) {
+            company.reportValidity();
+            return;
+        }
+        if (dept && !dept.value) {
+            dept.reportValidity();
+            return;
+        }
+        if (title && !title.value.trim()) {
+            title.reportValidity();
+            return;
+        }
+        if (quota && !quota.value) {
+            quota.reportValidity();
+            return;
+        }
+        if (deadline && !deadline.value) {
+            deadline.reportValidity();
+            return;
+        }
+
+        this.createStep = 2;
+        this.$nextTick(() => {
+            this.initQuillCreate();
+        });
+    },
+    goToEditStep2() {
+        let company = document.getElementById('edit_company_id');
+        let dept = document.getElementById('edit_department_id');
+        let title = document.getElementById('edit_title');
+        let quota = document.getElementById('edit_quota');
+        let deadline = document.getElementById('edit_deadline');
+
+        if (company && !company.value) {
+            company.reportValidity();
+            return;
+        }
+        if (dept && !dept.value) {
+            dept.reportValidity();
+            return;
+        }
+        if (title && !title.value.trim()) {
+            title.reportValidity();
+            return;
+        }
+        if (quota && !quota.value) {
+            quota.reportValidity();
+            return;
+        }
+        if (deadline && !deadline.value) {
+            deadline.reportValidity();
+            return;
+        }
+
+        this.editStep = 2;
+        this.$nextTick(() => {
+            this.initQuillEdit(this.editData.description || '');
+        });
+    },
+    onCompanyChange(isEdit = false) {
+        if (!isEdit) {
+            this.createDepartmentId = '';
+            this.createPositionId = '';
+        } else {
+            this.editData.department_id = '';
+            this.editData.position_id = '';
+        }
+    },
+    onDepartmentChange(isEdit = false) {
+        if (!isEdit) {
+            this.createPositionId = '';
+        } else {
+            this.editData.position_id = '';
+        }
+    },
     createQuill: null,
     editQuill: null,
     editData: {
@@ -26,7 +112,8 @@
     },
     onPositionSelect(event, isEdit = false) {
         let select = event.target;
-        let selectedText = select.options[select.selectedIndex]?.dataset?.name || '';
+        let selectedOption = select.options[select.selectedIndex];
+        let selectedText = selectedOption?.dataset?.name || '';
         if (selectedText) {
             if (!isEdit) {
                 let titleInput = document.getElementById('title');
@@ -108,8 +195,15 @@
         });
     },
     openCreateModal() {
+        this.createStep = 1;
+        this.createCompanyId = '';
+        this.createDepartmentId = '';
+        this.createPositionId = '';
+        let titleInput = document.getElementById('title');
+        if (titleInput) {
+            titleInput.value = '';
+        }
         this.showCreateModal = true;
-        this.initQuillCreate();
         this.$nextTick(() => {
             if (this.createQuill) {
                 this.createQuill.root.innerHTML = '';
@@ -119,11 +213,12 @@
         });
     },
     openEditModal(job) {
+        this.editStep = 1;
         this.editData = {
             id: job.id,
-            company_id: job.company_id || '',
-            department_id: job.department_id || '',
-            position_id: job.position_id || '',
+            company_id: job.company_id ? String(job.company_id) : '',
+            department_id: job.department_id ? String(job.department_id) : '',
+            position_id: job.position_id ? String(job.position_id) : '',
             title: job.title || '',
             description: job.description || '',
             employment_type: job.employment_type || 'Full-time',
@@ -135,7 +230,6 @@
             status: job.status || 'Open'
         };
         this.showEditModal = true;
-        this.initQuillEdit(job.description || '');
     },
     openDeleteModal(job) {
         this.deleteData = {
@@ -384,40 +478,111 @@
         </div>
     @endif
 
-    <!-- Header & Action Section -->
-    <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 overflow-hidden shadow-sm rounded-2xl p-6">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Daftar Lowongan Kerja</h3>
-                <p class="text-xs text-gray-500 dark:text-slate-400">Kelola dan publikasikan lowongan pekerjaan baru.</p>
-            </div>
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
-                <!-- Search Input -->
-                <div class="relative w-full sm:w-64">
-                    <input type="text" 
-                           wire:model.live.debounce.300ms="search"
-                           placeholder="Cari posisi, lokasi, perusahaan..." 
-                           class="w-full pl-9 pr-4 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                    <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                </div>
-
-                <button @click="openCreateModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-md shadow-indigo-500/20 transition-all flex items-center justify-center gap-2 w-full sm:w-auto shrink-0">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                    Tambah Lowongan
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Data Table Section -->
+    <!-- Main Container Card -->
     <div class="relative bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
         
+        <!-- Header & Action Section -->
+        <div class="p-5 sm:p-6 border-b border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h3 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white">Daftar Lowongan Kerja</h3>
+                <p class="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Kelola dan publikasikan lowongan pekerjaan baru.</p>
+            </div>
+
+            <button type="button" @click="openCreateModal()" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-md shadow-indigo-600/20 transition active:scale-95 shrink-0">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                <span>Tambah Lowongan</span>
+            </button>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="p-4 sm:p-5 bg-gray-50/70 dark:bg-slate-800/50 border-b border-gray-100 dark:border-slate-800 space-y-3.5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
+                <!-- Search Input -->
+                <div class="relative lg:col-span-4">
+                    <input type="text" 
+                           wire:model.live.debounce.300ms="search" 
+                           placeholder="Cari posisi, lokasi, perusahaan..." 
+                           class="w-full pl-9 pr-4 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Filter Perusahaan -->
+                <div class="relative lg:col-span-4">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                    </div>
+                    <select wire:model.live="companyId" class="w-full pl-9 pr-8 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition appearance-none cursor-pointer [color-scheme:light] dark:[color-scheme:dark]">
+                        <option value="">Semua Perusahaan</option>
+                        @foreach ($companies as $comp)
+                            <option value="{{ $comp->id }}">{{ $comp->name }}</option>
+                        @endforeach
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Filter Departemen (Menyesuaikan dengan perusahaan yang dipilih) -->
+                <div class="relative lg:col-span-4">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg>
+                    </div>
+                    <select wire:model.live="departmentId" class="w-full pl-9 pr-8 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition appearance-none cursor-pointer [color-scheme:light] dark:[color-scheme:dark]">
+                        <option value="">{{ $companyId ? 'Semua Departemen di Perusahaan Ini' : 'Semua Departemen' }}</option>
+                        @foreach ($filterDepartments as $dept)
+                            <option value="{{ $dept->id }}">
+                                {{ $dept->name }} @if(!$companyId && $dept->company)({{ $dept->company->name }})@endif
+                            </option>
+                        @endforeach
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Toolbar Bottom Row: Quick Status Filter Badges & Reset Button -->
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+                <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                    <span class="text-[11px] font-bold text-gray-400 uppercase mr-1">Status:</span>
+                    <button type="button" wire:click="$set('statusFilter', '')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $statusFilter === '' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-800' }}">
+                        Semua
+                    </button>
+                    <button type="button" wire:click="$set('statusFilter', 'Open')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $statusFilter === 'Open' ? 'bg-emerald-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40' }}">
+                        Open
+                    </button>
+                    <button type="button" wire:click="$set('statusFilter', 'Closed')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition cursor-pointer {{ $statusFilter === 'Closed' ? 'bg-rose-600 text-white shadow-xs' : 'bg-white dark:bg-slate-900 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800 hover:bg-rose-50 dark:hover:bg-rose-950/40' }}">
+                        Closed
+                    </button>
+                </div>
+
+                @if ($search || $companyId || $departmentId || $statusFilter)
+                    <button type="button" wire:click="resetFilters" class="text-xs font-semibold text-rose-600 dark:text-rose-400 hover:underline inline-flex items-center gap-1 cursor-pointer">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        <span>Reset Filter</span>
+                    </button>
+                @endif
+            </div>
+        </div>
+
         <!-- Livewire Loading Overlay -->
-        <div wire:loading wire:target="search, previousPage, nextPage, gotoPage" class="absolute inset-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-[1px] flex items-center justify-center z-10 transition">
+        <div wire:loading wire:target="search, companyId, departmentId, statusFilter, previousPage, nextPage, gotoPage, resetFilters" class="absolute inset-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-[1px] flex items-center justify-center z-10 transition">
             <div class="flex items-center gap-2.5 px-4 py-2.5 bg-slate-900/90 dark:bg-slate-800/90 text-white rounded-xl shadow-xl text-xs font-semibold">
                 <svg class="animate-spin w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -581,10 +746,10 @@
 
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
-            <div x-show="showCreateModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="inline-block align-bottom bg-white dark:bg-slate-900 rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl w-full border border-gray-200 dark:border-slate-800">
+            <div x-show="showCreateModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="inline-block align-bottom bg-white dark:bg-slate-900 rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl w-full border border-gray-200 dark:border-slate-800">
                 
                 <div class="p-6">
-                    <div class="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-slate-800">
+                    <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-slate-800">
                         <h3 class="text-base font-bold text-gray-900 dark:text-white" id="modal-title">
                             Tambah Lowongan Pekerjaan Baru
                         </h3>
@@ -595,16 +760,50 @@
                         </button>
                     </div>
 
-                    <form action="{{ route('admin.job.store') }}" method="POST" @submit="if(createQuill) { let html = createQuill.root.innerHTML; let isEmpty = createQuill.getText().trim().length === 0; document.getElementById('create_final_description').value = isEmpty ? '' : html; }" class="mt-4 space-y-4">
+                    <!-- Step Indicator Tabs -->
+                    <div class="flex items-center gap-2 border-b border-gray-100 dark:border-slate-800 py-3 mb-4">
+                        <button type="button" 
+                                @click="createStep = 1"
+                                class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-semibold transition-all border"
+                                :class="createStep === 1 
+                                    ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 shadow-sm' 
+                                    : 'bg-gray-50 dark:bg-slate-800/60 border-transparent text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800'">
+                            <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold transition-colors"
+                                  :class="createStep === 1 ? 'bg-indigo-600 text-white' : 'bg-gray-200 dark:bg-slate-700 text-gray-600 dark:text-slate-300'">
+                                1
+                            </span>
+                            <span class="truncate">1. Informasi Lowongan</span>
+                        </button>
+
+                        <svg class="w-4 h-4 text-gray-300 dark:text-slate-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+
+                        <button type="button" 
+                                @click="goToCreateStep2()"
+                                class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-semibold transition-all border"
+                                :class="createStep === 2 
+                                    ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 shadow-sm' 
+                                    : 'bg-gray-50 dark:bg-slate-800/60 border-transparent text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800'">
+                            <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold transition-colors"
+                                  :class="createStep === 2 ? 'bg-indigo-600 text-white' : 'bg-gray-200 dark:bg-slate-700 text-gray-600 dark:text-slate-300'">
+                                2
+                            </span>
+                            <span class="truncate">2. Deskripsi & Persyaratan</span>
+                        </button>
+                    </div>
+
+                    <form action="{{ route('admin.job.store') }}" method="POST" id="createJobForm" @keydown.enter="if (createStep === 1 && $event.target.tagName !== 'TEXTAREA') { $event.preventDefault(); goToCreateStep2(); }" @submit="if(createQuill) { let html = createQuill.root.innerHTML; let isEmpty = createQuill.getText().trim().length === 0; document.getElementById('create_final_description').value = isEmpty ? '' : html; }" class="space-y-4">
                         @csrf
 
-                        <div class="grid grid-cols-2 gap-3">
+                        <!-- PAGE 1: Informasi Lowongan -->
+                        <div x-show="createStep === 1" class="space-y-3.5">
                             <!-- Company -->
                             <div>
                                 <label for="company_id" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
                                     Perusahaan <span class="text-rose-500">*</span>
                                 </label>
-                                <select name="company_id" id="company_id" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                <select name="company_id" id="company_id" x-model="createCompanyId" @change="onCompanyChange(false)" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
                                     <option value="">-- Pilih Perusahaan --</option>
                                     @foreach ($companies as $company)
                                         <option value="{{ $company->id }}" {{ old('company_id') == $company->id ? 'selected' : '' }}>
@@ -615,17 +814,24 @@
                             </div>
 
                             <!-- Department & Master Position Grid -->
-                            <div class="col-span-1 sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <!-- Department -->
                                 <div>
                                     <label for="department_id" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
                                         Departemen <span class="text-rose-500">*</span>
                                     </label>
-                                    <select name="department_id" id="department_id" x-model="createDepartmentId" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                                        <option value="">-- Pilih Departemen --</option>
+                                    <select name="department_id" id="department_id" x-model="createDepartmentId" @change="onDepartmentChange(false)" required :disabled="!createCompanyId" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition disabled:opacity-50 disabled:cursor-not-allowed">
+                                        <option value="" x-text="!createCompanyId ? '-- Pilih Perusahaan Terlebih Dahulu --' : '-- Pilih Departemen --'">-- Pilih Departemen --</option>
                                         @foreach ($departments as $dept)
-                                            <option value="{{ $dept->id }}" {{ old('department_id') == $dept->id ? 'selected' : '' }}>
-                                                {{ $dept->name }} {{ $dept->company ? '('.$dept->company->name.')' : '' }}
+                                            <option 
+                                                value="{{ $dept->id }}" 
+                                                data-company-id="{{ $dept->company_id }}"
+                                                x-show="createCompanyId == '{{ $dept->company_id }}'"
+                                                :hidden="createCompanyId != '{{ $dept->company_id }}'"
+                                                :disabled="createCompanyId != '{{ $dept->company_id }}'"
+                                                {{ old('department_id') == $dept->id ? 'selected' : '' }}
+                                            >
+                                                {{ $dept->name }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -637,124 +843,159 @@
                                         <span>Posisi / Jabatan Baku</span>
                                         <span class="text-[10px] text-gray-400 font-normal">Pilih otomatis</span>
                                     </label>
-                                    <select name="position_id" id="position_id" @change="onPositionSelect($event, false)" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                                        <option value="">-- Bebas / Tanpa Posisi Baku --</option>
+                                    <select name="position_id" id="position_id" x-model="createPositionId" @change="onPositionSelect($event, false)" :disabled="!createDepartmentId" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition disabled:opacity-50 disabled:cursor-not-allowed">
+                                        <option value="" x-text="!createDepartmentId ? '-- Pilih Departemen Terlebih Dahulu --' : '-- Bebas / Tanpa Posisi Baku --'">-- Bebas / Tanpa Posisi Baku --</option>
                                         @foreach ($positions as $pos)
-                                            <option value="{{ $pos->id }}" data-name="{{ $pos->name }}" x-show="!createDepartmentId || createDepartmentId == '{{ $pos->department_id }}'" {{ old('position_id') == $pos->id ? 'selected' : '' }}>
-                                                {{ $pos->name }} ({{ $pos->department?->name }})
+                                            <option 
+                                                value="{{ $pos->id }}" 
+                                                data-name="{{ $pos->name }}"
+                                                data-department-id="{{ $pos->department_id }}"
+                                                x-show="createDepartmentId == '{{ $pos->department_id }}'" 
+                                                :hidden="createDepartmentId != '{{ $pos->department_id }}'"
+                                                :disabled="createDepartmentId != '{{ $pos->department_id }}'"
+                                                {{ old('position_id') == $pos->id ? 'selected' : '' }}
+                                            >
+                                                {{ $pos->name }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Title -->
-                        <div>
-                            <label for="title" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                Judul Posisi / Pekerjaan <span class="text-rose-500">*</span>
-                            </label>
-                            <input type="text" name="title" id="title" value="{{ old('title') }}" required placeholder="Contoh: Senior Full Stack Developer" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <!-- Employment Type -->
+                            <!-- Title -->
                             <div>
-                                <label for="employment_type" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                    Tipe Pekerjaan <span class="text-rose-500">*</span>
+                                <label for="title" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                    Judul Posisi / Pekerjaan <span class="text-rose-500">*</span>
                                 </label>
-                                <select name="employment_type" id="employment_type" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                                    <option value="Full-time">Full-time</option>
-                                    <option value="Part-time">Part-time</option>
-                                    <option value="Contract">Contract</option>
-                                    <option value="Internship">Internship</option>
-                                    <option value="Freelance">Freelance</option>
-                                </select>
+                                <input type="text" name="title" id="title" value="{{ old('title') }}" required placeholder="Contoh: Senior Full Stack Developer" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
                             </div>
 
-                            <!-- Location -->
-                            <div>
-                                <label for="location" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                    Lokasi Kerja
-                                </label>
-                                <input type="text" name="location" id="location" value="{{ old('location') }}" placeholder="Contoh: Jakarta / Remote" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                            </div>
-                        </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <!-- Employment Type -->
+                                <div>
+                                    <label for="employment_type" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                        Tipe Pekerjaan <span class="text-rose-500">*</span>
+                                    </label>
+                                    <select name="employment_type" id="employment_type" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                        <option value="Full-time">Full-time</option>
+                                        <option value="Part-time">Part-time</option>
+                                        <option value="Contract">Contract</option>
+                                        <option value="Internship">Internship</option>
+                                        <option value="Freelance">Freelance</option>
+                                    </select>
+                                </div>
 
-                        <div class="grid grid-cols-2 gap-3">
-                            <!-- Salary Min -->
-                            <div>
-                                <label for="salary_min" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                    Gaji Minimal (Rp)
-                                </label>
-                                <input type="number" name="salary_min" id="salary_min" value="{{ old('salary_min') }}" placeholder="5000000" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                            </div>
-
-                            <!-- Salary Max -->
-                            <div>
-                                <label for="salary_max" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                    Gaji Maksimal (Rp)
-                                </label>
-                                <input type="number" name="salary_max" id="salary_max" value="{{ old('salary_max') }}" placeholder="8000000" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-3 gap-3">
-                            <!-- Quota -->
-                            <div>
-                                <label for="quota" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                    Kuota (Orang) <span class="text-rose-500">*</span>
-                                </label>
-                                <input type="number" name="quota" id="quota" min="1" value="{{ old('quota', 1) }}" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                <!-- Location -->
+                                <div>
+                                    <label for="location" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                        Lokasi Kerja
+                                    </label>
+                                    <input type="text" name="location" id="location" value="{{ old('location') }}" placeholder="Contoh: Jakarta / Remote" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                </div>
                             </div>
 
-                            <!-- Deadline -->
-                            <div>
-                                <label for="deadline" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                    Tenggat Waktu <span class="text-rose-500">*</span>
-                                </label>
-                                <input type="date" name="deadline" id="deadline" value="{{ old('deadline') }}" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <!-- Salary Min -->
+                                <div>
+                                    <label for="salary_min" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                        Gaji Minimal (Rp)
+                                    </label>
+                                    <input type="number" name="salary_min" id="salary_min" value="{{ old('salary_min') }}" placeholder="5000000" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                </div>
+
+                                <!-- Salary Max -->
+                                <div>
+                                    <label for="salary_max" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                        Gaji Maksimal (Rp)
+                                    </label>
+                                    <input type="number" name="salary_max" id="salary_max" value="{{ old('salary_max') }}" placeholder="8000000" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                </div>
                             </div>
 
-                            <!-- Status -->
-                            <div>
-                                <label for="status" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                    Status <span class="text-rose-500">*</span>
-                                </label>
-                                <select name="status" id="status" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                                    <option value="Open">Open</option>
-                                    <option value="Closed">Closed</option>
-                                    <option value="Draft">Draft</option>
-                                </select>
-                            </div>
-                        </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <!-- Quota -->
+                                <div>
+                                    <label for="quota" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                        Kuota (Orang) <span class="text-rose-500">*</span>
+                                    </label>
+                                    <input type="number" name="quota" id="quota" min="1" value="{{ old('quota', 1) }}" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                </div>
 
-                        <!-- Quill Rich Text Visual Editor for Description & Requirements -->
-                        <input type="hidden" name="description" id="create_final_description">
+                                <!-- Deadline -->
+                                <div>
+                                    <label for="deadline" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                        Tenggat Waktu <span class="text-rose-500">*</span>
+                                    </label>
+                                    <input type="date" name="deadline" id="deadline" value="{{ old('deadline') }}" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                </div>
 
-                        <div class="space-y-1.5 pt-1">
-                            <div class="flex items-center justify-between">
-                                <label class="block text-xs font-bold text-gray-800 dark:text-slate-200">
-                                    Deskripsi & Persyaratan Pekerjaan
-                                </label>
-                                <span class="text-[11px] text-gray-400 dark:text-slate-400">
-                                    Gunakan toolbar untuk format Heading, Bullet List (•), Numbering, atau Bold
-                                </span>
-                            </div>
-                            
-                            <div class="rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700 quill-dark-wrapper">
-                                <div id="create_quill_editor"></div>
+                                <!-- Status -->
+                                <div>
+                                    <label for="status" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                        Status <span class="text-rose-500">*</span>
+                                    </label>
+                                    <select name="status" id="status" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                        <option value="Open">Open</option>
+                                        <option value="Closed">Closed</option>
+                                        <option value="Draft">Draft</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Modal Actions -->
-                        <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 dark:border-slate-800">
+                        <!-- PAGE 2: Deskripsi & Persyaratan -->
+                        <div x-show="createStep === 2" class="space-y-4" style="display: none;">
+                            <!-- Quill Rich Text Visual Editor for Description & Requirements -->
+                            <input type="hidden" name="description" id="create_final_description">
+
+                            <div class="space-y-1.5 pt-1">
+                                <div class="flex items-center justify-between">
+                                    <label class="block text-xs font-bold text-gray-800 dark:text-slate-200">
+                                        Deskripsi & Persyaratan Pekerjaan
+                                    </label>
+                                    <span class="text-[11px] text-gray-400 dark:text-slate-400">
+                                        Gunakan toolbar untuk format Heading, Bullet List (•), Numbering, atau Bold
+                                    </span>
+                                </div>
+                                
+                                <div class="rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700 quill-dark-wrapper">
+                                    <div id="create_quill_editor"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal Actions for Step 1 -->
+                        <div x-show="createStep === 1" class="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-slate-800">
                             <button type="button" @click="showCreateModal = false" class="px-4 py-2 text-xs font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition">
                                 Batal
                             </button>
-                            <button type="submit" class="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-md shadow-indigo-500/20 transition">
-                                Simpan Lowongan
+                            <button type="button" @click="goToCreateStep2()" class="px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-md shadow-indigo-500/20 transition flex items-center gap-1.5">
+                                <span>Lanjut: Deskripsi & Syarat</span>
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                </svg>
                             </button>
+                        </div>
+
+                        <!-- Modal Actions for Step 2 -->
+                        <div x-show="createStep === 2" class="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-slate-800" style="display: none;">
+                            <button type="button" @click="createStep = 1" class="px-4 py-2 text-xs font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition flex items-center gap-1.5">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                                </svg>
+                                <span>Kembali ke Informasi</span>
+                            </button>
+                            <div class="flex items-center gap-2">
+                                <button type="button" @click="showCreateModal = false" class="px-3 py-2 text-xs font-medium text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition">
+                                    Batal
+                                </button>
+                                <button type="submit" class="px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-md shadow-indigo-500/20 transition flex items-center gap-1.5">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span>Simpan Lowongan</span>
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -770,10 +1011,10 @@
 
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
-            <div x-show="showEditModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="inline-block align-bottom bg-white dark:bg-slate-900 rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl w-full border border-gray-200 dark:border-slate-800">
+            <div x-show="showEditModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="inline-block align-bottom bg-white dark:bg-slate-900 rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl w-full border border-gray-200 dark:border-slate-800">
                 
                 <div class="p-6">
-                    <div class="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-slate-800">
+                    <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-slate-800">
                         <h3 class="text-base font-bold text-gray-900 dark:text-white" id="modal-title-edit">
                             Edit Lowongan Pekerjaan
                         </h3>
@@ -784,19 +1025,53 @@
                         </button>
                     </div>
 
-                    <form :action="'/admin/jobs/' + editData.id" method="POST" @submit="if(editQuill) { let html = editQuill.root.innerHTML; let isEmpty = editQuill.getText().trim().length === 0; editData.description = isEmpty ? '' : html; document.getElementById('edit_final_description').value = isEmpty ? '' : html; }" class="mt-4 space-y-4">
+                    <!-- Step Indicator Tabs -->
+                    <div class="flex items-center gap-2 border-b border-gray-100 dark:border-slate-800 py-3 mb-4">
+                        <button type="button" 
+                                @click="editStep = 1"
+                                class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-semibold transition-all border"
+                                :class="editStep === 1 
+                                    ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 shadow-sm' 
+                                    : 'bg-gray-50 dark:bg-slate-800/60 border-transparent text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800'">
+                            <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold transition-colors"
+                                  :class="editStep === 1 ? 'bg-indigo-600 text-white' : 'bg-gray-200 dark:bg-slate-700 text-gray-600 dark:text-slate-300'">
+                                1
+                            </span>
+                            <span class="truncate">1. Informasi Lowongan</span>
+                        </button>
+
+                        <svg class="w-4 h-4 text-gray-300 dark:text-slate-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+
+                        <button type="button" 
+                                @click="goToEditStep2()"
+                                class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-semibold transition-all border"
+                                :class="editStep === 2 
+                                    ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 shadow-sm' 
+                                    : 'bg-gray-50 dark:bg-slate-800/60 border-transparent text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800'">
+                            <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold transition-colors"
+                                  :class="editStep === 2 ? 'bg-indigo-600 text-white' : 'bg-gray-200 dark:bg-slate-700 text-gray-600 dark:text-slate-300'">
+                                2
+                            </span>
+                            <span class="truncate">2. Deskripsi & Persyaratan</span>
+                        </button>
+                    </div>
+
+                    <form :action="'/admin/jobs/' + editData.id" method="POST" id="editJobForm" @keydown.enter="if (editStep === 1 && $event.target.tagName !== 'TEXTAREA') { $event.preventDefault(); goToEditStep2(); }" @submit="if(editQuill) { let html = editQuill.root.innerHTML; let isEmpty = editQuill.getText().trim().length === 0; editData.description = isEmpty ? '' : html; document.getElementById('edit_final_description').value = isEmpty ? '' : html; }" class="space-y-4">
                         @csrf
                         @method('PUT')
                         <input type="hidden" name="is_edit" value="1">
                         <input type="hidden" name="id" x-model="editData.id">
 
-                        <div class="grid grid-cols-2 gap-3">
+                        <!-- PAGE 1: Informasi Lowongan -->
+                        <div x-show="editStep === 1" class="space-y-3.5">
                             <!-- Company -->
                             <div>
                                 <label for="edit_company_id" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
                                     Perusahaan
                                 </label>
-                                <select name="company_id" id="edit_company_id" x-model="editData.company_id" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                <select name="company_id" id="edit_company_id" x-model="editData.company_id" @change="onCompanyChange(true)" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
                                     <option value="">-- Pilih Perusahaan --</option>
                                     @foreach ($companies as $company)
                                         <option value="{{ $company->id }}">
@@ -807,17 +1082,23 @@
                             </div>
 
                             <!-- Department & Master Position Grid -->
-                            <div class="col-span-1 sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <!-- Department -->
                                 <div>
                                     <label for="edit_department_id" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
                                         Departemen
                                     </label>
-                                    <select name="department_id" id="edit_department_id" x-model="editData.department_id" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                                        <option value="">-- Pilih Departemen --</option>
+                                    <select name="department_id" id="edit_department_id" x-model="editData.department_id" @change="onDepartmentChange(true)" :disabled="!editData.company_id" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition disabled:opacity-50 disabled:cursor-not-allowed">
+                                        <option value="" x-text="!editData.company_id ? '-- Pilih Perusahaan Terlebih Dahulu --' : '-- Pilih Departemen --'">-- Pilih Departemen --</option>
                                         @foreach ($departments as $dept)
-                                            <option value="{{ $dept->id }}">
-                                                {{ $dept->name }} {{ $dept->company ? '('.$dept->company->name.')' : '' }}
+                                            <option 
+                                                value="{{ $dept->id }}" 
+                                                data-company-id="{{ $dept->company_id }}"
+                                                x-show="editData.company_id == '{{ $dept->company_id }}'"
+                                                :hidden="editData.company_id != '{{ $dept->company_id }}'"
+                                                :disabled="editData.company_id != '{{ $dept->company_id }}'"
+                                            >
+                                                {{ $dept->name }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -829,124 +1110,158 @@
                                         <span>Posisi / Jabatan Baku</span>
                                         <span class="text-[10px] text-gray-400 font-normal">Pilih otomatis</span>
                                     </label>
-                                    <select name="position_id" id="edit_position_id" x-model="editData.position_id" @change="onPositionSelect($event, true)" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                                        <option value="">-- Bebas / Tanpa Posisi Baku --</option>
+                                    <select name="position_id" id="edit_position_id" x-model="editData.position_id" @change="onPositionSelect($event, true)" :disabled="!editData.department_id" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition disabled:opacity-50 disabled:cursor-not-allowed">
+                                        <option value="" x-text="!editData.department_id ? '-- Pilih Departemen Terlebih Dahulu --' : '-- Bebas / Tanpa Posisi Baku --'">-- Bebas / Tanpa Posisi Baku --</option>
                                         @foreach ($positions as $pos)
-                                            <option value="{{ $pos->id }}" data-name="{{ $pos->name }}" x-show="!editData.department_id || editData.department_id == '{{ $pos->department_id }}'">
-                                                {{ $pos->name }} ({{ $pos->department?->name }})
+                                            <option 
+                                                value="{{ $pos->id }}" 
+                                                data-name="{{ $pos->name }}"
+                                                data-department-id="{{ $pos->department_id }}"
+                                                x-show="editData.department_id == '{{ $pos->department_id }}'" 
+                                                :hidden="editData.department_id != '{{ $pos->department_id }}'"
+                                                :disabled="editData.department_id != '{{ $pos->department_id }}'"
+                                            >
+                                                {{ $pos->name }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Title -->
-                        <div>
-                            <label for="edit_title" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                Judul Posisi / Pekerjaan
-                            </label>
-                            <input type="text" name="title" id="edit_title" x-model="editData.title" placeholder="Judul Posisi" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <!-- Employment Type -->
+                            <!-- Title -->
                             <div>
-                                <label for="edit_employment_type" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                    Tipe Pekerjaan
+                                <label for="edit_title" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                    Judul Posisi / Pekerjaan
                                 </label>
-                                <select name="employment_type" id="edit_employment_type" x-model="editData.employment_type" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                                    <option value="Full-time">Full-time</option>
-                                    <option value="Part-time">Part-time</option>
-                                    <option value="Contract">Contract</option>
-                                    <option value="Internship">Internship</option>
-                                    <option value="Freelance">Freelance</option>
-                                </select>
+                                <input type="text" name="title" id="edit_title" x-model="editData.title" placeholder="Judul Posisi" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
                             </div>
 
-                            <!-- Location -->
-                            <div>
-                                <label for="edit_location" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                    Lokasi Kerja
-                                </label>
-                                <input type="text" name="location" id="edit_location" x-model="editData.location" placeholder="Lokasi" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                            </div>
-                        </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <!-- Employment Type -->
+                                <div>
+                                    <label for="edit_employment_type" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                        Tipe Pekerjaan
+                                    </label>
+                                    <select name="employment_type" id="edit_employment_type" x-model="editData.employment_type" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                        <option value="Full-time">Full-time</option>
+                                        <option value="Part-time">Part-time</option>
+                                        <option value="Contract">Contract</option>
+                                        <option value="Internship">Internship</option>
+                                        <option value="Freelance">Freelance</option>
+                                    </select>
+                                </div>
 
-                        <div class="grid grid-cols-2 gap-3">
-                            <!-- Salary Min -->
-                            <div>
-                                <label for="edit_salary_min" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                    Gaji Minimal (Rp)
-                                </label>
-                                <input type="number" name="salary_min" id="edit_salary_min" x-model="editData.salary_min" placeholder="5000000" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                            </div>
-
-                            <!-- Salary Max -->
-                            <div>
-                                <label for="edit_salary_max" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                    Gaji Maksimal (Rp)
-                                </label>
-                                <input type="number" name="salary_max" id="edit_salary_max" x-model="editData.salary_max" placeholder="8000000" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-3 gap-3">
-                            <!-- Quota -->
-                            <div>
-                                <label for="edit_quota" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                    Kuota (Orang) <span class="text-rose-500">*</span>
-                                </label>
-                                <input type="number" name="quota" id="edit_quota" min="1" x-model.number="editData.quota" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                <!-- Location -->
+                                <div>
+                                    <label for="edit_location" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                        Lokasi Kerja
+                                    </label>
+                                    <input type="text" name="location" id="edit_location" x-model="editData.location" placeholder="Lokasi" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                </div>
                             </div>
 
-                            <!-- Deadline -->
-                            <div>
-                                <label for="edit_deadline" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                    Tenggat Waktu
-                                </label>
-                                <input type="date" name="deadline" id="edit_deadline" x-model="editData.deadline" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <!-- Salary Min -->
+                                <div>
+                                    <label for="edit_salary_min" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                        Gaji Minimal (Rp)
+                                    </label>
+                                    <input type="number" name="salary_min" id="edit_salary_min" x-model="editData.salary_min" placeholder="5000000" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                </div>
+
+                                <!-- Salary Max -->
+                                <div>
+                                    <label for="edit_salary_max" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                        Gaji Maksimal (Rp)
+                                    </label>
+                                    <input type="number" name="salary_max" id="edit_salary_max" x-model="editData.salary_max" placeholder="8000000" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                </div>
                             </div>
 
-                            <!-- Status -->
-                            <div>
-                                <label for="edit_status" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
-                                    Status
-                                </label>
-                                <select name="status" id="edit_status" x-model="editData.status" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                                    <option value="Open">Open</option>
-                                    <option value="Closed">Closed</option>
-                                    <option value="Draft">Draft</option>
-                                </select>
-                            </div>
-                        </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <!-- Quota -->
+                                <div>
+                                    <label for="edit_quota" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                        Kuota (Orang) <span class="text-rose-500">*</span>
+                                    </label>
+                                    <input type="number" name="quota" id="edit_quota" min="1" x-model.number="editData.quota" required class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                </div>
 
-                        <!-- Quill Rich Text Visual Editor for Description & Requirements -->
-                        <input type="hidden" name="description" id="edit_final_description" x-model="editData.description">
+                                <!-- Deadline -->
+                                <div>
+                                    <label for="edit_deadline" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                        Tenggat Waktu
+                                    </label>
+                                    <input type="date" name="deadline" id="edit_deadline" x-model="editData.deadline" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                </div>
 
-                        <div class="space-y-1.5 pt-1">
-                            <div class="flex items-center justify-between">
-                                <label class="block text-xs font-bold text-gray-800 dark:text-slate-200">
-                                    Deskripsi & Persyaratan Pekerjaan
-                                </label>
-                                <span class="text-[11px] text-gray-400 dark:text-slate-400">
-                                    Gunakan toolbar untuk format Heading, Bullet List (•), Numbering, atau Bold
-                                </span>
-                            </div>
-                            
-                            <div class="rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700 quill-dark-wrapper">
-                                <div id="edit_quill_editor"></div>
+                                <!-- Status -->
+                                <div>
+                                    <label for="edit_status" class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1">
+                                        Status
+                                    </label>
+                                    <select name="status" id="edit_status" x-model="editData.status" class="w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                                        <option value="Open">Open</option>
+                                        <option value="Closed">Closed</option>
+                                        <option value="Draft">Draft</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Modal Actions -->
-                        <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 dark:border-slate-800">
+                        <!-- PAGE 2: Deskripsi & Persyaratan -->
+                        <div x-show="editStep === 2" class="space-y-4" style="display: none;">
+                            <!-- Quill Rich Text Visual Editor for Description & Requirements -->
+                            <input type="hidden" name="description" id="edit_final_description" x-model="editData.description">
+
+                            <div class="space-y-1.5 pt-1">
+                                <div class="flex items-center justify-between">
+                                    <label class="block text-xs font-bold text-gray-800 dark:text-slate-200">
+                                        Deskripsi & Persyaratan Pekerjaan
+                                    </label>
+                                    <span class="text-[11px] text-gray-400 dark:text-slate-400">
+                                        Gunakan toolbar untuk format Heading, Bullet List (•), Numbering, atau Bold
+                                    </span>
+                                </div>
+                                
+                                <div class="rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700 quill-dark-wrapper">
+                                    <div id="edit_quill_editor"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal Actions for Step 1 -->
+                        <div x-show="editStep === 1" class="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-slate-800">
                             <button type="button" @click="showEditModal = false" class="px-4 py-2 text-xs font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition">
                                 Batal
                             </button>
-                            <button type="submit" class="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-md shadow-indigo-500/20 transition">
-                                Perbarui Lowongan
+                            <button type="button" @click="goToEditStep2()" class="px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-md shadow-indigo-500/20 transition flex items-center gap-1.5">
+                                <span>Lanjut: Deskripsi & Syarat</span>
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                </svg>
                             </button>
+                        </div>
+
+                        <!-- Modal Actions for Step 2 -->
+                        <div x-show="editStep === 2" class="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-slate-800" style="display: none;">
+                            <button type="button" @click="editStep = 1" class="px-4 py-2 text-xs font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition flex items-center gap-1.5">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                                </svg>
+                                <span>Kembali ke Informasi</span>
+                            </button>
+                            <div class="flex items-center gap-2">
+                                <button type="button" @click="showEditModal = false" class="px-3 py-2 text-xs font-medium text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition">
+                                    Batal
+                                </button>
+                                <button type="submit" class="px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-md shadow-indigo-500/20 transition flex items-center gap-1.5">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span>Perbarui Lowongan</span>
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>

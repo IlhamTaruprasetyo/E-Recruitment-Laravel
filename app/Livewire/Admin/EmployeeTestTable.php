@@ -5,6 +5,7 @@ namespace App\Livewire\Admin;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Test;
+use App\Models\Company;
 use App\Models\Department;
 use App\Models\TestCategory;
 use App\Models\QuestionBank;
@@ -14,6 +15,7 @@ class EmployeeTestTable extends Component
     use WithPagination;
 
     public $search = '';
+    public $companyId = '';
     public $departmentId = '';
     public $categoryId = '';
     public $targetEmployeeType = '';
@@ -21,6 +23,12 @@ class EmployeeTestTable extends Component
 
     public function updatingSearch()
     {
+        $this->resetPage();
+    }
+
+    public function updatingCompanyId()
+    {
+        $this->departmentId = '';
         $this->resetPage();
     }
 
@@ -47,6 +55,7 @@ class EmployeeTestTable extends Component
     public function resetFilters()
     {
         $this->search = '';
+        $this->companyId = '';
         $this->departmentId = '';
         $this->categoryId = '';
         $this->targetEmployeeType = '';
@@ -55,7 +64,12 @@ class EmployeeTestTable extends Component
 
     public function render()
     {
+        $companies = Company::orderBy('name', 'asc')->get();
         $departments = Department::with('company')->orderBy('name', 'asc')->get();
+        $filterDepartments = Department::when($this->companyId, function ($q) {
+            $q->where('company_id', $this->companyId);
+        })->orderBy('name', 'asc')->get();
+
         $categories = TestCategory::orderBy('name', 'asc')->get();
 
         $allQuestions = QuestionBank::with(['category', 'options'])
@@ -69,6 +83,15 @@ class EmployeeTestTable extends Component
             ->when($this->search, function ($query) {
                 $search = strtolower(trim($this->search));
                 $query->whereRaw('LOWER(title) LIKE ?', ['%' . $search . '%']);
+            })
+            ->when($this->companyId, function ($query) {
+                $query->where(function ($q) {
+                    $q->whereHas('departments', function ($d) {
+                        $d->where('company_id', $this->companyId);
+                    })->orWhereHas('department', function ($d) {
+                        $d->where('company_id', $this->companyId);
+                    });
+                });
             })
             ->when($this->departmentId, function ($query) {
                 if ($this->departmentId === 'all') {
@@ -93,9 +116,12 @@ class EmployeeTestTable extends Component
 
         return view('livewire.admin.employee-test.table', [
             'tests' => $tests,
+            'companies' => $companies,
             'departments' => $departments,
+            'filterDepartments' => $filterDepartments,
             'categories' => $categories,
             'allQuestions' => $allQuestions,
         ]);
     }
 }
+

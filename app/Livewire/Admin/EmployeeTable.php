@@ -5,6 +5,7 @@ namespace App\Livewire\Admin;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\EmployeeProfile;
+use App\Models\Company;
 use App\Models\Department;
 use App\Models\Position;
 use Illuminate\Validation\Rule;
@@ -14,6 +15,7 @@ class EmployeeTable extends Component
     use WithPagination;
 
     public $search = '';
+    public $companyId = '';
     public $departmentId = '';
     public $employeeType = '';
     public $perPage = 10;
@@ -89,6 +91,12 @@ class EmployeeTable extends Component
         $this->resetPage();
     }
 
+    public function updatingCompanyId()
+    {
+        $this->departmentId = '';
+        $this->resetPage();
+    }
+
     public function updatingDepartmentId()
     {
         $this->resetPage();
@@ -107,6 +115,7 @@ class EmployeeTable extends Component
     public function resetFilters()
     {
         $this->search = '';
+        $this->companyId = '';
         $this->departmentId = '';
         $this->employeeType = '';
         $this->resetPage();
@@ -267,10 +276,15 @@ class EmployeeTable extends Component
 
     public function render()
     {
+        $companies = Company::orderBy('name', 'asc')->get();
         $departments = Department::with('company')->orderBy('name', 'asc')->get();
+        $filterDepartments = Department::with('company')->when($this->companyId, function ($q) {
+            $q->where('company_id', $this->companyId);
+        })->orderBy('name', 'asc')->get();
+
         $positions = Position::with('department')->orderBy('name', 'asc')->get();
 
-        $employees = EmployeeProfile::with(['user', 'department.company', 'position'])
+        $employees = EmployeeProfile::with(['user', 'company', 'department.company', 'position'])
             ->when($this->search, function ($query) {
                 $search = strtolower(trim($this->search));
                 $query->where(function ($q) use ($search) {
@@ -285,6 +299,14 @@ class EmployeeTable extends Component
                       });
                 });
             })
+            ->when($this->companyId, function ($query) {
+                $query->where(function ($q) {
+                    $q->where('company_id', $this->companyId)
+                      ->orWhereHas('department', function ($d) {
+                          $d->where('company_id', $this->companyId);
+                      });
+                });
+            })
             ->when($this->departmentId, function ($query) {
                 $query->where('department_id', $this->departmentId);
             })
@@ -296,7 +318,9 @@ class EmployeeTable extends Component
 
         return view('livewire.admin.employee.table', [
             'employees' => $employees,
+            'companies' => $companies,
             'departments' => $departments,
+            'filterDepartments' => $filterDepartments,
             'positions' => $positions,
         ]);
     }

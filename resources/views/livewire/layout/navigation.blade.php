@@ -77,7 +77,60 @@ new class extends Component
 <nav x-data="{ open: false }" class="bg-transparent">
     <div class="flex items-center justify-between">
         <!-- Settings Dropdown -->
-        <div class="hidden sm:flex sm:items-center sm:ms-6">
+        <div class="hidden sm:flex sm:items-center sm:ms-6 gap-2">
+
+            <!-- Dark/Light Mode Toggle Button (Desktop) -->
+            <button
+                type="button"
+                x-data="{
+                    isDark: document.documentElement.classList.contains('dark'),
+                    toggle() {
+                        if (typeof window.toggleMikaTheme === 'function') {
+                            this.isDark = window.toggleMikaTheme();
+                        } else {
+                            this.isDark = !this.isDark;
+                            const html = document.documentElement;
+                            if (this.isDark) {
+                                html.classList.add('dark');
+                                html.classList.remove('light-mode');
+                                localStorage.setItem('mika-theme', 'dark');
+                            } else {
+                                html.classList.remove('dark');
+                                html.classList.add('light-mode');
+                                localStorage.setItem('mika-theme', 'light');
+                            }
+                        }
+                    }
+                }"
+                @theme-changed.window="isDark = $event.detail.isDark"
+                @click="toggle()"
+                :title="isDark ? 'Aktifkan Light Mode' : 'Aktifkan Dark Mode'"
+                class="relative flex items-center justify-center w-9 h-9 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 shadow-sm transition-all duration-200 group focus:outline-none overflow-hidden"
+            >
+                <!-- Sun Icon (shown in dark mode) -->
+                <svg x-show="isDark" x-cloak
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 rotate-90 scale-50"
+                     x-transition:enter-end="opacity-100 rotate-0 scale-100"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 rotate-0 scale-100"
+                     x-transition:leave-end="opacity-0 -rotate-90 scale-50"
+                     class="w-5 h-5 text-amber-400 absolute" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+                </svg>
+                <!-- Moon Icon (shown in light mode) -->
+                <svg x-show="!isDark" x-cloak
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 -rotate-90 scale-50"
+                     x-transition:enter-end="opacity-100 rotate-0 scale-100"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 rotate-0 scale-100"
+                     x-transition:leave-end="opacity-0 rotate-90 scale-50"
+                     class="w-4 h-4 text-indigo-500 absolute" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
+                </svg>
+            </button>
+
             <x-dropdown align="right" width="56">
                 <x-slot name="trigger">
                     <button class="inline-flex items-center gap-2.5 px-3 py-1.5 border border-gray-200 dark:border-gray-700/80 rounded-full text-sm font-semibold text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/60 focus:outline-none transition shadow-2xs group">
@@ -143,8 +196,58 @@ new class extends Component
             </x-dropdown>
         </div>
 
-        <!-- Mobile User Settings Toggle (Right) -->
-        <div class="-me-2 flex items-center sm:hidden">
+        <div class="-me-2 flex items-center sm:hidden gap-2">
+
+            <!-- Dark/Light Mode Toggle Button (Mobile) -->
+            <button
+                type="button"
+                x-data="{
+                    isDark: document.documentElement.classList.contains('dark'),
+                    toggle() {
+                        if (typeof window.toggleMikaTheme === 'function') {
+                            this.isDark = window.toggleMikaTheme();
+                        } else {
+                            this.isDark = !this.isDark;
+                            const html = document.documentElement;
+                            if (this.isDark) {
+                                html.classList.add('dark');
+                                html.classList.remove('light-mode');
+                                localStorage.setItem('mika-theme', 'dark');
+                            } else {
+                                html.classList.remove('dark');
+                                html.classList.add('light-mode');
+                                localStorage.setItem('mika-theme', 'light');
+                            }
+                        }
+                    }
+                }"
+                @theme-changed.window="isDark = $event.detail.isDark"
+                @click="toggle()"
+                :title="isDark ? 'Aktifkan Light Mode' : 'Aktifkan Dark Mode'"
+                class="relative flex items-center justify-center w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 shadow-sm transition-all duration-200 focus:outline-none overflow-hidden"
+            >
+                <svg x-show="isDark" x-cloak
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 rotate-90 scale-50"
+                     x-transition:enter-end="opacity-100 rotate-0 scale-100"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 rotate-0 scale-100"
+                     x-transition:leave-end="opacity-0 -rotate-90 scale-50"
+                     class="w-4 h-4 text-amber-400 absolute" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+                </svg>
+                <svg x-show="!isDark" x-cloak
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 -rotate-90 scale-50"
+                     x-transition:enter-end="opacity-100 rotate-0 scale-100"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 rotate-0 scale-100"
+                     x-transition:leave-end="opacity-0 rotate-90 scale-50"
+                     class="w-4 h-4 text-indigo-500 absolute" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
+                </svg>
+            </button>
+
             <button @click="open = ! open" class="inline-flex items-center gap-2 p-1.5 rounded-full border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none transition" title="Toggle User Menu">
                 @if ($photoUrl)
                     <img src="{{ $photoUrl }}" alt="{{ $displayName }}" class="w-7 h-7 rounded-full object-cover">

@@ -14,9 +14,28 @@ class JobTable extends Component
     use WithPagination;
 
     public $search = '';
+    public $companyId = '';
+    public $departmentId = '';
+    public $statusFilter = '';
     public $perPage = 10;
 
     public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingCompanyId()
+    {
+        $this->departmentId = '';
+        $this->resetPage();
+    }
+
+    public function updatingDepartmentId()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingStatusFilter()
     {
         $this->resetPage();
     }
@@ -26,8 +45,27 @@ class JobTable extends Component
         $this->resetPage();
     }
 
+    public function resetFilters()
+    {
+        $this->search = '';
+        $this->companyId = '';
+        $this->departmentId = '';
+        $this->statusFilter = '';
+        $this->resetPage();
+    }
+
     public function render()
     {
+        $companies = Company::orderBy('name')->get();
+
+        $departments = Department::with('company')->orderBy('name')->get();
+
+        $filterDepartments = Department::when($this->companyId, function ($q) {
+            $q->where('company_id', $this->companyId);
+        })->orderBy('name')->get();
+
+        $positions = Position::orderBy('name')->get();
+
         $jobs = Job::with(['company', 'department', 'position'])
             ->when($this->search, function ($query) {
                 $search = strtolower(trim($this->search));
@@ -46,17 +84,23 @@ class JobTable extends Component
                       });
                 });
             })
+            ->when($this->companyId, function ($query) {
+                $query->where('company_id', $this->companyId);
+            })
+            ->when($this->departmentId, function ($query) {
+                $query->where('department_id', $this->departmentId);
+            })
+            ->when($this->statusFilter, function ($query) {
+                $query->where('status', $this->statusFilter);
+            })
             ->orderBy('id', 'desc')
             ->paginate($this->perPage);
-
-        $companies = Company::all();
-        $departments = Department::all();
-        $positions = Position::orderBy('name')->get();
 
         return view('livewire.admin.jobs.table', [
             'jobs' => $jobs,
             'companies' => $companies,
             'departments' => $departments,
+            'filterDepartments' => $filterDepartments,
             'positions' => $positions,
         ]);
     }
