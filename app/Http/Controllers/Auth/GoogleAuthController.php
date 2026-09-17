@@ -93,7 +93,7 @@ class GoogleAuthController extends Controller
         }
 
         // Log the user in
-        Auth::login($user, remember: true);
+        Auth::login($user, remember: false);
         request()->session()->regenerate();
 
         return redirect()->intended(route('dashboard'));

@@ -1,10 +1,12 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Volt\Volt;
 
-test('profile page is displayed', function () {
-    $user = User::factory()->create();
+test('profile page is displayed for admin', function () {
+    $user = User::factory()->create(['role_id' => 1]);
 
     $this->actingAs($user);
 
@@ -13,8 +15,19 @@ test('profile page is displayed', function () {
     $response
         ->assertOk()
         ->assertSeeVolt('profile.update-profile-information-form')
-        ->assertSeeVolt('profile.update-password-form')
-        ->assertSeeVolt('profile.delete-user-form');
+        ->assertSeeVolt('profile.update-password-form');
+});
+
+test('profile page is displayed for applicant', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user);
+
+    $response = $this->get('/profile');
+
+    $response
+        ->assertOk()
+        ->assertSeeVolt('applicant.pribadi');
 });
 
 test('profile information can be updated', function () {
@@ -86,4 +99,45 @@ test('correct password must be provided to delete account', function () {
         ->assertNoRedirect();
 
     $this->assertNotNull($user->fresh());
+});
+
+test('user can upload profile avatar', function () {
+    Storage::fake('public');
+
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $file = UploadedFile::fake()->image('avatar.jpg');
+
+    $component = Volt::test('profile.update-profile-information-form')
+        ->set('name', 'Admin Test')
+        ->set('email', $user->email)
+        ->set('photo', $file)
+        ->call('updateProfileInformation');
+
+    $component->assertHasNoErrors();
+
+    $user->refresh();
+    $this->assertNotNull($user->avatar);
+    Storage::disk('public')->assertExists($user->avatar);
+});
+
+test('user can remove profile avatar', function () {
+    Storage::fake('public');
+
+    $user = User::factory()->create([
+        'avatar' => 'avatars/fake-avatar.jpg',
+    ]);
+    Storage::disk('public')->put('avatars/fake-avatar.jpg', 'fake content');
+
+    $this->actingAs($user);
+
+    $component = Volt::test('profile.update-profile-information-form')
+        ->call('removePhoto');
+
+    $component->assertHasNoErrors();
+
+    $user->refresh();
+    $this->assertNull($user->avatar);
+    Storage::disk('public')->assertMissing('avatars/fake-avatar.jpg');
 });

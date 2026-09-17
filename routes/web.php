@@ -32,6 +32,11 @@ Route::get('lowongan', [FrontendJobController::class, 'index'])->name('jobs.inde
 Route::get('lowongan/{id}', [FrontendJobController::class, 'show'])->name('jobs.show');
 Route::post('lowongan/{id}/apply', [JobApplicationController::class, 'store'])->middleware(['auth'])->name('jobs.apply');
 
+// Session Heartbeat (Sliding Refresh di balik layar saat pengguna aktif)
+Route::post('session/keep-alive', function () {
+    return response()->json(['status' => 'active', 'timestamp' => time()]);
+})->middleware(['auth'])->name('session.keep_alive');
+
 // Multi-user dashboard redirect based on role
 Route::get('dashboard', function () {
     $user = auth()->user();

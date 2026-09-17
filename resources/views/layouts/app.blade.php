@@ -209,6 +209,9 @@
             registerThemeStore();
         }
     </script>
+
+    <!-- Session Heartbeat (Sliding Refresh saat aktif bekerja) -->
+    <x-session-heartbeat />
 </body>
 
 </html>
