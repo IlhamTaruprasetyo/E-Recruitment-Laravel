@@ -19,9 +19,33 @@ class FrontendJobController extends Controller
     {
         $search = $request->query('search');
         $location = $request->query('location');
-        $departmentId = $request->query('department_id');
-        $companyId = $request->query('company_id');
-        $employmentType = $request->query('employment_type');
+
+        // Helper to extract array parameters flexibly (supports array, comma-separated, or single value)
+        $getArrayParam = function ($key) use ($request) {
+            $val = $request->query($key);
+            if (is_array($val)) {
+                return array_values(array_filter($val, fn($v) => !is_null($v) && $v !== ''));
+            }
+            if (is_string($val) && trim($val) !== '') {
+                return array_values(array_filter(explode(',', $val), fn($v) => trim($v) !== ''));
+            }
+            return [];
+        };
+
+        $selectedCompanyIds = $getArrayParam('company_id');
+        if (empty($selectedCompanyIds)) {
+            $selectedCompanyIds = $getArrayParam('company_ids');
+        }
+
+        $selectedDepartmentIds = $getArrayParam('department_id');
+        if (empty($selectedDepartmentIds)) {
+            $selectedDepartmentIds = $getArrayParam('department_ids');
+        }
+
+        $selectedEmploymentTypes = $getArrayParam('employment_type');
+        if (empty($selectedEmploymentTypes)) {
+            $selectedEmploymentTypes = $getArrayParam('employment_types');
+        }
 
         $jobsQuery = Job::active()->with(['company', 'department', 'position', 'degrees', 'majors']);
 
@@ -47,26 +71,30 @@ class FrontendJobController extends Controller
             $jobsQuery->where('location', 'like', "%{$location}%");
         }
 
-        if ($departmentId) {
-            $jobsQuery->where('department_id', $departmentId);
+        if (!empty($selectedDepartmentIds)) {
+            $jobsQuery->whereIn('department_id', $selectedDepartmentIds);
         }
 
-        if ($companyId) {
-            $jobsQuery->where('company_id', $companyId);
+        if (!empty($selectedCompanyIds)) {
+            $jobsQuery->whereIn('company_id', $selectedCompanyIds);
         }
 
-        if ($employmentType) {
-            $jobsQuery->where(function ($q) use ($employmentType) {
-                if ($employmentType === 'Magang' || $employmentType === 'Internship') {
-                    $q->whereIn('employment_type', ['Magang', 'Internship']);
-                } elseif ($employmentType === 'Full Time' || $employmentType === 'Full-time') {
-                    $q->whereIn('employment_type', ['Full Time', 'Full-time']);
-                } elseif ($employmentType === 'Part Time' || $employmentType === 'Part-time') {
-                    $q->whereIn('employment_type', ['Part Time', 'Part-time']);
-                } elseif ($employmentType === 'Kontrak' || $employmentType === 'Contract') {
-                    $q->whereIn('employment_type', ['Kontrak', 'Contract']);
-                } else {
-                    $q->where('employment_type', $employmentType);
+        if (!empty($selectedEmploymentTypes)) {
+            $jobsQuery->where(function ($q) use ($selectedEmploymentTypes) {
+                foreach ($selectedEmploymentTypes as $type) {
+                    $q->orWhere(function ($subQ) use ($type) {
+                        if ($type === 'Magang' || $type === 'Internship') {
+                            $subQ->whereIn('employment_type', ['Magang', 'Internship']);
+                        } elseif ($type === 'Full Time' || $type === 'Full-time') {
+                            $subQ->whereIn('employment_type', ['Full Time', 'Full-time']);
+                        } elseif ($type === 'Part Time' || $type === 'Part-time') {
+                            $subQ->whereIn('employment_type', ['Part Time', 'Part-time']);
+                        } elseif ($type === 'Kontrak' || $type === 'Contract') {
+                            $subQ->whereIn('employment_type', ['Kontrak', 'Contract']);
+                        } else {
+                            $subQ->where('employment_type', $type);
+                        }
+                    });
                 }
             });
         }
@@ -87,6 +115,11 @@ class FrontendJobController extends Controller
             'Remote' => 'Remote'
         ];
 
+        // For backwards compatibility in views
+        $departmentId = count($selectedDepartmentIds) === 1 ? $selectedDepartmentIds[0] : null;
+        $companyId = count($selectedCompanyIds) === 1 ? $selectedCompanyIds[0] : null;
+        $employmentType = count($selectedEmploymentTypes) === 1 ? $selectedEmploymentTypes[0] : null;
+
         return view('frontend.jobs.index', compact(
             'jobs',
             'departments',
@@ -94,6 +127,9 @@ class FrontendJobController extends Controller
             'employmentTypes',
             'search',
             'location',
+            'selectedCompanyIds',
+            'selectedDepartmentIds',
+            'selectedEmploymentTypes',
             'departmentId',
             'companyId',
             'employmentType'

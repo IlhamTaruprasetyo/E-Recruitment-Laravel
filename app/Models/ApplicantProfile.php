@@ -100,21 +100,37 @@ class ApplicantProfile extends Model
     }
 
     /**
+     * Internal cache for section statuses during a single request lifecycle
+     */
+    protected ?array $cachedSectionStatuses = null;
+
+    public function clearSectionStatusesCache(): void
+    {
+        $this->cachedSectionStatuses = null;
+    }
+
+    /**
      * Get section completion status map
      */
     public function getSectionStatusesAttribute(): array
     {
-        return [
+        if ($this->cachedSectionStatuses !== null) {
+            return $this->cachedSectionStatuses;
+        }
+
+        return $this->cachedSectionStatuses = [
             'pribadi' => ! empty($this->nik) && ! empty($this->full_name) && ! empty($this->phone) && ! empty($this->address),
             'cv' => ! empty($this->cv_file_path) || ! empty($this->generated_cv_url),
-            'keluarga' => $this->family()->exists() || (! empty($this->child_sequence) && ! empty($this->marital_status)),
-            'pendidikan' => $this->educations()->exists(),
-            'skill' => $this->skills()->exists(),
-            'pengalaman' => $this->workExperiences()->exists(),
-            'organisasi' => $this->organizations()->exists(),
-            'prestasi' => $this->achievements()->exists(),
-            'social_media' => $this->socialMedias()->exists(),
-            'data_tambahan' => $this->certifications()->exists() || $this->trainings()->exists() || $this->languages()->exists(),
+            'keluarga' => $this->relationLoaded('family') ? (bool) $this->family : ($this->family()->exists() || (! empty($this->child_sequence) && ! empty($this->marital_status))),
+            'pendidikan' => $this->relationLoaded('educations') ? $this->educations->isNotEmpty() : $this->educations()->exists(),
+            'skill' => $this->relationLoaded('skills') ? $this->skills->isNotEmpty() : $this->skills()->exists(),
+            'pengalaman' => $this->relationLoaded('workExperiences') ? $this->workExperiences->isNotEmpty() : $this->workExperiences()->exists(),
+            'organisasi' => $this->relationLoaded('organizations') ? $this->organizations->isNotEmpty() : $this->organizations()->exists(),
+            'prestasi' => $this->relationLoaded('achievements') ? $this->achievements->isNotEmpty() : $this->achievements()->exists(),
+            'social_media' => $this->relationLoaded('socialMedias') ? $this->socialMedias->isNotEmpty() : $this->socialMedias()->exists(),
+            'data_tambahan' => ($this->relationLoaded('certifications') ? $this->certifications->isNotEmpty() : $this->certifications()->exists())
+                || ($this->relationLoaded('trainings') ? $this->trainings->isNotEmpty() : $this->trainings()->exists())
+                || ($this->relationLoaded('languages') ? $this->languages->isNotEmpty() : $this->languages()->exists()),
         ];
     }
 

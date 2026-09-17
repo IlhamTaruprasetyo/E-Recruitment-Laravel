@@ -44,55 +44,65 @@
                 <div class="w-full lg:w-56 relative" :class="open ? 'z-50' : 'z-10'" x-data="{
                     open: false,
                     search: '',
-                    selected: '{{ request('company_id', '') }}',
-                    selectedName: '{{ $companies->firstWhere('id', request('company_id'))?->name ?? '' }}',
-                    tempSelected: '{{ request('company_id', '') }}',
-                    init() {
-                        this.tempSelected = this.selected;
+                    selected: {{ json_encode(array_map('strval', $selectedCompanyIds ?? [])) }},
+                    tempSelected: {{ json_encode(array_map('strval', $selectedCompanyIds ?? [])) }},
+                    companiesMap: {
+                        @foreach ($companies as $comp)
+                            '{{ $comp->id }}': '{{ addslashes($comp->name) }}',
+                        @endforeach
+                    },
+                    getDisplayText() {
+                        if (!this.selected || this.selected.length === 0) return 'Semua Perusahaan';
+                        if (this.selected.length === 1) {
+                            return this.companiesMap[this.selected[0]] || '1 Perusahaan';
+                        }
+                        return this.selected.length + ' Perusahaan';
                     },
                     openDropdown() {
-                        this.tempSelected = this.selected;
+                        this.tempSelected = [...this.selected];
                         this.search = '';
                         this.open = true;
                     },
                     reset() {
-                        this.tempSelected = '';
-                        this.selected = '';
-                        this.selectedName = '';
+                        this.tempSelected = [];
+                        this.selected = [];
                         this.open = false;
                     },
                     apply() {
-                        this.selected = this.tempSelected;
-                        let el = this.$root.querySelector('input[name=\'_jobs_temp_company\']:checked');
-                        if (el) {
-                            let span = el.closest('label').querySelector('span');
-                            this.selectedName = span ? span.innerText.trim() : '';
-                        } else {
-                            this.selectedName = '';
-                        }
+                        this.selected = [...this.tempSelected];
                         this.open = false;
                     }
                 }" @click.outside="open = false">
 
-                    <input type="hidden" name="company_id" :value="selected">
+                    <template x-for="id in selected" :key="id">
+                        <input type="hidden" name="company_id[]" :value="id">
+                    </template>
 
                     <button type="button" @click="open ? open = false : openDropdown()"
-                        :class="selected ? 'text-[#93F514] font-bold' : 'text-gray-700'"
+                        :class="selected.length > 0 ? 'text-[#93F514] font-bold' : 'text-gray-700'"
                         class="w-full py-2.5 px-4 flex items-center justify-between text-left text-sm transition">
                         <div class="flex items-center gap-2 truncate">
-                            <template x-if="selected">
+                            <template x-if="selected.length > 0">
                                 <span
-                                    class="w-5 h-5 rounded-full bg-[#93F514] text-black font-extrabold text-xs flex items-center justify-center shrink-0 shadow-sm">
-                                    1
+                                    class="min-w-5 h-5 px-1 rounded-full bg-[#93F514] text-black font-extrabold text-xs flex items-center justify-center shrink-0 shadow-sm"
+                                    x-text="selected.length">
+                                    {{ count($selectedCompanyIds ?? []) }}
                                 </span>
                             </template>
-                            <span class="truncate"
-                                x-text="selected ? (selectedName || '1 Perusahaan') : 'Semua Perusahaan'">
-                                {{ request('company_id') ? $companies->firstWhere('id', request('company_id'))?->name ?? '1 Perusahaan' : 'Semua Perusahaan' }}
+                            <span class="truncate" x-text="getDisplayText()">
+                                @if (!empty($selectedCompanyIds))
+                                    @if (count($selectedCompanyIds) === 1)
+                                        {{ $companies->firstWhere('id', $selectedCompanyIds[0])?->name ?? '1 Perusahaan' }}
+                                    @else
+                                        {{ count($selectedCompanyIds) }} Perusahaan
+                                    @endif
+                                @else
+                                    Semua Perusahaan
+                                @endif
                             </span>
                         </div>
                         <svg class="w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200"
-                            :class="open ? 'rotate-180 text-[#93F514]' : (selected ? 'text-[#93F514]' : '')" fill="none"
+                            :class="open ? 'rotate-180 text-[#93F514]' : (selected.length > 0 ? 'text-[#93F514]' : '')" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                         </svg>
@@ -122,14 +132,15 @@
                         <!-- All Option -->
                         <label
                             class="flex items-center gap-3 py-2 px-1 text-xs font-semibold text-gray-700 hover:text-black cursor-pointer border-b border-gray-100">
-                            <input type="radio" name="_jobs_temp_company" value="" x-model="tempSelected"
+                            <input type="checkbox" :checked="tempSelected.length === 0" @change="tempSelected = []"
                                 class="w-4 h-4 rounded border-gray-300 text-[#93F514] focus:ring-[#93F514] cursor-pointer">
                             <span>Semua Perusahaan</span>
                         </label>
 
                         <!-- Group Title -->
-                        <div class="mt-3 mb-1.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                            Pilihan Perusahaan
+                        <div class="mt-3 mb-1.5 flex items-center justify-between text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                            <span>Pilihan Perusahaan</span>
+                            <span x-show="tempSelected.length > 0" class="text-[#4fa304] font-semibold lowercase" x-text="tempSelected.length + ' dipilih'"></span>
                         </div>
 
                         <!-- 2-Column Grid List items (Compact & Scrollable) -->
@@ -140,7 +151,7 @@
                                         <label
                                             class="flex items-center gap-2.5 py-1.5 px-1.5 rounded-lg text-xs text-gray-600 hover:text-black hover:bg-gray-50 cursor-pointer transition"
                                             x-show="!search || '{{ strtolower($comp->name) }}'.includes(search.toLowerCase())">
-                                            <input type="radio" name="_jobs_temp_company" value="{{ $comp->id }}"
+                                            <input type="checkbox" value="{{ $comp->id }}"
                                                 x-model="tempSelected"
                                                 class="w-4 h-4 rounded border-gray-300 text-[#93F514] focus:ring-[#93F514] cursor-pointer shrink-0">
                                             <span class="truncate">{{ $comp->name }}</span>
@@ -168,55 +179,65 @@
                 <div class="w-full lg:w-56 relative" :class="open ? 'z-50' : 'z-10'" x-data="{
                     open: false,
                     search: '',
-                    selected: '{{ request('department_id', '') }}',
-                    selectedName: '{{ $departments->firstWhere('id', request('department_id'))?->name ?? '' }}',
-                    tempSelected: '{{ request('department_id', '') }}',
-                    init() {
-                        this.tempSelected = this.selected;
+                    selected: {{ json_encode(array_map('strval', $selectedDepartmentIds ?? [])) }},
+                    tempSelected: {{ json_encode(array_map('strval', $selectedDepartmentIds ?? [])) }},
+                    departmentsMap: {
+                        @foreach ($departments as $dept)
+                            '{{ $dept->id }}': '{{ addslashes($dept->name) }}',
+                        @endforeach
+                    },
+                    getDisplayText() {
+                        if (!this.selected || this.selected.length === 0) return 'Semua Departemen';
+                        if (this.selected.length === 1) {
+                            return this.departmentsMap[this.selected[0]] || '1 Departemen';
+                        }
+                        return this.selected.length + ' Departemen';
                     },
                     openDropdown() {
-                        this.tempSelected = this.selected;
+                        this.tempSelected = [...this.selected];
                         this.search = '';
                         this.open = true;
                     },
                     reset() {
-                        this.tempSelected = '';
-                        this.selected = '';
-                        this.selectedName = '';
+                        this.tempSelected = [];
+                        this.selected = [];
                         this.open = false;
                     },
                     apply() {
-                        this.selected = this.tempSelected;
-                        let el = this.$root.querySelector('input[name=\'_jobs_temp_department\']:checked');
-                        if (el) {
-                            let span = el.closest('label').querySelector('span');
-                            this.selectedName = span ? span.innerText.trim() : '';
-                        } else {
-                            this.selectedName = '';
-                        }
+                        this.selected = [...this.tempSelected];
                         this.open = false;
                     }
                 }" @click.outside="open = false">
 
-                    <input type="hidden" name="department_id" :value="selected">
+                    <template x-for="id in selected" :key="id">
+                        <input type="hidden" name="department_id[]" :value="id">
+                    </template>
 
                     <button type="button" @click="open ? open = false : openDropdown()"
-                        :class="selected ? 'text-[#93F514] font-bold' : 'text-gray-700'"
+                        :class="selected.length > 0 ? 'text-[#93F514] font-bold' : 'text-gray-700'"
                         class="w-full py-2.5 px-4 flex items-center justify-between text-left text-sm transition">
                         <div class="flex items-center gap-2 truncate">
-                            <template x-if="selected">
+                            <template x-if="selected.length > 0">
                                 <span
-                                    class="w-5 h-5 rounded-full bg-[#93F514] text-black font-extrabold text-xs flex items-center justify-center shrink-0 shadow-sm">
-                                    1
+                                    class="min-w-5 h-5 px-1 rounded-full bg-[#93F514] text-black font-extrabold text-xs flex items-center justify-center shrink-0 shadow-sm"
+                                    x-text="selected.length">
+                                    {{ count($selectedDepartmentIds ?? []) }}
                                 </span>
                             </template>
-                            <span class="truncate"
-                                x-text="selected ? (selectedName || '1 Departemen') : 'Semua Departemen'">
-                                {{ request('department_id') ? $departments->firstWhere('id', request('department_id'))?->name ?? '1 Departemen' : 'Semua Departemen' }}
+                            <span class="truncate" x-text="getDisplayText()">
+                                @if (!empty($selectedDepartmentIds))
+                                    @if (count($selectedDepartmentIds) === 1)
+                                        {{ $departments->firstWhere('id', $selectedDepartmentIds[0])?->name ?? '1 Departemen' }}
+                                    @else
+                                        {{ count($selectedDepartmentIds) }} Departemen
+                                    @endif
+                                @else
+                                    Semua Departemen
+                                @endif
                             </span>
                         </div>
                         <svg class="w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200"
-                            :class="open ? 'rotate-180 text-[#93F514]' : (selected ? 'text-[#93F514]' : '')" fill="none"
+                            :class="open ? 'rotate-180 text-[#93F514]' : (selected.length > 0 ? 'text-[#93F514]' : '')" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                         </svg>
@@ -247,14 +268,15 @@
                         <!-- All Option -->
                         <label
                             class="flex items-center gap-3 py-2 px-1 text-xs font-semibold text-gray-700 hover:text-black cursor-pointer border-b border-gray-100">
-                            <input type="radio" name="_jobs_temp_department" value="" x-model="tempSelected"
+                            <input type="checkbox" :checked="tempSelected.length === 0" @change="tempSelected = []"
                                 class="w-4 h-4 rounded border-gray-300 text-[#93F514] focus:ring-[#93F514] cursor-pointer">
                             <span>Semua Departemen</span>
                         </label>
 
                         <!-- Group Title -->
-                        <div class="mt-3 mb-1.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                            Pilihan Departemen
+                        <div class="mt-3 mb-1.5 flex items-center justify-between text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                            <span>Pilihan Departemen</span>
+                            <span x-show="tempSelected.length > 0" class="text-[#4fa304] font-semibold lowercase" x-text="tempSelected.length + ' dipilih'"></span>
                         </div>
 
                         <!-- 2-Column Grid List items (Compact & Scrollable) -->
@@ -265,8 +287,8 @@
                                         <label
                                             class="flex items-center gap-2.5 py-1.5 px-1.5 rounded-lg text-xs text-gray-600 hover:text-black hover:bg-gray-50 cursor-pointer transition"
                                             x-show="!search || '{{ strtolower($dept->name) }}'.includes(search.toLowerCase())">
-                                            <input type="radio" name="_jobs_temp_department"
-                                                value="{{ $dept->id }}" x-model="tempSelected"
+                                            <input type="checkbox" value="{{ $dept->id }}"
+                                                x-model="tempSelected"
                                                 class="w-4 h-4 rounded border-gray-300 text-[#93F514] focus:ring-[#93F514] cursor-pointer shrink-0">
                                             <span class="truncate">{{ $dept->name }}</span>
                                         </label>
@@ -293,46 +315,61 @@
                 <div class="w-full lg:w-48 relative" :class="open ? 'z-50' : 'z-10'" x-data="{
                     open: false,
                     search: '',
-                    selected: '{{ request('employment_type', '') }}',
+                    selected: {{ json_encode($selectedEmploymentTypes ?? []) }},
+                    tempSelected: {{ json_encode($selectedEmploymentTypes ?? []) }},
                     types: ['Magang', 'Full Time', 'Part Time', 'Contract', 'Freelance', 'Remote'],
-                    tempSelected: '{{ request('employment_type', '') }}',
-                    init() {
-                        this.tempSelected = this.selected;
+                    getDisplayText() {
+                        if (!this.selected || this.selected.length === 0) return 'Semua Tipe Pekerjaan';
+                        if (this.selected.length === 1) {
+                            return this.selected[0];
+                        }
+                        return this.selected.length + ' Tipe Dipilih';
                     },
                     openDropdown() {
-                        this.tempSelected = this.selected;
+                        this.tempSelected = [...this.selected];
                         this.search = '';
                         this.open = true;
                     },
                     reset() {
-                        this.tempSelected = '';
-                        this.selected = '';
+                        this.tempSelected = [];
+                        this.selected = [];
                         this.open = false;
                     },
                     apply() {
-                        this.selected = this.tempSelected;
+                        this.selected = [...this.tempSelected];
                         this.open = false;
                     }
                 }" @click.outside="open = false">
 
-                    <input type="hidden" name="employment_type" :value="selected">
+                    <template x-for="t in selected" :key="t">
+                        <input type="hidden" name="employment_type[]" :value="t">
+                    </template>
 
                     <button type="button" @click="open ? open = false : openDropdown()"
-                        :class="selected ? 'text-[#93F514] font-bold' : 'text-gray-700'"
+                        :class="selected.length > 0 ? 'text-[#93F514] font-bold' : 'text-gray-700'"
                         class="w-full py-2.5 px-4 flex items-center justify-between text-left text-sm transition">
                         <div class="flex items-center gap-2 truncate">
-                            <template x-if="selected">
+                            <template x-if="selected.length > 0">
                                 <span
-                                    class="w-5 h-5 rounded-full bg-[#93F514] text-black font-extrabold text-xs flex items-center justify-center shrink-0 shadow-sm">
-                                    1
+                                    class="min-w-5 h-5 px-1 rounded-full bg-[#93F514] text-black font-extrabold text-xs flex items-center justify-center shrink-0 shadow-sm"
+                                    x-text="selected.length">
+                                    {{ count($selectedEmploymentTypes ?? []) }}
                                 </span>
                             </template>
-                            <span class="truncate" x-text="selected ? selected : 'Semua Tipe Pekerjaan'">
-                                {{ request('employment_type') ? request('employment_type') : 'Semua Tipe Pekerjaan' }}
+                            <span class="truncate" x-text="getDisplayText()">
+                                @if (!empty($selectedEmploymentTypes))
+                                    @if (count($selectedEmploymentTypes) === 1)
+                                        {{ $selectedEmploymentTypes[0] }}
+                                    @else
+                                        {{ count($selectedEmploymentTypes) }} Tipe Dipilih
+                                    @endif
+                                @else
+                                    Semua Tipe Pekerjaan
+                                @endif
                             </span>
                         </div>
                         <svg class="w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200"
-                            :class="open ? 'rotate-180 text-[#93F514]' : (selected ? 'text-[#93F514]' : '')" fill="none"
+                            :class="open ? 'rotate-180 text-[#93F514]' : (selected.length > 0 ? 'text-[#93F514]' : '')" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                         </svg>
@@ -363,14 +400,15 @@
                         <!-- All Option -->
                         <label
                             class="flex items-center gap-3 py-2 px-1 text-xs font-semibold text-gray-700 hover:text-black cursor-pointer border-b border-gray-100">
-                            <input type="radio" name="_jobs_temp_type" value="" x-model="tempSelected"
+                            <input type="checkbox" :checked="tempSelected.length === 0" @change="tempSelected = []"
                                 class="w-4 h-4 rounded border-gray-300 text-[#93F514] focus:ring-[#93F514] cursor-pointer">
                             <span>Semua Tipe Pekerjaan</span>
                         </label>
 
                         <!-- Group Title -->
-                        <div class="mt-3 mb-1.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                            Pilihan Tipe Pekerjaan
+                        <div class="mt-3 mb-1.5 flex items-center justify-between text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                            <span>Pilihan Tipe Pekerjaan</span>
+                            <span x-show="tempSelected.length > 0" class="text-[#4fa304] font-semibold lowercase" x-text="tempSelected.length + ' dipilih'"></span>
                         </div>
 
                         <!-- 2-Column Grid List items (Compact & Scrollable) -->
@@ -382,7 +420,7 @@
                                     <label
                                         class="flex items-center gap-2.5 py-1.5 px-1.5 rounded-lg text-xs text-gray-600 hover:text-black hover:bg-gray-50 cursor-pointer transition"
                                         x-show="!search || type.toLowerCase().includes(search.toLowerCase())">
-                                        <input type="radio" name="_jobs_temp_type" :value="type"
+                                        <input type="checkbox" :value="type"
                                             x-model="tempSelected"
                                             class="w-4 h-4 rounded border-gray-300 text-[#93F514] focus:ring-[#93F514] cursor-pointer shrink-0">
                                         <span x-text="type" class="truncate"></span>
@@ -416,7 +454,7 @@
                         </svg>
                         <span class="whitespace-nowrap">Cari Lowongan</span>
                     </button>
-                    @if (request('search') || request('company_id') || request('department_id') || request('employment_type'))
+                    @if (request('search') || !empty($selectedCompanyIds) || !empty($selectedDepartmentIds) || !empty($selectedEmploymentTypes))
                         <a href="{{ route('jobs.index') }}" title="Reset Filter"
                             class="p-2.5 rounded-xl lg:rounded-full bg-gray-100 hover:bg-red-50 text-gray-500 hover:text-red-500 transition flex items-center justify-center border border-gray-200">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -441,9 +479,22 @@
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <div>
                     <h2 class="text-xl sm:text-2xl font-bold text-[#EEEEEE]">
-                        @if (request('company_id'))
-                            Lowongan di <span
-                                class="text-[#93F514]">{{ $companies->firstWhere('id', request('company_id'))?->name ?? 'Perusahaan Terpilih' }}</span>
+                        @if (!empty($selectedCompanyIds))
+                            @if (count($selectedCompanyIds) === 1)
+                                Lowongan di <span
+                                    class="text-[#93F514]">{{ $companies->firstWhere('id', $selectedCompanyIds[0])?->name ?? 'Perusahaan Terpilih' }}</span>
+                            @else
+                                Lowongan di <span
+                                    class="text-[#93F514]">{{ count($selectedCompanyIds) }} Perusahaan Terpilih</span>
+                            @endif
+                        @elseif (!empty($selectedDepartmentIds))
+                            @if (count($selectedDepartmentIds) === 1)
+                                Lowongan di Departemen <span
+                                    class="text-[#93F514]">{{ $departments->firstWhere('id', $selectedDepartmentIds[0])?->name ?? 'Departemen Terpilih' }}</span>
+                            @else
+                                Lowongan di <span
+                                    class="text-[#93F514]">{{ count($selectedDepartmentIds) }} Departemen Terpilih</span>
+                            @endif
                         @else
                             Daftar <span class="text-[#93F514]">Semua Lowongan</span>
                         @endif
@@ -454,7 +505,7 @@
                 </div>
 
                 <div class="flex items-center gap-3 self-end sm:self-auto">
-                    @if (request('company_id') || request('search') || request('department_id') || request('employment_type'))
+                    @if (!empty($selectedCompanyIds) || request('search') || !empty($selectedDepartmentIds) || !empty($selectedEmploymentTypes))
                         <a href="{{ route('jobs.index') }}"
                             class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#93F514] hover:text-[#52fa4d] transition shrink-0 px-3 py-1.5 rounded-xl bg-[#93F514]/10 border border-[#93F514]/30 hover:bg-[#93F514]/20">
                             <span>Reset Filter</span>
@@ -850,9 +901,9 @@
                         Pilih perusahaan mitra untuk melihat lowongan kerja dan karir yang sedang dibuka.
                     </p>
 
-                    @if (request('company_id'))
+                    @if (!empty($selectedCompanyIds))
                         <div class="mt-3">
-                            <a href="{{ route('jobs.index', array_merge(request()->except('company_id', 'page'))) }}"
+                            <a href="{{ route('jobs.index', array_merge(request()->except('company_id', 'company_ids', 'page'))) }}"
                                 class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#93F514] hover:text-[#52fa4d] bg-[#93F514]/10 px-3 py-1 rounded-full border border-[#93F514]/30 transition">
                                 <span>Tampilkan Semua Perusahaan</span>
                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -868,10 +919,10 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 justify-center">
                     @foreach ($companies as $comp)
                         @php
-                            $isActive = request('company_id') == $comp->id;
+                            $isActive = in_array((string) $comp->id, array_map('strval', $selectedCompanyIds ?? []));
                             $jobCount = $comp->jobs_count ?? $comp->jobs()->where('status', 'Open')->count();
                         @endphp
-                        <a href="{{ route('jobs.index', array_merge(request()->except('page'), ['company_id' => $comp->id])) }}"
+                        <a href="{{ route('jobs.index', array_merge(request()->except('page', 'company_id', 'company_ids'), ['company_id' => [$comp->id]])) }}"
                             class="group relative rounded-2xl p-5 border transition-all duration-300 flex flex-col justify-between
                               {{ $isActive
                                   ? 'bg-gradient-to-b from-[#0a2e0a] to-[#041404] border-[#93F514] shadow-lg shadow-black/40 ring-1 ring-[#93F514]'

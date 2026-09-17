@@ -256,6 +256,52 @@
             filter: none !important;
         }
 
+        /* Navbar User Profile Capsule & Dropdown in Light Mode */
+        html.light-mode .nav-profile-pill {
+            background-color: rgba(243, 244, 246, 0.95) !important;
+            border-color: rgba(0, 0, 0, 0.12) !important;
+            color: #1f2937 !important;
+        }
+        html.light-mode .nav-profile-pill:hover {
+            background-color: #e5e7eb !important;
+            border-color: rgba(95, 178, 14, 0.6) !important;
+        }
+        html.light-mode .nav-profile-name {
+            color: #111827 !important;
+        }
+        html.light-mode .nav-profile-dropdown {
+            background-color: rgba(255, 255, 255, 0.98) !important;
+            border-color: rgba(0, 0, 0, 0.1) !important;
+            box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05) !important;
+        }
+        html.light-mode .nav-profile-header {
+            background-color: #f9fafb !important;
+            border-color: #e5e7eb !important;
+        }
+        html.light-mode .nav-profile-item {
+            color: #374151 !important;
+        }
+        html.light-mode .nav-profile-item:hover {
+            background-color: #f0fdf4 !important;
+            color: #15803d !important;
+        }
+        html.light-mode .nav-profile-divider {
+            border-color: #e5e7eb !important;
+        }
+        html.light-mode .nav-profile-email {
+            color: #6b7280 !important;
+        }
+        html.light-mode .nav-profile-role {
+            background-color: #dcfce7 !important;
+            color: #166534 !important;
+            border-color: #bbf7d0 !important;
+        }
+        html.light-mode .nav-profile-mobile-card {
+            background-color: #ffffff !important;
+            border-color: #e5e7eb !important;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
+        }
+
         /* =====================================================
            BACKGROUND UTILITIES: dark → light
         ===================================================== */
@@ -1940,6 +1986,7 @@
            THEME TOGGLE BUTTON
         ===================================================== */
         .theme-toggle-btn {
+            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1952,6 +1999,7 @@
             cursor: pointer;
             transition: background 0.2s, border-color 0.2s, transform 0.2s;
             flex-shrink: 0;
+            overflow: hidden;
         }
 
         .theme-toggle-btn:hover {
@@ -2051,6 +2099,9 @@
             }
         })();
     </script>
+
+    <!-- Session Heartbeat (Sliding Refresh saat aktif bekerja) -->
+    <x-session-heartbeat />
 </body>
 
 </html>

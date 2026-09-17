@@ -3,21 +3,79 @@
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Volt\Component;
+use Livewire\WithFileUploads;
 
 new class extends Component
 {
+    use WithFileUploads;
+
     public string $name = '';
     public string $email = '';
+    public $photo = null;
+    public ?string $currentPhotoUrl = null;
 
     /**
      * Mount the component.
      */
     public function mount(): void
     {
-        $this->name = Auth::user()->name;
-        $this->email = Auth::user()->email;
+        $user = Auth::user();
+        $this->name = $user->name ?? '';
+        $this->email = $user->email ?? '';
+        $this->currentPhotoUrl = $this->resolvePhotoUrl($user);
+    }
+
+    /**
+     * Resolve photo URL for the user.
+     */
+    protected function resolvePhotoUrl($user): ?string
+    {
+        if (empty($user?->avatar)) {
+            return null;
+        }
+
+        return Str::startsWith($user->avatar, ['http://', 'https://'])
+            ? $user->avatar
+            : asset('storage/' . $user->avatar);
+    }
+
+    /**
+     * Remove the user's avatar.
+     */
+    public function removePhoto(): void
+    {
+        $user = Auth::user();
+
+        if (!empty($user->avatar) && Str::startsWith($user->avatar, 'avatars/') && !str_contains($user->avatar, '..')) {
+            if (Storage::disk('public')->exists($user->avatar)) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+        }
+
+        $user->avatar = null;
+        $user->save();
+
+        if ($user->applicantProfile) {
+            $user->applicantProfile->update(['photo' => null]);
+        }
+
+        $this->photo = null;
+        $this->currentPhotoUrl = null;
+
+        $this->dispatch('profile-updated', name: $user->name, photo: null);
+        Session::flash('status', 'photo-removed');
+    }
+
+    /**
+     * Cancel temporary uploaded photo before saving.
+     */
+    public function cancelUpload(): void
+    {
+        $this->photo = null;
     }
 
     /**
@@ -30,9 +88,30 @@ new class extends Component
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
+            'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:3072'],
+        ], [
+            'photo.image' => 'File foto harus berupa gambar.',
+            'photo.mimes' => 'Format foto yang diizinkan adalah JPG, JPEG, PNG, atau WEBP.',
+            'photo.max' => 'Ukuran foto maksimal adalah 3MB.',
         ]);
 
-        $user->fill($validated);
+        $user->fill([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+        ]);
+
+        if ($this->photo) {
+            // Delete old avatar if local file exists
+            if (!empty($user->avatar) && Str::startsWith($user->avatar, 'avatars/') && !str_contains($user->avatar, '..')) {
+                if (Storage::disk('public')->exists($user->avatar)) {
+                    Storage::disk('public')->delete($user->avatar);
+                }
+            }
+
+            $path = $this->photo->store('avatars', 'public');
+            $user->avatar = $path;
+            $this->photo = null;
+        }
 
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
@@ -42,13 +121,19 @@ new class extends Component
 
         // Also synchronize applicant profile and employee profile if exist to avoid desync
         if ($user->applicantProfile) {
-            $user->applicantProfile->update(['full_name' => $user->name]);
+            $applicantData = ['full_name' => $user->name];
+            if ($user->avatar) {
+                $applicantData['photo'] = $user->avatar;
+            }
+            $user->applicantProfile->update($applicantData);
         }
         if ($user->employeeProfile) {
             $user->employeeProfile->update(['full_name' => $user->name]);
         }
 
-        $this->dispatch('profile-updated', name: $user->name);
+        $this->currentPhotoUrl = $this->resolvePhotoUrl($user);
+
+        $this->dispatch('profile-updated', name: $user->name, photo: $this->currentPhotoUrl);
     }
 
     /**
@@ -82,12 +167,98 @@ new class extends Component
                 Informasi Profil
             </h2>
             <p class="mt-1 text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-                Perbarui nama lengkap dan alamat email utama akun Anda.
+                Perbarui foto profil, nama lengkap, dan alamat email utama akun Anda.
             </p>
         </div>
     </header>
 
     <form wire:submit="updateProfileInformation" class="mt-6 space-y-5">
+        
+        <!-- Foto Profil -->
+        <div class="p-4 rounded-2xl bg-gray-50/70 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-700/70">
+            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-3">
+                Foto Profil
+            </label>
+
+            <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+                <!-- Avatar Preview with Loading Overlay -->
+                <div class="relative group shrink-0">
+                    <div class="w-20 h-20 sm:w-22 sm:h-22 rounded-full overflow-hidden ring-4 ring-indigo-500/15 dark:ring-indigo-500/25 shadow-md border-2 border-white dark:border-gray-700 flex items-center justify-center bg-white dark:bg-gray-800 relative">
+                        @if ($photo)
+                            <img src="{{ $photo->temporaryUrl() }}" alt="Preview Foto" class="w-full h-full object-cover">
+                        @elseif ($currentPhotoUrl)
+                            <img src="{{ $currentPhotoUrl }}" alt="{{ $name }}" class="w-full h-full object-cover" x-on:error="$el.style.display = 'none'">
+                        @else
+                            <div class="w-full h-full bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-600 flex items-center justify-center text-white font-extrabold text-2xl shadow-inner">
+                                <span>{{ strtoupper(substr($name ?: 'A', 0, 1)) }}</span>
+                            </div>
+                        @endif
+
+                        <!-- Uploading Spinner Overlay -->
+                        <div wire:loading wire:target="photo" class="absolute inset-0 bg-gray-900/60 backdrop-blur-xs flex flex-col items-center justify-center text-white rounded-full">
+                            <svg class="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span class="text-[10px] font-semibold mt-1">Mengunggah...</span>
+                        </div>
+                    </div>
+
+                    @if ($photo)
+                        <span class="absolute top-0 right-0 px-2 py-0.5 bg-amber-500 text-white text-[9px] font-bold rounded-full shadow-xs tracking-wider uppercase animate-pulse">
+                            Pratinjau
+                        </span>
+                    @endif
+                </div>
+
+                <!-- Action Controls & Description -->
+                <div class="flex-1 text-center sm:text-left space-y-2.5">
+                    <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                        <!-- Custom File Input Button -->
+                        <label class="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/80 text-indigo-700 dark:text-indigo-300 text-xs font-semibold rounded-xl border border-indigo-200 dark:border-indigo-800 transition duration-150 active:scale-[0.98] shadow-2xs">
+                            <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span>{{ $photo || $currentPhotoUrl ? 'Ganti Foto' : 'Unggah Foto' }}</span>
+                            <input type="file" wire:model="photo" accept="image/png,image/jpeg,image/jpg,image/webp" class="hidden">
+                        </label>
+
+                        @if ($photo)
+                            <!-- Batal Pratinjau Button -->
+                            <button type="button" wire:click="cancelUpload" class="inline-flex items-center gap-1.5 px-3 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs font-semibold rounded-xl transition duration-150 active:scale-[0.98]">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                                <span>Batalkan Pilihan</span>
+                            </button>
+                        @elseif ($currentPhotoUrl)
+                            <!-- Hapus Foto Button -->
+                            <button type="button" 
+                                    wire:click="removePhoto" 
+                                    wire:confirm="Apakah Anda yakin ingin menghapus foto profil dan kembali menggunakan inisial nama?"
+                                    class="inline-flex items-center gap-1.5 px-3 py-2 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 text-xs font-semibold rounded-xl border border-rose-200 dark:border-rose-800 transition duration-150 active:scale-[0.98]">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                <span>Hapus Foto</span>
+                            </button>
+                        @endif
+                    </div>
+
+                    <p class="text-[11px] text-gray-400 dark:text-gray-400">
+                        Format: <span class="font-medium text-gray-600 dark:text-gray-300">JPG, PNG, atau WEBP</span>. Maksimal <span class="font-medium text-gray-600 dark:text-gray-300">3 MB</span>. Rasio 1:1 disarankan.
+                    </p>
+
+                    <x-input-error class="mt-1" :messages="$errors->get('photo')" />
+
+                    @if (session('status') === 'photo-removed')
+                        <p class="text-xs text-amber-600 dark:text-amber-400 font-medium">
+                            ✓ Foto profil berhasil dihapus dan kembali ke inisial nama.
+                        </p>
+                    @endif
+                </div>
+            </div>
+        </div>
         
         <!-- Nama Lengkap -->
         <div>

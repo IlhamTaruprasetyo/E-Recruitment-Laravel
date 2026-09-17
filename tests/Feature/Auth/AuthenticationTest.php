@@ -70,3 +70,31 @@ test('users can logout', function () {
 
     $this->assertGuest();
 });
+
+test('session timeout redirects to login with error message', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)
+        ->withSession(['last_activity_time' => time() - 400])
+        ->get('/dashboard');
+
+    $response->assertRedirect(route('login', ['timeout' => 1]));
+    $response->assertSessionHas('error');
+});
+
+test('login page with timeout parameter logs out and redirects with error', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)
+        ->get('/login?timeout=1');
+
+    $response->assertRedirect(route('login', ['timeout' => 1]));
+    $response->assertSessionHas('error');
+});
+
+test('guest visiting login with timeout parameter sees error message', function () {
+    $response = $this->get('/login?timeout=1');
+
+    $response->assertOk();
+    $response->assertSee('Sesi Anda telah berakhir');
+});

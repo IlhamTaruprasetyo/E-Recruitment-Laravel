@@ -157,7 +157,7 @@
                     </div>
                     <a href="{{ $applicationRoute }}"
                         class="text-xs font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400">
-                        Lihat Semua →
+                        Lihat Semua
                     </a>
                 </div>
 

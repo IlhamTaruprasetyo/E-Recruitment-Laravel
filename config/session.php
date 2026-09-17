@@ -32,7 +32,30 @@ return [
     |
     */
 
-    'lifetime' => (int) env('SESSION_LIFETIME', 120),
+    'lifetime' => (int) env('SESSION_LIFETIME', 720),
+
+    /*
+    | Idle Timeout (Menit) - Sesi terkunci jika tidak ada aktivitas selama waktu ini
+    */
+    'idle_timeout' => (int) env('SESSION_IDLE_TIMEOUT', 30),
+
+    /*
+    | Absolute Expiry Timeout (Menit) - Batas maksimal sesi sejak login pertama (12 Jam = 720 menit)
+    */
+    'absolute_timeout' => (int) env('SESSION_ABSOLUTE_TIMEOUT', 720),
+
+    /*
+    | Durasi countdown peringatan sebelum auto-logout (Detik, default 120 detik = 2 menit)
+    */
+    'countdown_window' => (int) env('SESSION_COUNTDOWN_WINDOW', 120),
+
+    /*
+    | Idle timeout per-role (opsional, fallback ke SESSION_IDLE_TIMEOUT)
+    */
+    'lifetime_admin' => env('SESSION_IDLE_TIMEOUT_ADMIN', env('SESSION_LIFETIME_ADMIN')),
+    'lifetime_recruiter' => env('SESSION_IDLE_TIMEOUT_RECRUITER', env('SESSION_LIFETIME_RECRUITER')),
+    'lifetime_applicant' => env('SESSION_IDLE_TIMEOUT_APPLICANT', env('SESSION_LIFETIME_APPLICANT')),
+    'lifetime_employee' => env('SESSION_IDLE_TIMEOUT_EMPLOYEE', env('SESSION_LIFETIME_EMPLOYEE')),
 
     'expire_on_close' => env('SESSION_EXPIRE_ON_CLOSE', false),
 

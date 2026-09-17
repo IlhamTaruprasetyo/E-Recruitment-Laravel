@@ -335,7 +335,7 @@ new #[Layout('layouts.guest')] class extends Component {
                             <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
                             <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
                         </svg>
-                        <span>Daftar Cepat dengan Google</span>
+                        <span>Daftar dengan Google</span>
                     </a>
 
                     <!-- Or Divider -->
@@ -651,9 +651,9 @@ new #[Layout('layouts.guest')] class extends Component {
                                 class="w-full py-3 px-4 bg-[#93F514] hover:bg-[#82dc0e] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed text-black font-semibold text-sm rounded-xl shadow-lg shadow-[#93F514]/20 hover:shadow-[#93F514]/30 transition flex items-center justify-center gap-2 group cursor-pointer">
                             <span wire:loading.remove wire:target="register" class="inline-flex items-center gap-2">
                                 <span>{{ $account_type === 'employee' ? 'Daftar Sebagai Karyawan' : 'Daftar Sekarang' }}</span>
-                                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                {{-- <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                                </svg>
+                                </svg> --}}
                             </span>
                             <span wire:loading.inline-flex wire:target="register" class="items-center justify-center gap-2">
                                 <svg class="animate-spin h-4 w-4 text-black shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

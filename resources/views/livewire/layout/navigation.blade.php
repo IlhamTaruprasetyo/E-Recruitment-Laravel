@@ -135,7 +135,7 @@ new class extends Component
                 <x-slot name="trigger">
                     <button class="inline-flex items-center gap-2.5 px-3 py-1.5 border border-gray-200 dark:border-gray-700/80 rounded-full text-sm font-semibold text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/60 focus:outline-none transition shadow-2xs group">
                         <div x-data="{{ json_encode(['photo' => $photoUrl, 'initial' => $userInitial]) }}"
-                             x-on:profile-updated.window="if ($event.detail && $event.detail.photo) photo = $event.detail.photo"
+                             x-on:profile-updated.window="if ($event.detail && 'photo' in $event.detail) photo = $event.detail.photo"
                              class="shrink-0 flex items-center justify-center">
                             <template x-if="photo">
                                 <img :src="photo" alt="{{ $displayName }}" class="w-8 h-8 rounded-full object-cover ring-2 ring-indigo-500/20 group-hover:ring-indigo-500/50 transition">
@@ -278,7 +278,7 @@ new class extends Component
         <div class="pt-3.5 pb-2">
             <div class="px-4 pb-3 flex items-center gap-3 border-b border-gray-100 dark:border-gray-700/80">
                 <div x-data="{{ json_encode(['photo' => $photoUrl, 'initial' => $userInitial]) }}"
-                     x-on:profile-updated.window="if ($event.detail && $event.detail.photo) photo = $event.detail.photo"
+                     x-on:profile-updated.window="if ($event.detail && 'photo' in $event.detail) photo = $event.detail.photo"
                      class="shrink-0 flex items-center justify-center">
                     <template x-if="photo">
                         <img :src="photo" alt="{{ $displayName }}" class="w-10 h-10 rounded-full object-cover ring-2 ring-indigo-500/20 shrink-0">

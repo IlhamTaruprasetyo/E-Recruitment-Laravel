@@ -16,6 +16,12 @@
             $isEmployee = auth()->check() && ($user->role_id == 4 || $roleName === 'employee');
             $roleLabel = $user->role?->name ?? ($isAdminOrRecruiter ? 'Admin' : ($isEmployee ? 'Employee' : 'Pelamar'));
             $employeeProfile = $isEmployee ? $user->employeeProfile : null;
+            $adminAvatarUrl = null;
+            if (!empty($user->avatar)) {
+                $adminAvatarUrl = \Illuminate\Support\Str::startsWith($user->avatar, ['http://', 'https://'])
+                    ? $user->avatar
+                    : asset('storage/' . $user->avatar);
+            }
         @endphp
 
         <div class="py-4 px-4 sm:px-6 lg:px-8">
@@ -23,19 +29,35 @@
 
                 @if ($isAdminOrRecruiter)
                     <!-- Admin / Recruiter Profile View -->
-                    <div class="p-6 bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 rounded-2xl shadow-lg text-white flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="p-6 bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 rounded-2xl shadow-lg text-white flex flex-col sm:flex-row items-center justify-between gap-4"
+                         x-data="{ 
+                             bannerPhoto: @js($adminAvatarUrl), 
+                             bannerName: @js(auth()->user()->name ?? 'Admin'),
+                             get bannerInitial() { return (this.bannerName || 'A').charAt(0).toUpperCase(); }
+                         }"
+                         x-on:profile-updated.window="
+                             if ($event.detail) {
+                                 if ('photo' in $event.detail) bannerPhoto = $event.detail.photo;
+                                 if ($event.detail.name) bannerName = $event.detail.name;
+                             }
+                         ">
                         <div class="flex items-center gap-4">
-                            <div class="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-2xl font-black shadow-inner">
-                                {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
+                            <div class="w-14 h-14 rounded-full bg-white/15 backdrop-blur-md border-2 border-white/30 ring-2 ring-white/20 overflow-hidden flex items-center justify-center text-white text-2xl font-black shadow-inner shrink-0 relative">
+                                <template x-if="bannerPhoto">
+                                    <img :src="bannerPhoto" :alt="bannerName" class="w-full h-full object-cover">
+                                </template>
+                                <template x-if="!bannerPhoto">
+                                    <span x-text="bannerInitial"></span>
+                                </template>
                             </div>
                             <div>
-                                <h3 class="text-xl font-bold tracking-tight">{{ auth()->user()->name }}</h3>
+                                <h3 class="text-xl font-bold tracking-tight" x-text="bannerName">{{ auth()->user()->name }}</h3>
                                 <p class="text-xs text-indigo-100 mt-0.5">{{ auth()->user()->email }} &bull; <span class="px-2 py-0.5 rounded-md bg-white/20 text-white font-semibold">{{ $roleLabel }}</span></p>
                             </div>
                         </div>
                         <a href="{{ auth()->user()->role_id == 2 || strtolower(auth()->user()->role?->name ?? '') === 'recruiter' ? route('recruiter.dashboard') : route('admin.dashboard') }}" 
                            class="px-5 py-2.5 rounded-xl bg-white text-indigo-700 font-bold text-xs hover:bg-indigo-50 transition shadow-md shrink-0">
-                            &larr; Buka Panel Dashboard
+                            Buka Panel Dashboard
                         </a>
                     </div>
 

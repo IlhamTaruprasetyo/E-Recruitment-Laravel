@@ -185,22 +185,47 @@ new #[Layout('layouts.guest')] class extends Component
                     </p>
                 </div>
 
-                <!-- Session Status Message -->
+                <!-- Session Status Message (Hilang Otomatis setelah 5 Detik) -->
                 @if (session('status'))
-                    <div class="mb-5 p-3.5 rounded-xl bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] text-xs font-medium flex items-center gap-2">
-                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                        </svg>
-                        <span>{{ session('status') }}</span>
+                    <div x-data="{ show: true }"
+                         x-show="show"
+                         x-init="setTimeout(() => show = false, 5000)"
+                         x-transition:leave="transition ease-in duration-300"
+                         x-transition:leave-start="opacity-100 transform scale-100"
+                         x-transition:leave-end="opacity-0 transform -translate-y-2"
+                         class="mb-5 p-3.5 rounded-xl bg-[#93F514]/15 border border-[#93F514]/40 text-[#93F514] text-xs font-medium flex items-center justify-between gap-2 shadow-sm">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>{{ session('status') }}</span>
+                        </div>
+                        <button type="button" @click="show = false" class="text-[#93F514]/60 hover:text-[#93F514] text-sm leading-none focus:outline-none cursor-pointer">&times;</button>
                     </div>
                 @endif
 
-                @if (session('error'))
-                    <div class="mb-5 p-3.5 rounded-xl bg-red-500/15 border border-red-500/40 text-red-400 text-xs font-medium flex items-center gap-2">
-                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span>{{ session('error') }}</span>
+                @php
+                    $errorMessage = session('error');
+                    if (! $errorMessage && request()->has('timeout')) {
+                        $idleMinutes = (int) config('session.idle_timeout', 5);
+                        $errorMessage = "Sesi Anda telah berakhir karena tidak ada aktivitas selama {$idleMinutes} menit. Silakan masuk kembali.";
+                    }
+                @endphp
+
+                @if ($errorMessage)
+                    <div x-data="{ show: true }"
+                         x-show="show"
+                         x-transition:leave="transition ease-in duration-300"
+                         x-transition:leave-start="opacity-100 transform scale-100"
+                         x-transition:leave-end="opacity-0 transform -translate-y-2"
+                         class="mb-5 p-3.5 rounded-xl bg-red-500/15 border border-red-500/40 text-red-400 text-xs font-medium flex items-center justify-between gap-2 shadow-sm">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>{{ $errorMessage }}</span>
+                        </div>
+                        <button type="button" @click="show = false" class="text-red-400/60 hover:text-red-400 text-sm leading-none focus:outline-none cursor-pointer" title="Tutup">&times;</button>
                     </div>
                 @endif
 
