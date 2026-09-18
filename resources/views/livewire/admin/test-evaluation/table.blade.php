@@ -1026,7 +1026,7 @@
                                                         </div>
                                                         <div class="truncate">
                                                             <span class="block font-semibold text-indigo-900 dark:text-indigo-200 truncate" x-text="item.single_answer.attachment_name || 'Lampiran File Jawaban'"></span>
-                                                            <span class="text-[10px] text-gray-500 dark:text-slate-400" x-text="(item.single_answer.attachment_size ? Math.round(item.single_answer.attachment_size / 1024) + ' KB • ' : '') + 'Lampiran Tersimpan'"></span>
+                                                            <span class="text-[10px] text-gray-500 dark:text-slate-400" x-text="(item.single_answer.attachment_size ? (item.single_answer.attachment_size >= 1048576 ? (item.single_answer.attachment_size / 1048576).toFixed(2) + ' MB • ' : Math.round(item.single_answer.attachment_size / 1024) + ' KB • ') : '') + 'Lampiran Tersimpan'"></span>
                                                         </div>
                                                     </div>
                                                     <a :href="item.single_answer.attachment_url" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg shadow-sm transition shrink-0 ml-2">

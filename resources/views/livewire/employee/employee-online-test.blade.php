@@ -429,7 +429,7 @@
                                             <span>Perhatian Khusus File Video / Ukuran Besar:</span>
                                         </div>
                                         <p class="text-xs sm:text-sm text-amber-900/90 dark:text-amber-200 leading-relaxed font-normal">
-                                            Batas unggah langsung dokumen adalah <strong>5 MB</strong>. Jika jawaban Anda membutuhkan lampiran berukuran besar atau berbentuk <strong>Video</strong>, mohon unggah terlebih dahulu ke <strong>Google Drive / Cloud Storage</strong> dan cantumkan link tautannya pada kolom jawaban uraian di atas.
+                                            Batas unggah langsung dokumen adalah <strong>10 MB</strong>. Jika jawaban Anda membutuhkan lampiran berukuran besar atau berbentuk <strong>Video</strong>, mohon unggah terlebih dahulu ke <strong>Google Drive / Cloud Storage</strong> dan cantumkan link tautannya pada kolom jawaban uraian di atas.
                                         </p>
                                         <div class="p-2.5 sm:p-3 rounded-xl bg-amber-100/80 dark:bg-amber-900/50 border border-amber-300/60 dark:border-amber-700/60 text-xs sm:text-sm text-amber-900 dark:text-amber-200 font-medium flex items-start gap-2.5">
                                             <svg class="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -440,7 +440,7 @@
                                     </div>
                                 </div>
 
-                                <!-- UPLOAD FILE ATTACHMENT ESSAY (MAKS 5MB) -->
+                                <!-- UPLOAD FILE ATTACHMENT ESSAY (MAKS 10MB) -->
                                 <div
                                     class="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 space-y-3">
                                     <div class="flex items-center justify-between">
@@ -455,7 +455,7 @@
                                         </div>
                                         <span
                                             class="text-[11px] font-medium text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 px-2.5 py-0.5 rounded-full border border-slate-200 dark:border-slate-700">
-                                            Dokumen Pendukung - Maks. 5 MB
+                                            Dokumen Pendukung - Maks. 10 MB
                                         </span>
                                     </div>
 
@@ -496,7 +496,7 @@
                                                     </a>
                                                     <span class="text-[11px] text-gray-500 dark:text-slate-400">
                                                         @if (!empty($uploadedAttachment['size']))
-                                                            {{ round($uploadedAttachment['size'] / 1024, 1) }} KB •
+                                                            {{ $uploadedAttachment['size'] >= 1048576 ? round($uploadedAttachment['size'] / 1048576, 2) . ' MB' : round($uploadedAttachment['size'] / 1024, 1) . ' KB' }} •
                                                         @endif
                                                         File Tersimpan
                                                     </span>
@@ -543,7 +543,7 @@
                                                 </div>
                                                 <div class="flex-1 truncate">
                                                     <span class="text-xs text-gray-700 dark:text-gray-300 font-medium">
-                                                        Pilih atau drag file dokumen/analisis (Maks. 5 MB)
+                                                        Pilih atau drag file dokumen/analisis (Maks. 10 MB)
                                                     </span>
                                                     <span class="block text-[10px] text-gray-400">File otomatis tersimpan setelah dipilih • Khusus video harap cantumkan link Google Drive</span>
                                                 </div>

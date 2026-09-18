@@ -1156,7 +1156,7 @@
                                                                         x-text="item.single_answer.attachment_name || 'Lampiran File Jawaban'"></span>
                                                                     <span
                                                                         class="text-[10px] text-gray-500 dark:text-slate-400"
-                                                                        x-text="item.single_answer.attachment_size ? Math.round(item.single_answer.attachment_size / 1024) + ' KB' : 'File Terlampir'"></span>
+                                                                        x-text="item.single_answer.attachment_size ? (item.single_answer.attachment_size >= 1048576 ? (item.single_answer.attachment_size / 1048576).toFixed(2) + ' MB' : Math.round(item.single_answer.attachment_size / 1024) + ' KB') : 'File Terlampir'"></span>
                                                                 </div>
                                                             </div>
                                                             <div class="flex items-center gap-1.5 shrink-0">

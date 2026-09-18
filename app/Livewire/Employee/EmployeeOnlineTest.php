@@ -397,11 +397,11 @@ class EmployeeOnlineTest extends Component
     public function uploadEssayAttachment($questionId)
     {
         $this->validate([
-            'essayFiles.' . $questionId => 'required|file|max:5120', // 5MB max
+            'essayFiles.' . $questionId => 'required|file|max:10240', // 10MB max
         ], [
             'essayFiles.' . $questionId . '.required' => 'Pilih file terlebih dahulu.',
             'essayFiles.' . $questionId . '.file' => 'File tidak valid.',
-            'essayFiles.' . $questionId . '.max' => 'Ukuran file maksimal adalah 5MB. Untuk file video atau file besar, silakan gunakan tautan Google Drive.',
+            'essayFiles.' . $questionId . '.max' => 'Ukuran file maksimal adalah 10MB. Untuk file video atau file besar, silakan gunakan tautan Google Drive.',
         ]);
 
         $file = $this->essayFiles[$questionId] ?? null;
