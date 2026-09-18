@@ -118,8 +118,20 @@
 
         <!-- Brand Logo -->
         <div class="flex items-center gap-3">
-            <a href="{{ route('home') }}" class="flex items-center gap-3 group">
-                <img src="{{ asset('storage/logo/mikaaaa.png') }}" alt="Logo MIKA"
+            @php
+                $navLogoUrl = null;
+                if (isset($mainCompany) && $mainCompany->logo) {
+                    if (\Illuminate\Support\Str::startsWith($mainCompany->logo, ['http://', 'https://', 'res.cloudinary.com'])) {
+                        $navLogoUrl = $mainCompany->logo;
+                    } else {
+                        $navLogoUrl = asset('storage/' . $mainCompany->logo);
+                    }
+                } else {
+                    $navLogoUrl = asset('storage/logo/mikaaaa.png');
+                }
+            @endphp
+            <a href="{{ route('home') }}" class="flex items-center gap-2.5 sm:gap-3 group" title="MIKA CAREER - {{ $mainCompany->name ?? 'Mitra Karya Analitika' }}">
+                <img src="{{ $navLogoUrl }}" alt="{{ $mainCompany->name ?? 'Logo MIKA' }}"
                     class="h-10 w-auto object-contain rounded-lg group-hover:scale-105 transition-transform duration-300">
                 <div>
                     <span class="text-lg sm:text-xl font-black tracking-tight text-[#EEEEEE] flex items-center gap-1">
